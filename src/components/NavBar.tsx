@@ -130,8 +130,7 @@ const NavBar = () => {
         <div className="relative flex items-center justify-between h-20">
           {/* Logo */}
           <div className="flex-shrink-0 cursor-pointer" onClick={() => navigate('/')}>
-            <img
-              src="https://zwjhmkfgtvmzkisqrfwm.supabase.co/storage/v1/object/sign/images/BH%20Alone%20Clear%20Background%20Reversed%20White.png?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJpbWFnZXMvQkggQWxvbmUgQ2xlYXIgQmFja2dyb3VuZCBSZXZlcnNlZCBXaGl0ZS5wbmciLCJpYXQiOjE3NDIxNzgzNzYsImV4cCI6MTc3MzcxNDM3Nn0.aiF8a7OBqaUWd2-TuptIhwjngwB4xstrtr3XQwJEpz8"
+            <img src="public/BHfullwhite.png" alt="BlackHays Group" class="h-10 w-auto" />
               alt="BlackHays Group"
               className="h-10 w-auto"
             />
