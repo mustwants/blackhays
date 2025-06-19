@@ -162,7 +162,7 @@ const NavBar = () => {
                             className="block w-full text-left px-4 py-2 text-sm text-bhgray-700 hover:bg-bhgray-100"
                           >
                             <div className="flex items-center">
-                              {subItem.icon && <subItem.icon className="w-4 h-4 mr-2" />}
+                              {subItem.icon && React.createElement(subItem.icon, { className: "w-4 h-4 mr-2" })}
                               {subItem.label}
                             </div>
                           </button>
@@ -226,7 +226,7 @@ const NavBar = () => {
                         onClick={() => handleNavClick(subItem.id)}
                         className="flex items-center w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-bhred hover:text-white transition-colors"
                       >
-                        {subItem.icon && <subItem.icon className="w-4 h-4 mr-2" />}
+                        {subItem.icon && React.createElement(subItem.icon, { className: "w-4 h-4 mr-2" })}
                         {subItem.label}
                       </button>
                     ))}
