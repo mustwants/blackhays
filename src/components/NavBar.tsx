@@ -129,11 +129,12 @@ const NavBar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="relative flex items-center justify-between h-20">
           {/* Logo */}
-          <div className="flex-shrink-0 cursor-pointer" onClick={() => navigate('/')}>
-            <img src="public/BHfullwhite.png" alt="BlackHays Group" class="h-10 w-auto" />
-              alt="BlackHays Group"
-              className="h-10 w-auto"
-            />
+          <div className="flex-shrink-0 cursor-pointer">
+            <img 
+  src="https://zwjhmkfgtvmzkisqrfwm.supabase.co/storage/v1/object/public/images/BHfullwhite.png"
+  alt="BlackHays Group"
+  className="h-10 w-auto"
+/>
           </div>
 
           {/* Desktop Menu */}
