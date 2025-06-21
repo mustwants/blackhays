@@ -5,7 +5,7 @@ import FloatingActionMenu from './components/FloatingActionMenu';
 import { AuthProvider } from './contexts/AuthContext';
 import { Toaster } from './components/common/Toaster';
 import LoadingScreen from './components/common/LoadingScreen';
-import { ProjectProvider } from './contexts/ProjectContext';
+import { ProjectProvider } from './contexts/ProjectContext'; // Or replace if not needed
 
 export default function App() {
   const location = useLocation();
