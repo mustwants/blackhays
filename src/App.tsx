@@ -4,6 +4,8 @@ import NavBar from './components/NavBar';
 import FloatingActionMenu from './components/FloatingActionMenu';
 import { AuthProvider } from './contexts/AuthContext';
 import { Toaster } from './components/common/Toaster';
+import LoadingScreen from './components/common/LoadingScreen';
+import { ProjectProvider } from './contexts/ProjectContext';
 
 export default function App() {
   const location = useLocation();
