@@ -19,7 +19,7 @@ const AdvisorsPage = () => {
       try {
         const { data, error } = await supabase
           .from('advisors')
-          .select('id, name, about, professional_title, military_branch') // ✅ REMOVED location
+          .select('id, name, about, professional_title, military_branch') // ✅ location removed
           .eq('status', 'approved')
           .order('name', { ascending: true });
 
