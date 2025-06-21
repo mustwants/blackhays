@@ -3,7 +3,6 @@ import { Outlet, useLocation } from 'react-router-dom';
 import NavBar from './components/NavBar';
 import FloatingActionMenu from './components/FloatingActionMenu';
 import { AuthProvider } from './contexts/AuthContext';
-import LoadingScreen from './components/common/LoadingScreen';
 import { Toaster } from './components/common/Toaster';
 
 export default function App() {
