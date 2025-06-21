@@ -5,24 +5,24 @@ import FloatingActionMenu from './components/FloatingActionMenu';
 import { AuthProvider } from './contexts/AuthContext';
 import { Toaster } from './components/common/Toaster';
 import LoadingScreen from './components/common/LoadingScreen';
-import { ProjectProvider } from './contexts/ProjectContext'; // Or replace if not needed
+import { ProjectProvider } from './contexts/ProjectContext';
 
 export default function App() {
   const location = useLocation();
   const [loading, setLoading] = useState(true);
-  
+
   useEffect(() => {
     // Simulate initial resources loading
     const timer = setTimeout(() => {
       setLoading(false);
     }, 500);
-    
+
     return () => clearTimeout(timer);
   }, []);
 
   // Check if current route is login/register to hide navigation
-  const isAuthPage = 
-    location.pathname === '/login' || 
+  const isAuthPage =
+    location.pathname === '/login' ||
     location.pathname === '/register' ||
     location.pathname === '/reset-password';
 
