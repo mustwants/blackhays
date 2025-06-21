@@ -6,7 +6,8 @@ export interface MapAdvisor {
   about: string;
   professional_title?: string;
   military_branch?: string;
-  // Removed location from interface since it's not returned
+  // Optional location field if you plan to add later:
+  // location?: [number, number];
 }
 
 class AdvisorMapService {
