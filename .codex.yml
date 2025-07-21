@@ -1,0 +1,12 @@
+on:
+  pull_request:
+    branches:
+      - main
+
+rules:
+  lint: true
+  format: true
+  suggest_refactor: true
+  enforce_readme: false
+  run_tests: false
+  annotate_code: true
