@@ -57,20 +57,28 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
     setLoading(true);
 
     try {
+      console.log('Attempting login with email:', email);
       const { data, error } = await login(email, password);
       
+      console.log('Login response:', { data, error });
+      
       if (error) {
-        throw error;
+        console.error('Login failed with error:', error);
+        setError('Invalid credentials. Please try again.');
+        return;
       }
 
       if (!data?.session && !data?.user) {
-        throw new Error('Authentication failed');
+        console.error('No session or user data returned');
+        setError('Authentication failed. Please try again.');
+        return;
       }
       
+      console.log('Login successful, setting authenticated');
       setIsAuthenticated(true);
     } catch (err) {
       console.error("Login error:", err);
-      setError('Invalid credentials. Please try again.');
+      setError('An unexpected error occurred. Please try again.');
     } finally {
       setLoading(false);
     }

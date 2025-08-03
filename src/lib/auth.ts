@@ -14,14 +14,20 @@ const ADMIN_CREDENTIALS = {
 
 export const login = async (email: string, password: string) => {
   try {
+    console.log('Login attempt for:', email);
+    
     // Check hardcoded admin credentials first
     const normalizedEmail = email.toLowerCase();
+    console.log('Normalized email:', normalizedEmail);
+    
     const isAdminUser = Object.entries(ADMIN_CREDENTIALS).some(
       ([adminEmail, adminPassword]) => 
         adminEmail.toLowerCase() === normalizedEmail && 
         password === adminPassword
     );
 
+    console.log('Is admin user:', isAdminUser);
+    
     if (isAdminUser) {
       console.log('Auth service: Admin login successful:', normalizedEmail);
       
@@ -47,6 +53,7 @@ export const login = async (email: string, password: string) => {
       try {
         localStorage.setItem('auth_session', JSON.stringify(sessionData));
         localStorage.setItem('auth_token', sessionData.session.access_token);
+        console.log('Admin session stored successfully');
       } catch (storageError) {
         console.warn('Failed to store admin session:', storageError);
       }
@@ -54,8 +61,8 @@ export const login = async (email: string, password: string) => {
       return { data: sessionData, error: null };
     }
 
+    console.log('Not admin user, trying Supabase auth');
     // Try Supabase auth
-    console.log("Attempting Supabase login");
     const { data, error } = await supabase.auth.signInWithPassword({
       email: normalizedEmail,
       password
@@ -63,7 +70,7 @@ export const login = async (email: string, password: string) => {
 
     if (error) {
       console.error('Supabase auth error:', error);
-      throw error;
+      return { data: null, error };
     }
 
     return { data, error: null };
