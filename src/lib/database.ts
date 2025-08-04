@@ -125,7 +125,7 @@ class DatabaseHelpers {
         .eq(query.column, query.value);
       
       if (options.returnData) {
-        updateQuery = updateQuery.select().single();
+        updateQuery = updateQuery.select().maybeSingle();
       }
       
       const { data: result, error } = await updateQuery;
@@ -134,6 +134,12 @@ class DatabaseHelpers {
         console.error(`Error updating ${table}:`, error);
         throw error;
       }
+      
+      if (options.returnData && !result) {
+        console.error(`No rows updated in ${table}`);
+        return { data: null, error: 'No rows updated' };
+      }
+
       return { data: result as T, error: null };
     } catch (err) {
       console.error(`Error updating ${table}:`, err);
