@@ -2,7 +2,8 @@ import { supabase, isConnected } from '../lib/supabaseClient';
 
 export interface MapAdvisor {
   id: string;
-  name: string;
+  first_name: string;
+  last_name: string;
   about: string;
   professional_title?: string;
   military_branch?: string;
@@ -32,9 +33,9 @@ class AdvisorMapService {
 
         const { data, error } = await supabase
           .from('advisors')
-          .select('id, name, email, expertise, status') // ✅ location removed
+          .select('id, first_name, last_name, about, professional_title, military_branch')
           .eq('status', 'approved')
-          .order('name');
+          .order('last_name');
 
         if (error) {
           console.error('Error fetching advisors:', error);
