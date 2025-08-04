@@ -163,38 +163,47 @@ const EventSubmissions: React.FC<EventSubmissionsProps> = ({ initialData = [] })
           {submissions.map((submission) => (
             <div key={submission.id} className="bg-white rounded-lg shadow-sm border p-6">
               <div className="flex justify-between items-start">
-                <div>
-                  <div className="flex items-center mb-2">
-                    <h3 className="text-xl font-bold text-gray-900 mr-3">
-                      {submission.name}
-                    </h3>
-                    {!submission.isEvent && getStatusBadge(submission.status || 'pending')}
-                  </div>
-                  <div className="space-y-2 text-gray-600">
-                    <p>
-                      <strong>Date:</strong> {new Date(submission.start_date).toLocaleDateString()} - 
-                      {new Date(submission.end_date).toLocaleDateString()}
-                    </p>
-                    <p><strong>Location:</strong> {submission.location}</p>
-                    {submission.website && (
+                         <div className="flex items-start">
+                  {submission.logo_url && (
+                    <img
+                      src={submission.logo_url}
+                      alt={`${submission.name} logo`}
+                      className="h-12 w-12 object-contain mr-4"
+                    />
+                  )}
+                  <div>
+                    <div className="flex items-center mb-2">
+                      <h3 className="text-xl font-bold text-gray-900 mr-3">
+                        {submission.name}
+                      </h3>
+                      {!submission.isEvent && getStatusBadge(submission.status || 'pending')}
+                    </div>
+                    <div className="space-y-2 text-gray-600">
                       <p>
-                        <strong>Website:</strong>{' '}
-                        <a 
-                          href={submission.website} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:underline"
-                        >
-                          {submission.website}
-                        </a>
+                        <strong>Date:</strong> {new Date(submission.start_date).toLocaleDateString()} -
+                        {new Date(submission.end_date).toLocaleDateString()}
                       </p>
-                    )}
-                    {submission.about && (
-                      <p><strong>About:</strong> {submission.about}</p>
-                    )}
-                    {submission.submitter_email && (
-                      <p><strong>Submitter:</strong> {submission.submitter_email}</p>
-                    )}
+                     <p><strong>Location:</strong> {submission.location}</p>
+                      {submission.website && (
+                        <p>
+                          <strong>Website:</strong>{' '}
+                          <a
+                            href={submission.website}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:underline"
+                          >
+                            {submission.website}
+                          </a>
+                        </p>
+                      )}
+                      {submission.about && (
+                        <p><strong>About:</strong> {submission.about}</p>
+                      )}
+                      {submission.submitter_email && (
+                        <p><strong>Submitter:</strong> {submission.submitter_email}</p>
+                      )}
+                    </div>
                   </div>
                 </div>
 
