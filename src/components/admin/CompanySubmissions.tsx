@@ -6,9 +6,9 @@ interface CompanySubmissionsProps {
   initialData?: any[];
 }
 
-const CompanySubmissions: React.FC<CompanySubmissionsProps> = ({ initialData = [] }) => {
-  const [submissions, setSubmissions] = useState(initialData);
-  const [loading, setLoading] = useState(initialData.length === 0);
+const CompanySubmissions: React.FC<CompanySubmissionsProps> = ({ initialData }) => {
+  const [submissions, setSubmissions] = useState(initialData ?? []);
+  const [loading, setLoading] = useState(!initialData || initialData.length === 0);
   const [error, setError] = useState(null);
   const [editingItem, setEditingItem] = useState(null);
   const [actionSuccess, setActionSuccess] = useState(null);
@@ -38,7 +38,7 @@ const CompanySubmissions: React.FC<CompanySubmissionsProps> = ({ initialData = [
 
   // Load data on mount
   useEffect(() => {
-    if (initialData.length > 0) {
+    if (initialData && initialData.length > 0) {
       setSubmissions(initialData);
       setLoading(false);
     } else {
