@@ -183,12 +183,13 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
     setAdvisorApplications([
       {
         id: 'mock-1',
-        name: 'John Doe',
+        first_name: 'John',
+        last_name: 'Doe',
         email: 'john@example.com',
         phone: '555-123-4567',
         professional_title: 'Defense Consultant',
         military_branch: 'Army',
-        years_of_service: '12',
+        years_of_mil_service: '12',
         about: 'This is a mock advisor application for development.',
         status: 'pending',
         created_at: new Date().toISOString()
@@ -1144,7 +1145,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                     <div className="flex justify-between items-start">
                       <div>
                         <div className="flex items-center mb-1">
-                          <h3 className="text-lg font-bold text-bhgray-900">{application.name}</h3>
+                          <h3 className="text-lg font-bold text-bhgray-900">{application.first_name} {application.last_name}</h3>
                           <div className="ml-2">
                             {getStatusBadge(application.status || 'pending')}
                           </div>
@@ -1166,9 +1167,14 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                               <strong>Military Branch:</strong> {application.military_branch}
                             </p>
                           )}
-                          {application.years_of_service && (
+                          {application.years_of_mil_service && (
                             <p className="text-sm text-bhgray-600">
-                              <strong>Years of Service:</strong> {application.years_of_service}
+                              <strong>Years of Military Service:</strong> {application.years_of_mil_service}
+                            </p>
+                          )}
+                          {application.years_of_us_civil_service && (
+                            <p className="text-sm text-bhgray-600">
+                              <strong>Years of US Civil Service:</strong> {application.years_of_us_civil_service}
                             </p>
                           )}
                         </div>
@@ -1233,14 +1239,25 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                     
                     {editingItem && editingItem.id === application.id && (
                       <div className="mt-4 space-y-3 border-t pt-3">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700">Name</label>
-                          <input
-                            type="text"
-                            value={editingItem.name}
-                            onChange={(e) => setEditingItem({...editingItem, name: e.target.value})}
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-bhred focus:ring-bhred sm:text-sm"
-                          />
+                                               <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700">First Name</label>
+                            <input
+                              type="text"
+                              value={editingItem.first_name}
+                              onChange={(e) => setEditingItem({...editingItem, first_name: e.target.value})}
+                              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-bhred focus:ring-bhred sm:text-sm"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700">Last Name</label>
+                            <input
+                              type="text"
+                              value={editingItem.last_name}
+                              onChange={(e) => setEditingItem({...editingItem, last_name: e.target.value})}
+                              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-bhred focus:ring-bhred sm:text-sm"
+                            />
+                          </div>
                         </div>
                         <div className="grid grid-cols-2 gap-3">
                           <div>
@@ -1282,11 +1299,11 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
                             />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700">Years of Service</label>
+                            <label className="block text-sm font-medium text-gray-700">Years of Military Service</label>
                             <input
                               type="text"
-                              value={editingItem.years_of_service || ''}
-                              onChange={(e) => setEditingItem({...editingItem, years_of_service: e.target.value})}
+                              value={editingItem.years_of_mil_service || ''}
+                              onChange={(e) => setEditingItem({...editingItem, years_of_mil_service: e.target.value})}
                               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-bhred focus:ring-bhred sm:text-sm"
                             />
                           </div>
