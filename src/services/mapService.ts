@@ -164,15 +164,15 @@ class MapService {
 
     return data.map(advisor => ({
       id: advisor.id,
-      name: advisor.name,
+      name: `${advisor.first_name} ${advisor.last_name}`,
       type: 'advisor',
       description: advisor.about,
       location: this.getLocation(advisor),
-      address: advisor.address,
+      address: advisor.street_address ? `${advisor.street_address}, ${advisor.city}, ${advisor.state}` : `${advisor.city}, ${advisor.state}`,
       details: {
         professional_title: advisor.professional_title,
         military_branch: advisor.military_branch,
-        years_of_service: advisor.years_of_service
+        years_of_mil_service: advisor.years_of_mil_service
       }
     }));
   }
