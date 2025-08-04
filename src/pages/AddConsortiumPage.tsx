@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Rocket, MapPin, Link2, Mail, Phone, FileText, Check, Briefcase, Clock } from 'lucide-react';
+import { Rocket, MapPin, Link2, Mail, Phone, FileText, Check, Briefcase, Clock, Beaker } from 'lucide-react';
 import Footer from '../components/Footer';
 import AdminPanel from '../components/AdminPanel';
 import { supabase } from '../lib/supabaseClient';
@@ -23,6 +23,23 @@ const AddConsortiumPage = () => {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+
+    const fillTestData = () => {
+    setFormData({
+      name: 'Defense Industry Consortium',
+      website: 'https://example.com',
+      focus_area: 'Cybersecurity',
+      government_partner: 'US Army',
+      established_year: '2018',
+      eligibility_criteria: 'Open to defense contractors.',
+      description: 'A test consortium for defense collaboration.',
+      contact_name: 'John Doe',
+      contact_email: 'john.doe@example.com',
+      contact_phone: '555-987-6543',
+      membership_fee: '$5000/year',
+      headquarters: 'Washington, DC'
+    });
+  };
 
   const handleAdminClick = () => {
     setShowAdminPanel(true);
@@ -111,6 +128,17 @@ const AddConsortiumPage = () => {
                     {error}
                   </div>
                 )}
+
+                                <div className="flex justify-end">
+                  <button
+                    type="button"
+                    onClick={fillTestData}
+                    className="flex items-center text-sm text-gray-500 hover:text-gray-700"
+                  >
+                    <Beaker className="w-4 h-4 mr-1" />
+                    Use Test Data
+                  </button>
+                </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Consortium Name</label>
