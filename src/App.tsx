@@ -21,6 +21,11 @@ export default function App() {
     return () => clearTimeout(timer);
   }, []);
 
+    // Scroll to top when route changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
   // Check if current route is login/register to hide navigation
   const isAuthPage =
     location.pathname === '/login' ||
