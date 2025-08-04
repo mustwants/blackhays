@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAdvisors } from '../hooks/useAdvisors';
-import { FileText, Upload, Check } from 'lucide-react';
+import { FileText, Upload, Check, Beaker } from 'lucide-react';
 
 interface AdvisorApplicationForm {
   name: string;
@@ -41,6 +41,23 @@ const ConsultantApplication = () => {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+
+    const fillTestData = () => {
+    setFormData({
+      name: 'Jane Doe',
+      phone: '555-123-4567',
+      email: 'jane.doe@example.com',
+      address: '123 Defense St, Arlington, VA',
+      zip_code: '22202',
+      professional_title: 'Defense Consultant',
+      military_branch: 'army',
+      other_branch: '',
+      years_of_service: '10',
+      service_status: ['veteran'],
+      other_status: '',
+      about: 'Experienced military advisor with a decade of service.'
+    });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -101,6 +118,16 @@ const ConsultantApplication = () => {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-6">
+                            <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={fillTestData}
+                  className="flex items-center text-sm text-gray-500 hover:text-gray-700"
+                >
+                  <Beaker className="w-4 h-4 mr-1" />
+                  Use Test Data
+                </button>
+              </div>
               <div className="grid grid-cols-1 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-bhgray-700">Full Name</label>
