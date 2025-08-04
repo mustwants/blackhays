@@ -4,18 +4,25 @@ import { useAdvisors } from '../hooks/useAdvisors';
 import { FileText, Upload, Check, Beaker } from 'lucide-react';
 
 interface AdvisorApplicationForm {
-  name: string;
-  phone: string;
+  first_name: string;
+  last_name: string;
   email: string;
-  address: string;
+  state: string;
   zip_code: string;
-  professional_title: string;
-  military_branch: string;
-  other_branch: string;
-  years_of_service: string;
-  service_status: string[];
-  other_status: string;
-  about: string;
+  phone?: string;
+  street_address?: string;
+  city?: string;
+  webpage?: string;
+  facebook?: string;
+  x?: string;
+  linkedin?: string;
+  bluesky?: string;
+  instagram?: string;
+  professional_title?: string;
+  military_branch?: string;
+  years_of_mil_service?: string;
+  years_of_us_civil_service?: string;
+  about?: string;
   resume_url?: string;
   headshot_url?: string;
   business_logo_url?: string;
@@ -25,36 +32,50 @@ const ConsultantApplication = () => {
   const navigate = useNavigate();
   const { submitApplication } = useAdvisors();
   const [formData, setFormData] = useState<AdvisorApplicationForm>({
-    name: '',
-    phone: '',
+    first_name: '',
+    last_name: '',
     email: '',
-    address: '',
+    state: '',
     zip_code: '',
+        phone: '',
+    street_address: '',
+    city: '',
+    webpage: '',
+    facebook: '',
+    x: '',
+    linkedin: '',
+    bluesky: '',
+    instagram: '',
     professional_title: '',
     military_branch: '',
-    other_branch: '',
-    years_of_service: '',
-    service_status: [],
-    other_status: '',
+    years_of_mil_service: '',
+    years_of_us_civil_service: '',
     about: ''
   });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-    const fillTestData = () => {
+  const fillTestData = () => {
     setFormData({
-      name: 'Jane Doe',
-      phone: '555-123-4567',
+      first_name: 'Jane',
+      last_name: 'Doe',
       email: 'jane.doe@example.com',
-      address: '123 Defense St, Arlington, VA',
+      state: 'VA',
       zip_code: '22202',
+            phone: '555-123-4567',
+      street_address: '123 Defense St',
+      city: 'Arlington',
+      webpage: 'https://example.com',
+      facebook: 'https://facebook.com/janedoe',
+      x: 'https://x.com/janedoe',
+      linkedin: 'https://linkedin.com/in/janedoe',
+      bluesky: '',
+      instagram: '',
       professional_title: 'Defense Consultant',
       military_branch: 'army',
-      other_branch: '',
-      years_of_service: '10',
-      service_status: ['veteran'],
-      other_status: '',
+      years_of_mil_service: '10',
+      years_of_us_civil_service: '5',
       about: 'Experienced military advisor with a decade of service.'
     });
   };
@@ -118,7 +139,7 @@ const ConsultantApplication = () => {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-6">
-                            <div className="flex justify-end">
+              <div className="flex justify-end">
                 <button
                   type="button"
                   onClick={fillTestData}
@@ -128,16 +149,29 @@ const ConsultantApplication = () => {
                   Use Test Data
                 </button>
               </div>
+              
               <div className="grid grid-cols-1 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-bhgray-700">Full Name</label>
-                  <input
-                    type="text"
-                    value={formData.name}
-                    onChange={e => setFormData({ ...formData, name: e.target.value })}
-                    className="mt-1 block w-full rounded-md border-bhgray-300 shadow-sm focus:border-bhred focus:ring-bhred"
-                    required
-                  />
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-bhgray-700">First Name</label>
+                    <input
+                      type="text"
+                      value={formData.first_name}
+                      onChange={e => setFormData({ ...formData, first_name: e.target.value })}
+                      className="mt-1 block w-full rounded-md border-bhgray-300 shadow-sm focus:border-bhred focus:ring-bhred"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-bhgray-700">Last Name</label>
+                    <input
+                      type="text"
+                      value={formData.last_name}
+                      onChange={e => setFormData({ ...formData, last_name: e.target.value })}
+                      className="mt-1 block w-full rounded-md border-bhgray-300 shadow-sm focus:border-bhred focus:ring-bhred"
+                      required
+                    />
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -151,7 +185,6 @@ const ConsultantApplication = () => {
                       required
                     />
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-bhgray-700">Phone</label>
                     <input
@@ -159,23 +192,44 @@ const ConsultantApplication = () => {
                       value={formData.phone}
                       onChange={e => setFormData({ ...formData, phone: e.target.value })}
                       className="mt-1 block w-full rounded-md border-bhgray-300 shadow-sm focus:border-bhred focus:ring-bhred"
-                      required
+                     />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-bhgray-700">Street Address</label>
+                    <input
+                      type="text"
+                       value={formData.street_address}
+                      onChange={e => setFormData({ ...formData, street_address: e.target.value })}
+                      className="mt-1 block w-full rounded-md border-bhgray-300 shadow-sm focus:border-bhred focus:ring-bhred"
+                      placeholder="Street address"
+                    />
+                  </div>
+                                    <div>
+                    <label className="block text-sm font-medium text-bhgray-700">City</label>
+                    <input
+                      type="text"
+                      value={formData.city}
+                      onChange={e => setFormData({ ...formData, city: e.target.value })}
+                      className="mt-1 block w-full rounded-md border-bhgray-300 shadow-sm focus:border-bhred focus:ring-bhred"
+                      placeholder="City"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-bhgray-700">Address</label>
+                    <label className="block text-sm font-medium text-bhgray-700">State</label>
                     <input
                       type="text"
-                      value={formData.address}
-                      onChange={e => setFormData({ ...formData, address: e.target.value })}
+                      value={formData.state}
+                      onChange={e => setFormData({ ...formData, state: e.target.value })}
                       className="mt-1 block w-full rounded-md border-bhgray-300 shadow-sm focus:border-bhred focus:ring-bhred"
-                      placeholder="Street address"
+                      required
                     />
                   </div>
-                  
                   <div>
                     <label className="block text-sm font-medium text-bhgray-700">ZIP Code</label>
                     <input
@@ -183,9 +237,71 @@ const ConsultantApplication = () => {
                       value={formData.zip_code}
                       onChange={e => setFormData({ ...formData, zip_code: e.target.value })}
                       className="mt-1 block w-full rounded-md border-bhgray-300 shadow-sm focus:border-bhred focus:ring-bhred"
-                      placeholder="ZIP code"
+                      required
                     />
                   </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-bhgray-700">Webpage</label>
+                  <input
+                    type="url"
+                    value={formData.webpage}
+                    onChange={e => setFormData({ ...formData, webpage: e.target.value })}
+                    className="mt-1 block w-full rounded-md border-bhgray-300 shadow-sm focus:border-bhred focus:ring-bhred"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-bhgray-700">Facebook</label>
+                    <input
+                      type="url"
+                      value={formData.facebook}
+                      onChange={e => setFormData({ ...formData, facebook: e.target.value })}
+                      className="mt-1 block w-full rounded-md border-bhgray-300 shadow-sm focus:border-bhred focus:ring-bhred"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-bhgray-700">X</label>
+                    <input
+                      type="url"
+                      value={formData.x}
+                      onChange={e => setFormData({ ...formData, x: e.target.value })}
+                      className="mt-1 block w-full rounded-md border-bhgray-300 shadow-sm focus:border-bhred focus:ring-bhred"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-bhgray-700">LinkedIn</label>
+                    <input
+                      type="url"
+                      value={formData.linkedin}
+                      onChange={e => setFormData({ ...formData, linkedin: e.target.value })}
+                      className="mt-1 block w-full rounded-md border-bhgray-300 shadow-sm focus:border-bhred focus:ring-bhred"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-bhgray-700">BlueSky</label>
+                    <input
+                      type="url"
+                      value={formData.bluesky}
+                      onChange={e => setFormData({ ...formData, bluesky: e.target.value })}
+                      className="mt-1 block w-full rounded-md border-bhgray-300 shadow-sm focus:border-bhred focus:ring-bhred"
+                    />
+                  </div>
+                </div>
+
+                                <div>
+                  <label className="block text-sm font-medium text-bhgray-700">Instagram</label>
+                  <input
+                    type="url"
+                    value={formData.instagram}
+                    onChange={e => setFormData({ ...formData, instagram: e.target.value })}
+                    className="mt-1 block w-full rounded-md border-bhgray-300 shadow-sm focus:border-bhred focus:ring-bhred"
+                  />
                 </div>
 
                 <div>
@@ -213,34 +329,31 @@ const ConsultantApplication = () => {
                     <option value="marines">Marines</option>
                     <option value="coast_guard">Coast Guard</option>
                     <option value="space_force">Space Force</option>
-                    <option value="other">Other</option>
                   </select>
                 </div>
 
-                {formData.military_branch === 'other' && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-bhgray-700">
-                      Please specify other branch
-                    </label>
+                    <label className="block text-sm font-medium text-bhgray-700">Years of Military Service</label>
                     <input
                       type="text"
-                      value={formData.other_branch}
-                      onChange={e => setFormData({ ...formData, other_branch: e.target.value })}
+                      value={formData.years_of_mil_service}
+                      onChange={e => setFormData({ ...formData, years_of_mil_service: e.target.value })}
                       className="mt-1 block w-full rounded-md border-bhgray-300 shadow-sm focus:border-bhred focus:ring-bhred"
+                                            placeholder="e.g., 10"
                     />
                   </div>
-                )}
-
-                <div>
-                  <label className="block text-sm font-medium text-bhgray-700">Years of Service</label>
-                  <input
-                    type="text"
-                    value={formData.years_of_service}
-                    onChange={e => setFormData({ ...formData, years_of_service: e.target.value })}
-                    className="mt-1 block w-full rounded-md border-bhgray-300 shadow-sm focus:border-bhred focus:ring-bhred"
-                    placeholder="e.g., 10"
-                  />
-                </div>
+                  <div>
+                    <label className="block text-sm font-medium text-bhgray-700">Years of US Civil Service</label>
+                    <input
+                      type="text"
+                      value={formData.years_of_us_civil_service}
+                      onChange={e => setFormData({ ...formData, years_of_us_civil_service: e.target.value })}
+                      className="mt-1 block w-full rounded-md border-bhgray-300 shadow-sm focus:border-bhred focus:ring-bhred"
+                      placeholder="e.g., 5"
+                    />
+                  </div>
+                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-bhgray-700">About You</label>
@@ -250,7 +363,6 @@ const ConsultantApplication = () => {
                     rows={4}
                     className="mt-1 block w-full rounded-md border-bhgray-300 shadow-sm focus:border-bhred focus:ring-bhred"
                     placeholder="Tell us about your experience and expertise..."
-                    required
                   />
                 </div>
 
@@ -271,6 +383,41 @@ const ConsultantApplication = () => {
                       </div>
                     </div>
                   </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-bhgray-700">Headshot (Optional)</label>
+                    <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-bhgray-300 border-dashed rounded-md">
+                      <div className="space-y-1 text-center">
+                        <Upload className="mx-auto h-12 w-12 text-bhgray-400" />
+                        <div className="flex text-sm text-bhgray-600">
+                          <label className="relative cursor-pointer bg-white rounded-md font-medium text-bhred hover:text-red-700">
+                            <span>Upload a file</span>
+                            <input type="file" className="sr-only" />
+                          </label>
+                          <p className="pl-1">or drag and drop</p>
+                        </div>
+                        <p className="text-xs text-bhgray-500">Image up to 5MB</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-bhgray-700">Business Logo (Optional)</label>
+                    <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-bhgray-300 border-dashed rounded-md">
+                      <div className="space-y-1 text-center">
+                        <Upload className="mx-auto h-12 w-12 text-bhgray-400" />
+                        <div className="flex text-sm text-bhgray-600">
+                          <label className="relative cursor-pointer bg-white rounded-md font-medium text-bhred hover:text-red-700">
+                            <span>Upload a file</span>
+                            <input type="file" className="sr-only" />
+                          </label>
+                          <p className="pl-1">or drag and drop</p>
+                        </div>
+                        <p className="text-xs text-bhgray-500">Image up to 5MB</p>
+                      </div>
+                    </div>
+                  </div>
+                  
                 </div>
               </div>
 
