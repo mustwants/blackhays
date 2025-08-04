@@ -1,17 +1,12 @@
 import React, { useState } from 'react';
-import { RefreshCw, Send, Database, AlertCircle, Check, 
+import { RefreshCw, Database, AlertCircle, Check,
   Briefcase, Users, Calendar, Rocket, Brain, Mail } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
 
 type SubmissionType = 'event' | 'advisor' | 'newsletter' | 'company' | 'consortium' | 'innovation';
 
-interface MockData {
-  count: number;
-  type: SubmissionType;
-}
-
 interface MockDataGeneratorProps {
-  onDataGenerated?: (type: SubmissionType, data: any[]) => void;
+  onDataGenerated?: (type: SubmissionType, data: unknown[]) => void;
 }
 
 const MockDataGenerator: React.FC<MockDataGeneratorProps> = ({ onDataGenerated }) => {
@@ -50,8 +45,13 @@ const MockDataGenerator: React.FC<MockDataGeneratorProps> = ({ onDataGenerated }
         
         for (const item of itemsWithIds) {
           try {
-            // Remove mock ID and status for newsletter subscribers
-            const { id, status, ...insertData } = item;
+            // Remove mock ID and only remove status for newsletter subscribers
+            const insertData: Record<string, unknown> = { ...item };
+            delete insertData.id;
+            if (type === 'newsletter') {
+              delete insertData.status;
+            }
+
             
             const { error: insertError } = await supabase
               .from(tableName)
