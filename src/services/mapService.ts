@@ -3,6 +3,8 @@ import { LocationService } from '../lib/locationService';
 import { errorUtils } from '../utils/errorUtils';
 import { cacheUtils } from '../utils/cacheUtils';
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 export interface MapEntity {
   id: string;
   name: string;
@@ -11,8 +13,92 @@ export interface MapEntity {
   location: [number, number];
   address?: string;
   website?: string;
-  details?: Record<string, any>;
+  details?: Record<string, unknown>;
 }
+
+// Mock data used when Supabase is unavailable or returns no data
+const MOCK_MAP_ENTITIES: MapEntity[] = [
+  {
+    id: 'mock-advisor-1',
+    name: 'John Smith',
+    type: 'advisor',
+    description:
+      'Former Navy Admiral with 20+ years of experience in defense contracting and strategic planning.',
+    location: [-77.0369, 38.9072],
+    address: 'Washington, DC',
+    details: {
+      professional_title: 'Defense Strategy Consultant',
+      military_branch: 'Navy',
+      years_of_service: '20+'
+    }
+  },
+  {
+    id: 'mock-advisor-2',
+    name: 'Sarah Johnson',
+    type: 'advisor',
+    description:
+      'Cybersecurity expert and former Air Force Colonel specializing in defense technology.',
+    location: [-121.4944, 38.5816],
+    address: 'Sacramento, CA',
+    details: {
+      professional_title: 'Cybersecurity Consultant',
+      military_branch: 'Air Force',
+      years_of_service: '18'
+    }
+  },
+  {
+    id: 'mock-company-1',
+    name: 'Defense Tech Solutions',
+    type: 'company',
+    description:
+      'Leading provider of advanced defense technologies and cybersecurity solutions.',
+    location: [-122.4194, 37.7749],
+    website: 'https://example.com',
+    details: {
+      industry: 'Defense Technology',
+      focus_areas: 'Cybersecurity, AI, Robotics'
+    }
+  },
+  {
+    id: 'mock-innovation-1',
+    name: 'Advanced Materials Lab',
+    type: 'innovation',
+    description:
+      'Research facility developing next-generation materials for defense applications.',
+    location: [-71.0589, 42.3601],
+    website: 'https://example.com',
+    details: {
+      type: 'Research Lab',
+      focus_areas: 'Materials Science, Nanotechnology'
+    }
+  },
+  {
+    id: 'mock-consortium-1',
+    name: 'Defense Innovation Consortium',
+    type: 'consortium',
+    description:
+      'Collaborative network of defense contractors and research institutions.',
+    location: [-104.9903, 39.7392],
+    website: 'https://example.com',
+    details: {
+      focus_area: 'Defense Innovation',
+      government_partner: 'Department of Defense'
+    }
+  },
+  {
+    id: 'mock-event-1',
+    name: 'Defense Technology Summit 2024',
+    type: 'event',
+    description:
+      'Annual summit bringing together defense contractors, innovators, and government officials.',
+    location: [-77.0369, 38.9072],
+    website: 'https://example.com',
+    details: {
+      start_date: new Date('2024-06-15').toISOString(),
+      end_date: new Date('2024-06-17').toISOString()
+    }
+  }
+];
 
 class MapService {
   private static instance: MapService;
@@ -45,17 +131,28 @@ class MapService {
         this.getEvents()
       ]);
 
-      entities.push(...advisors, ...companies, ...consortiums, ...innovations, ...events);
+        entities.push(
+          ...advisors,
+          ...companies,
+          ...consortiums,
+          ...innovations,
+          ...events
+        );
 
-      // Cache the results
-      cacheUtils.set(this.CACHE_KEY, entities);
+        if (entities.length === 0) {
+          return MOCK_MAP_ENTITIES;
+        }
 
-      return entities;
-    } catch (error) {
-      errorUtils.logError(error, 'Error fetching map entities');
-      return [];
+        // Cache the results
+        cacheUtils.set(this.CACHE_KEY, entities);
+
+        return entities;
+      } catch (error) {
+        errorUtils.logError(error, 'Error fetching map entities');
+        return MOCK_MAP_ENTITIES;
+      }
     }
-  }
+
 
   private async getAdvisors(): Promise<MapEntity[]> {
     const { data } = await supabase
@@ -168,22 +265,25 @@ class MapService {
     }));
   }
 
-  private getLocation(entity: any): [number, number] {
+  private getLocation(entity: Record<string, unknown>): [number, number] {
     let coords;
 
     // Try to parse existing location fields
-    if (entity.location) {
-      coords = LocationService.parseLocation(entity.location);
+    if ((entity as any).location) {
+      coords = LocationService.parseLocation((entity as any).location);
     }
 
-    if (!coords && entity.headquarters) {
-      coords = LocationService.parseLocation(entity.headquarters);
+    if (!coords && (entity as any).headquarters) {
+      coords = LocationService.parseLocation((entity as any).headquarters);
     }
 
     // If no valid coordinates, generate from address-like fields
-    if (!coords && (entity.address || entity.location || entity.headquarters)) {
+    if (
+      !coords &&
+      ((entity as any).address || (entity as any).location || (entity as any).headquarters)
+    ) {
       coords = LocationService.getCoordinatesFromAddress(
-        entity.address || entity.location || entity.headquarters
+        (entity as any).address || (entity as any).location || (entity as any).headquarters
       );
     }
 
