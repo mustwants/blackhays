@@ -136,17 +136,17 @@ const MockDataGenerator: React.FC<MockDataGeneratorProps> = ({ onDataGenerated }
       'Technology Integration Expert'
     ];
     
-    for (let i = 0; i < count; i++) {
-      const location = locations[i % locations.length];
-      advisors.push({
-        name: `Test Advisor ${i + 1}`,
-        email: `advisor${i + 1}@example.com`,
+       for (let i = 0; i < count; i++) {
+        const location = locations[i % locations.length];
+        advisors.push({
+          name: `Test Advisor ${i + 1}`,
+        email: `advisor${i + 1}-${Date.now()}@example.com`,
         phone: `555-${Math.floor(100 + Math.random() * 900)}-${Math.floor(1000 + Math.random() * 9000)}`,
         professional_title: titles[i % titles.length],
         military_branch: militaryBranches[i % militaryBranches.length],
         years_of_service: Math.floor(Math.random() * 25) + 5,
         about: `Mock advisor with extensive experience in defense and security.`,
-        location: `POINT(${location.coords[0]} ${location.coords[1]})`,
+        location: `(${location.coords[0]}, ${location.coords[1]})`,
         address: `${Math.floor(100 + Math.random() * 9900)} Main St, ${location.city}, ${location.state}`,
         zip_code: `${Math.floor(10000 + Math.random() * 90000)}`
       });
@@ -167,7 +167,7 @@ const MockDataGenerator: React.FC<MockDataGeneratorProps> = ({ onDataGenerated }
       subscribers.push({
         first_name: firstName,
         last_name: lastName,
-        email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}${i + 1}@example.com`,
+        email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}${i + 1}-${Date.now()}@example.com`,
         notify_ceo: true
       });
     }
