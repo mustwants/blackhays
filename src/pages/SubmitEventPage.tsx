@@ -64,15 +64,19 @@ const SubmitEventPage = () => {
     }
 
     // Validate dates
-    const startDate = new Date(formData.start_date);
-    const endDate = new Date(formData.end_date);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const formatDate = (date: Date) => {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
 
-    if (startDate < today) {
+    const today = formatDate(new Date());
+
+    if (formData.start_date < today) {
       throw new Error('Start date cannot be in the past');
     }
-    if (endDate < startDate) {
+    if (formData.end_date < formData.start_date) {
       throw new Error('End date cannot be before start date');
     }
   };
