@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calendar, MapPin, Link2, FileText, Check } from 'lucide-react';
+import { Calendar, MapPin, Link2, FileText, Check, Beaker } from 'lucide-react';
 import { useEvents } from '../hooks/useEvents';
 import Footer from '../components/Footer';
 import AdminPanel from '../components/AdminPanel';
@@ -19,6 +19,18 @@ const SubmitEventPage = () => {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+
+    const fillTestData = () => {
+    setFormData({
+      name: 'Defense Innovation Summit 2025',
+      start_date: '2025-06-01',
+      end_date: '2025-06-03',
+      location: 'Washington, DC',
+      website: 'https://example.com',
+      about: 'Annual summit on defense innovation.',
+      submitter_email: 'test@example.com'
+    });
+  };
 
   const handleAdminClick = () => {
     setShowAdminPanel(true);
@@ -135,6 +147,18 @@ const SubmitEventPage = () => {
                     {error}
                   </div>
                 )}
+
+                
+                <div className="flex justify-end">
+                  <button
+                    type="button"
+                    onClick={fillTestData}
+                    className="flex items-center text-sm text-gray-500 hover:text-gray-700"
+                  >
+                    <Beaker className="w-4 h-4 mr-1" />
+                    Use Test Data
+                  </button>
+                </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Event Name</label>
