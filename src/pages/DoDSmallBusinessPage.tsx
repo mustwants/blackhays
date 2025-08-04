@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { ExternalLink, FileText, Building, Shield, Search, HelpCircle, Download, Check } from 'lucide-react';
+import { ExternalLink, Shield, Search, HelpCircle, Download, Check } from 'lucide-react';
 import { jsPDF } from 'jspdf';
-import html2canvas from 'html2canvas';
 import Footer from '../components/Footer';
 import AdminPanel from '../components/AdminPanel';
 
@@ -18,53 +17,82 @@ interface ChecklistItem {
 const DoDSmallBusinessPage = () => {
   const [showAdminPanel, setShowAdminPanel] = useState(false);
   const [checklist, setChecklist] = useState<ChecklistItem[]>([
-    { id: 'ein', label: 'EIN', completed: false, type: 'text', value: '' },
-    { 
-      id: 'duns', 
-      label: 'DUNS/UEI', 
-      completed: false, 
-      type: 'text', 
+       {
+      id: 'ein',
+      label: 'EIN',
+      completed: false,
+      type: 'text',
+      value: '',
+      link: 'https://www.irs.gov/businesses/small-businesses-self-employed/employer-id-numbers'
+    },
+    {
+      id: 'duns',
+      label: 'DUNS/UEI',
+      completed: false,
+      type: 'text',
       value: '',
       link: 'https://sam.gov/content/duns-uei'
     },
-    { id: 'bank', label: 'Bank Account (Last 4)', completed: false, type: 'text', value: '', mask: true },
-    { id: 'address', label: 'Physical Address', completed: false, type: 'text', value: '' },
-    { id: 'incorp', label: 'Date of Incorporation', completed: false, type: 'date', value: '' },
-    { 
-      id: 'login', 
-      label: 'Create a Login.gov account', 
+    {
+      id: 'bank',
+      label: 'Bank Account (Last 4)',
+      completed: false,
+      type: 'text',
+      value: '',
+      mask: true,
+      link: 'https://www.irs.gov/businesses/small-businesses-self-employed/opening-a-bank-account'
+    },
+    {
+      id: 'address',
+      label: 'Physical Address',
+      completed: false,
+      type: 'text',
+      value: '',
+      link: 'https://www.sba.gov/business-guide/plan-your-business/choose-your-business-location-equipment'
+    },
+    {
+      id: 'incorp',
+      label: 'Date of Incorporation',
+      completed: false,
+      type: 'date',
+      value: '',
+      link: 'https://www.sba.gov/business-guide/launch-your-business/choose-business-structure'
+    },
+    {
+      id: 'login',
+      label: 'Create a Login.gov account',
       completed: false,
       link: 'https://login.gov/'
     },
     { 
-      id: 'cage', 
-      label: 'Acquire CAGE Code', 
-      completed: false, 
-      type: 'text', 
+      id: 'cage',
+      label: 'Acquire CAGE Code',
+      completed: false,
+      type: 'text',
       value: '',
       link: 'https://cage.dla.mil/'
     },
-    { 
-      id: 'sam', 
-      label: 'Register in SAM', 
+    {
+      id: 'sam',
+      label: 'Register in SAM',
       completed: false,
       link: 'https://sam.gov/content/home'
     },
-    { 
-      id: 'sbir', 
-      label: 'Register in SBIR', 
+    {
+      id: 'sbir',
+      label: 'Register in SBIR',
       completed: false,
       link: 'https://www.sbir.gov/registration'
     },
-    { 
-      id: 'sbc', 
-      label: 'Register SBC and get Certificate', 
+    {
+      id: 'sbc',
+      label: 'Register SBC and get Certificate',
       completed: false,
       link: 'https://certify.sba.gov/'
     },
-    { 
-      id: 'dsip', 
-      label: 'Set up your DSIP for submissions', 
+    {
+      id: 'dsip',
+      label: 'Set up your DSIP for submissions',
       completed: false,
       link: 'https://www.dodsbirsttr.mil/submissions/'
     }
@@ -101,29 +129,37 @@ const DoDSmallBusinessPage = () => {
     ));
   };
 
-  const exportToPDF = async () => {
-    const checklistElement = document.getElementById('checklist-content');
-    if (!checklistElement) return;
+  const exportToPDF = () => {
+    const pdf = new jsPDF();
+    pdf.setFontSize(16);
+    pdf.text('DoD Small Business Checklist', 10, 20);
 
-    try {
-      const canvas = await html2canvas(checklistElement, {
-        scale: 2,
-        logging: false,
-        useCORS: true
-      });
+    let y = 30;
+    const pageHeight = pdf.internal.pageSize.getHeight();
 
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'px',
-        format: [canvas.width, canvas.height]
-      });
+    checklist.forEach(item => {
+      let display = item.label;
+      if (item.value) {
+        const masked = item.mask
+          ? `${'*'.repeat(Math.max(0, item.value.length - 4))}${item.value.slice(-4)}`
+          : item.value;
+        display += `: ${masked}`;
+      }
 
-      pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
-      pdf.save('dod-small-business-checklist.pdf');
-    } catch (error) {
-      console.error('Error generating PDF:', error);
-    }
+      if (item.link) {
+        pdf.textWithLink(display, 10, y, { url: item.link });
+      } else {
+        pdf.text(display, 10, y);
+      }
+
+      y += 10;
+      if (y > pageHeight - 10) {
+        pdf.addPage();
+        y = 20;
+      }
+    });
+
+    pdf.save('dod-small-business-checklist.pdf');
   };
 
   const resources = [
