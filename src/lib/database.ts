@@ -1,5 +1,5 @@
 // Database helper functions
-import { supabase } from './supabaseClient';
+import { supabase, isConnected as supabaseIsConnected } from './supabaseClient';
 
 // Generic type for all submission types
 export interface Submission {
@@ -169,7 +169,7 @@ class DatabaseHelpers {
 // Database operations
 export const db = {
   // Check connection status
-  isConnected: () => true, // Always return true since we handle offline mode gracefully
+  isConnected: () => supabaseIsConnected(),
   
   // Generic fetch function for submissions
   async fetchSubmissions<T extends Submission>(table: string) {
