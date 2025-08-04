@@ -1,7 +1,42 @@
 import React, { useState } from 'react';
-import { Shield, Users, Target, FileText, ArrowRight, Globe, Rocket, Briefcase, Cpu, Zap, Plane, Ship, Check, Lock, Wifi, Monitor, Search, Building, Laptop, Database, FlaskConical, Radar, Radio, PlusCircle } from 'lucide-react';
+import {
+  Shield,
+  Users,
+  Target,
+  FileText,
+  ArrowRight,
+  Globe,
+  Rocket,
+  Briefcase,
+  Cpu,
+  Zap,
+  Plane,
+  Ship,
+  Check,
+  Lock,
+  Wifi,
+  Monitor,
+  Search,
+  Building,
+  Laptop,
+  Database,
+  FlaskConical,
+  Radar,
+  Radio,
+  PlusCircle
+} from 'lucide-react';
 import Footer from '../components/Footer';
 import AdminPanel from '../components/AdminPanel';
+
+interface Consortium {
+  id: string;
+  name: string;
+  logo: React.ElementType;
+  website: string;
+  description: string;
+  details: string[];
+  focus: string[];
+}
 
 const ConsortiumsPage = () => {
   const [showAdminPanel, setShowAdminPanel] = useState(false);
@@ -367,61 +402,64 @@ const ConsortiumsPage = () => {
         </div>
       </div>
 
-      {/* Consortiums Grid */}
+        {/* Consortiums Grid */}
       <div className="py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {consortiums.map((consortium) => (
-              <div key={consortium.id} className="bg-white rounded-lg shadow-lg overflow-hidden">
-                <div className="p-8 space-y-6">
-                  <div className="flex items-center mb-4">
-                    <consortium.logo className="w-10 h-10 text-bhred" />
-                    <h3 className="text-2xl font-bold ml-4">{consortium.name}</h3>
-                  </div>
-                  <p className="text-gray-600 mb-6">{consortium.description}</p>
-                  
-                  <div className="flex flex-wrap gap-2">
-                    {consortium.focus.map((area, index) => (
-                      <span key={index} className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
-                        {area}
-                      </span>
-                    ))}
-                  </div>
-                  
-                  <button 
-                    className="flex items-center text-bhred hover:text-red-700 mt-4"
-                    onClick={() => toggleConsortium(consortium.id)}
-                  >
-                    {expandedConsortium === consortium.id ? 'Hide Details' : 'View Details'}
-                  </button>
-                  
-                  {expandedConsortium === consortium.id && (
-                    <div className="mt-4 space-y-3 pt-4 border-t border-gray-200">
-                      <h4 className="font-semibold text-gray-800">Key Features:</h4>
-                      {consortium.details.map((detail, index) => (
-                        <div key={index} className="flex items-start">
-                          <div className="w-2 h-2 bg-bhred rounded-full mt-2 mr-3 flex-shrink-0" />
-                          <p className="text-gray-700">{detail}</p>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {consortiums.map((consortium) => {
+                const Logo = consortium.logo;
+                return (
+                  <div key={consortium.id} className="bg-white rounded-lg shadow-lg overflow-hidden">
+                    <div className="p-8 space-y-6">
+                      <div className="flex items-center mb-4">
+                        <Logo className="w-10 h-10 text-bhred" />
+                        <h3 className="text-2xl font-bold ml-4">{consortium.name}</h3>
+                      </div>
+                      <p className="text-gray-600 mb-6">{consortium.description}</p>
+
+                      <div className="flex flex-wrap gap-2">
+                        {consortium.focus.map((area, index) => (
+                          <span key={index} className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
+                            {area}
+                          </span>
+                        ))}
+                      </div>
+
+                      <button
+                        className="flex items-center text-bhred hover:text-red-700 mt-4"
+                        onClick={() => toggleConsortium(consortium.id)}
+                      >
+                        {expandedConsortium === consortium.id ? 'Hide Details' : 'View Details'}
+                      </button>
+
+                      {expandedConsortium === consortium.id && (
+                        <div className="mt-4 space-y-3 pt-4 border-t border-gray-200">
+                          <h4 className="font-semibold text-gray-800">Key Features:</h4>
+                          {consortium.details.map((detail, index) => (
+                            <div key={index} className="flex items-start">
+                              <div className="w-2 h-2 bg-bhred rounded-full mt-2 mr-3 flex-shrink-0" />
+                              <p className="text-gray-700">{detail}</p>
+                            </div>
+                          ))}
                         </div>
-                      ))}
+                      )}
+
+                      <a
+                        href={consortium.website}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center mt-4 text-bhred hover:text-red-700"
+                      >
+                        <Globe className="w-4 h-4 mr-2" />
+                        Visit Website
+                      </a>
                     </div>
-                  )}
-                  
-                  <a
-                    href={consortium.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center mt-4 text-bhred hover:text-red-700"
-                  >
-                    <Globe className="w-4 h-4 mr-2" />
-                    Visit Website
-                  </a>
-                </div>
-              </div>
-            ))}
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
-      </div>
 
       {/* CTA Section */}
       <div className="bg-gray-50 py-16">
