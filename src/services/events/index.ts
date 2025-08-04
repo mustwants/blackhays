@@ -10,6 +10,7 @@ export interface Event {
   location: string;
   website?: string;
   about?: string;
+    logo_url?: string;
 }
 
 export interface EventSubmission extends Omit<Event, 'id'> {
@@ -162,7 +163,8 @@ class EventService {
           end_date: eventSubmission.end_date,
           location: eventSubmission.location,
           website: eventSubmission.website || '',
-          about: eventSubmission.about || ''
+                    about: eventSubmission.about || '',
+          logo_url: eventSubmission.logo_url || ''
         };
         
         console.log("Attempting to insert into events table:", eventData);
