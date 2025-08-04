@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAdvisors } from '../hooks/useAdvisors';
 import { FileText, Upload, Check, Beaker } from 'lucide-react';
+import { supabase } from '../lib/supabaseClient';
 
 interface AdvisorApplicationForm {
   first_name: string;
@@ -55,7 +56,35 @@ const ConsultantApplication = () => {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [resumeName, setResumeName] = useState('');
+  const [headshotName, setHeadshotName] = useState('');
+  const [logoName, setLogoName] = useState('');
 
+  const handleFileUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+    field: 'resume_url' | 'headshot_url' | 'business_logo_url'
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const fileExt = file.name.split('.').pop();
+      const filePath = `${field}/${Date.now()}.${fileExt}`;
+      const { error: uploadError } = await supabase.storage
+        .from('advisor-files')
+        .upload(filePath, file);
+      if (uploadError) throw uploadError;
+      const { data } = supabase.storage
+        .from('advisor-files')
+        .getPublicUrl(filePath);
+      setFormData(prev => ({ ...prev, [field]: data.publicUrl }));
+      if (field === 'resume_url') setResumeName(file.name);
+      if (field === 'headshot_url') setHeadshotName(file.name);
+      if (field === 'business_logo_url') setLogoName(file.name);
+    } catch (err) {
+      console.error(err);
+      setError('Failed to upload file. Please try again.');
+    }
+  };
   const fillTestData = () => {
     setFormData({
       first_name: 'Jane',
@@ -91,6 +120,7 @@ const ConsultantApplication = () => {
       setSuccess(true);
       setTimeout(() => navigate('/'), 3000);
     } catch (err) {
+            console.error(err);
       setError('Failed to submit application. Please try again.');
     } finally {
       setSubmitting(false);
@@ -374,12 +404,18 @@ const ConsultantApplication = () => {
                         <FileText className="mx-auto h-12 w-12 text-bhgray-400" />
                         <div className="flex text-sm text-bhgray-600">
                           <label className="relative cursor-pointer bg-white rounded-md font-medium text-bhred hover:text-red-700">
-                            <span>Upload a file</span>
-                            <input type="file" className="sr-only" />
+                            <span>{resumeName ? 'Change file' : 'Upload a file'}</span>
+                            <input
+                              type="file"
+                              accept="application/pdf"
+                              onChange={e => handleFileUpload(e, 'resume_url')}
+                              className="sr-only"
+                            />
                           </label>
                           <p className="pl-1">or drag and drop</p>
                         </div>
                         <p className="text-xs text-bhgray-500">PDF up to 10MB</p>
+                        {resumeName && <p className="text-xs text-bhgray-500 mt-1">{resumeName}</p>}
                       </div>
                     </div>
                   </div>
@@ -391,12 +427,18 @@ const ConsultantApplication = () => {
                         <Upload className="mx-auto h-12 w-12 text-bhgray-400" />
                         <div className="flex text-sm text-bhgray-600">
                           <label className="relative cursor-pointer bg-white rounded-md font-medium text-bhred hover:text-red-700">
-                            <span>Upload a file</span>
-                            <input type="file" className="sr-only" />
+                            <span>{headshotName ? 'Change file' : 'Upload a file'}</span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={e => handleFileUpload(e, 'headshot_url')}
+                              className="sr-only"
+                            />
                           </label>
                           <p className="pl-1">or drag and drop</p>
                         </div>
                         <p className="text-xs text-bhgray-500">Image up to 5MB</p>
+                        {headshotName && <p className="text-xs text-bhgray-500 mt-1">{headshotName}</p>}
                       </div>
                     </div>
                   </div>
@@ -408,12 +450,18 @@ const ConsultantApplication = () => {
                         <Upload className="mx-auto h-12 w-12 text-bhgray-400" />
                         <div className="flex text-sm text-bhgray-600">
                           <label className="relative cursor-pointer bg-white rounded-md font-medium text-bhred hover:text-red-700">
-                            <span>Upload a file</span>
-                            <input type="file" className="sr-only" />
+                            <span>{logoName ? 'Change file' : 'Upload a file'}</span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={e => handleFileUpload(e, 'business_logo_url')}
+                              className="sr-only"
+                            />
                           </label>
                           <p className="pl-1">or drag and drop</p>
                         </div>
                         <p className="text-xs text-bhgray-500">Image up to 5MB</p>
+                        {logoName && <p className="text-xs text-bhgray-500 mt-1">{logoName}</p>}
                       </div>
                     </div>
                   </div>
