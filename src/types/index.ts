@@ -17,6 +17,7 @@ export interface Event extends BaseSubmission {
   location: string;
   website?: string;
   about?: string;
+    logo_url?: string;
 }
 
 export interface EventSubmission extends Omit<Event, 'id'> {
