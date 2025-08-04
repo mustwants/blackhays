@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, Check, X } from 'lucide-react';
+import { Mail, Check, X, Beaker } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 
 interface NewsletterSignupProps {
@@ -15,6 +15,14 @@ const NewsletterSignup: React.FC<NewsletterSignupProps> = ({ onClose }) => {
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [error, setError] = useState<string | null>(null);
 
+    const fillTestData = () => {
+    setFormData({
+      first_name: 'Test',
+      last_name: 'User',
+      email: 'test.user@example.com'
+    });
+  };
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus('submitting');
@@ -120,6 +128,16 @@ const NewsletterSignup: React.FC<NewsletterSignupProps> = ({ onClose }) => {
             <p className="text-gray-600 text-center mb-6">
               Stay updated with the latest in defense technology and innovation
             </p>
+                        <div className="flex justify-end mb-2">
+              <button
+                type="button"
+                onClick={fillTestData}
+                className="flex items-center text-sm text-gray-500 hover:text-gray-700"
+              >
+                <Beaker className="w-4 h-4 mr-1" />
+                Use Test Data
+              </button>
+            </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
