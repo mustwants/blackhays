@@ -4,22 +4,29 @@ import { db } from '../../lib/database';
 
 export interface Advisor {
   id: string;
-  name: string;
+  first_name: string;
+  last_name: string;
   email: string;
-  phone: string;
+  state: string;
+  zip_code: string;
+  phone?: string;
+  street_address?: string;
+  city?: string;
+  webpage?: string;
+  facebook?: string;
+  x?: string;
+  linkedin?: string;
+  bluesky?: string;
+  instagram?: string;
   professional_title?: string;
   military_branch?: string;
-  other_branch?: string;
-  years_of_service?: string;
-  service_status?: string[];
-  other_status?: string;
-  about: string;
+  years_of_mil_service?: string;
+  years_of_us_civil_service?: string;
+  about?: string;
   resume_url?: string;
   headshot_url?: string;
   business_logo_url?: string;
   status: 'pending' | 'approved' | 'rejected' | 'paused';
-  address?: string;
-  zip_code?: string;
   location?: any; // Can be point, string, or array
 }
 
@@ -99,29 +106,35 @@ class AdvisorService {
     return [
       {
         id: 'mock-advisor-1',
-        name: 'Col. John Smith (Ret.)',
+        first_name: 'John',
+        last_name: 'Smith',
         email: 'john.smith@example.com',
         phone: '555-123-4567',
         professional_title: 'Defense Consultant',
         military_branch: 'Army',
-        years_of_service: '25',
+        years_of_mil_service: '25',
         about: 'Former Special Operations Command with 25 years of experience in defense acquisition.',
         status: 'approved',
-        address: 'Arlington, VA',
+        street_address: '123 Defense St',
+        city: 'Arlington',
+        state: 'VA',
         zip_code: '22201',
         location: [-77.0864, 38.8904]
       },
       {
         id: 'mock-advisor-2',
-        name: 'Dr. Jane Adams',
+        first_name: 'Jane',
+        last_name: 'Adams',
         email: 'jane.adams@example.com',
         phone: '555-987-6543',
         professional_title: 'Intelligence Specialist',
         military_branch: 'Air Force',
-        years_of_service: '18',
+        years_of_mil_service: '18',
         about: 'Intelligence specialist with expertise in cybersecurity and emerging technologies.',
         status: 'approved',
-        address: 'San Francisco, CA',
+        street_address: '456 Innovation Ave',
+        city: 'San Francisco',
+        state: 'CA',
         zip_code: '94107',
         location: [-122.4194, 37.7749]
       }
