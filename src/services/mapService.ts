@@ -171,14 +171,20 @@ class MapService {
   private getLocation(entity: any): [number, number] {
     let coords;
 
-    // Try to parse existing location
+    // Try to parse existing location fields
     if (entity.location) {
       coords = LocationService.parseLocation(entity.location);
     }
 
-    // If no valid coordinates, generate from address
-    if (!coords && (entity.address || entity.location)) {
-      coords = LocationService.getCoordinatesFromAddress(entity.address || entity.location);
+    if (!coords && entity.headquarters) {
+      coords = LocationService.parseLocation(entity.headquarters);
+    }
+
+    // If no valid coordinates, generate from address-like fields
+    if (!coords && (entity.address || entity.location || entity.headquarters)) {
+      coords = LocationService.getCoordinatesFromAddress(
+        entity.address || entity.location || entity.headquarters
+      );
     }
 
     // If still no coordinates, use random US location
