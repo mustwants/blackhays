@@ -8,7 +8,7 @@ interface CompanySubmissionsProps {
 
 const CompanySubmissions: React.FC<CompanySubmissionsProps> = ({ initialData = [] }) => {
   const [submissions, setSubmissions] = useState(initialData);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(initialData.length === 0);
   const [error, setError] = useState(null);
   const [editingItem, setEditingItem] = useState(null);
   const [actionSuccess, setActionSuccess] = useState(null);
@@ -17,7 +17,6 @@ const CompanySubmissions: React.FC<CompanySubmissionsProps> = ({ initialData = [
     setLoading(true);
     setError(null);
     try {
-      // Fetch all submissions, not just pending ones
       const { data, error: fetchError } = await supabase
         .from('company_submissions')
         .select('*')
@@ -39,8 +38,15 @@ const CompanySubmissions: React.FC<CompanySubmissionsProps> = ({ initialData = [
 
   // Load data on mount
   useEffect(() => {
-    fetchSubmissions();
-  }, []); // Empty dependency array for initial load only
+    if (initialData.length > 0) {
+      setSubmissions(initialData);
+      setLoading(false);
+    } else {
+      fetchSubmissions();
+    }
+  }, [initialData]);
+
+  const isMockId = (id: string) => id.startsWith('mock-');
 
   const handleAction = async (id: string, action: string) => {
     setLoading(true);
@@ -48,7 +54,18 @@ const CompanySubmissions: React.FC<CompanySubmissionsProps> = ({ initialData = [
     setActionSuccess(null);
     
     try {
-      if (action === 'delete') {
+      if (isMockId(id)) {
+        if (action === 'delete') {
+          setSubmissions(prev => prev.filter(item => item.id !== id));
+          setActionSuccess('Mock submission deleted');
+        } else {
+          const status = action === 'approve' ? 'approved' : action === 'pause' ? 'paused' : 'rejected';
+          setSubmissions(prev =>
+            prev.map(item => item.id === id ? { ...item, status } : item)
+          );
+          setActionSuccess(`Mock status updated to: ${status}`);
+        }
+      } else if (action === 'delete') {
         const { error } = await supabase
           .from('company_submissions')
           .delete()
@@ -59,7 +76,7 @@ const CompanySubmissions: React.FC<CompanySubmissionsProps> = ({ initialData = [
         setSubmissions(prev => prev.filter(item => item.id !== id));
         setActionSuccess('Successfully deleted submission');
       } else {
-        const status = action === 'approve' ? 'approved' : 
+        const status = action === 'approve' ? 'approved' :
                       action === 'pause' ? 'paused' : 'rejected';
         
         const { error } = await supabase
@@ -69,7 +86,7 @@ const CompanySubmissions: React.FC<CompanySubmissionsProps> = ({ initialData = [
           
         if (error) throw error;
         
-        setSubmissions(prev => 
+        setSubmissions(prev =>
           prev.map(item => item.id === id ? { ...item, status } : item)
         );
         
@@ -94,19 +111,27 @@ const CompanySubmissions: React.FC<CompanySubmissionsProps> = ({ initialData = [
     setError(null);
     
     try {
-      const { error } = await supabase
-        .from('company_submissions')
-        .update(editingItem)
-        .eq('id', id);
-        
-      if (error) throw error;
-      
-      setSubmissions(prev => 
-        prev.map(item => item.id === id ? editingItem : item)
-      );
-      
-      setEditingItem(null);
-      setActionSuccess("Successfully updated submission details");
+      if (isMockId(id)) {
+        setSubmissions(prev =>
+          prev.map(item => item.id === id ? editingItem : item)
+        );
+        setEditingItem(null);
+        setActionSuccess('Mock submission updated');
+      } else {
+        const { error } = await supabase
+          .from('company_submissions')
+          .update(editingItem)
+          .eq('id', id);
+
+        if (error) throw error;
+
+        setSubmissions(prev =>
+          prev.map(item => item.id === id ? editingItem : item)
+        );
+
+        setEditingItem(null);
+        setActionSuccess("Successfully updated submission details");
+      }
     } catch (err) {
       console.error('Error saving edit:', err);
       setError(err.message);
