@@ -47,6 +47,8 @@ const ConsortiumSubmissions: React.FC<ConsortiumSubmissionsProps> = ({ initialDa
       fetchSubmissions();
     }
   }, [initialData]); // Only depend on initialData
+  
+  const isMockId = (id: string) => id.startsWith('mock-');
 
   const handleAction = async (id: string, action: string) => {
     setLoading(true);
@@ -54,7 +56,18 @@ const ConsortiumSubmissions: React.FC<ConsortiumSubmissionsProps> = ({ initialDa
     setActionSuccess(null);
     
     try {
-      if (action === 'delete') {
+      if (isMockId(id)) {
+        if (action === 'delete') {
+          setSubmissions(prev => prev.filter(item => item.id !== id));
+          setActionSuccess('Mock submission deleted');
+        } else {
+          const status = action === 'approve' ? 'approved' : action === 'pause' ? 'paused' : 'rejected';
+          setSubmissions(prev =>
+            prev.map(item => item.id === id ? { ...item, status } : item)
+          );
+          setActionSuccess(`Mock status updated to: ${status}`);
+        }
+      } else if (action === 'delete') {
         const { error } = await supabase
           .from('consortium_submissions')
           .delete()
@@ -100,19 +113,27 @@ const ConsortiumSubmissions: React.FC<ConsortiumSubmissionsProps> = ({ initialDa
     setError(null);
     
     try {
-      const { error } = await supabase
-        .from('consortium_submissions')
-        .update(editingItem)
-        .eq('id', id);
-        
-      if (error) throw error;
-      
-      setSubmissions(prev => 
-        prev.map(item => item.id === id ? editingItem : item)
-      );
-      
-      setEditingItem(null);
-      setActionSuccess("Successfully updated submission details");
+      if (isMockId(id)) {
+        setSubmissions(prev =>
+          prev.map(item => item.id === id ? editingItem : item)
+        );
+        setEditingItem(null);
+        setActionSuccess('Mock submission updated');
+      } else {
+        const { error } = await supabase
+          .from('consortium_submissions')
+          .update(editingItem)
+          .eq('id', id);
+
+        if (error) throw error;
+
+        setSubmissions(prev =>
+          prev.map(item => item.id === id ? editingItem : item)
+        );
+
+        setEditingItem(null);
+        setActionSuccess("Successfully updated submission details");
+      }
     } catch (err) {
       console.error('Error saving edit:', err);
       setError(err.message);
