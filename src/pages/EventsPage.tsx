@@ -158,6 +158,13 @@ const EventsPage = () => {
                 className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow"
               >
                 <div className="p-6">
+                                    {event.logo_url && (
+                    <img
+                      src={event.logo_url}
+                      alt={`${event.name} logo`}
+                      className="h-24 w-full object-contain mb-4"
+                    />
+                  )}
                   <h3 className="text-xl font-bold text-bhgray-900 mb-2">
                     {event.name}
                   </h3>
