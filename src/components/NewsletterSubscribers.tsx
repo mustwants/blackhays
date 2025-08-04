@@ -1,15 +1,25 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import { RefreshCw, Download, Trash2 } from 'lucide-react';
+import { RefreshCw, Download, Trash2, Upload, Edit2, Check, PauseCircle, X } from 'lucide-react';
+
+interface Subscriber {
+  id: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  status?: string;
+  created_at?: string;
+}
 
 interface NewsletterSubscribersProps {
-  initialData?: any[];
+  initialData?: Subscriber[];
 }
 
 const NewsletterSubscribers: React.FC<NewsletterSubscribersProps> = ({ initialData = [] }) => {
-  const [subscribers, setSubscribers] = useState(initialData);
+  const [subscribers, setSubscribers] = useState<Subscriber[]>(initialData);
   const [loading, setLoading] = useState(initialData.length === 0);
   const [error, setError] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
   const fetchSubscribers = async () => {
     try {
@@ -43,15 +53,15 @@ const NewsletterSubscribers: React.FC<NewsletterSubscribersProps> = ({ initialDa
     }
   };
 
-  // Initial load
-  useEffect(() => {
-    if (initialData.length > 0) {
-      setSubscribers(initialData);
-      setLoading(false);
-    } else {
-      fetchSubscribers();
-    }
-  }, []); // Empty dependency array for initial load only
+    // Initial load
+    useEffect(() => {
+      if (initialData.length > 0) {
+        setSubscribers(initialData);
+        setLoading(false);
+      } else {
+        fetchSubscribers();
+      }
+    }, [initialData]);
 
   const deleteSubscriber = async (id: string) => {
     try {
@@ -79,18 +89,73 @@ const NewsletterSubscribers: React.FC<NewsletterSubscribersProps> = ({ initialDa
     }
   };
 
+    const updateStatus = async (id: string, status: 'approved' | 'paused' | 'denied') => {
+    try {
+      setError(null);
+      const { error: updateError } = await supabase
+        .from('newsletter_subscribers')
+        .update({ status })
+        .eq('id', id);
+
+      if (updateError) {
+        throw updateError;
+      }
+
+      setSubscribers(prev =>
+        prev.map(sub => (sub.id === id ? { ...sub, status } : sub))
+      );
+    } catch (err) {
+      console.error('Error updating status:', err);
+      setError('Failed to update status');
+    }
+  };
+
+  const editSubscriber = async (subscriber: Subscriber) => {
+    const first_name =
+      prompt('First Name', subscriber.first_name) ?? subscriber.first_name;
+    const last_name =
+      prompt('Last Name', subscriber.last_name) ?? subscriber.last_name;
+    const email = prompt('Email', subscriber.email) ?? subscriber.email;
+
+    try {
+      const { error: updateError } = await supabase
+        .from('newsletter_subscribers')
+        .update({
+          first_name: first_name.trim(),
+          last_name: last_name.trim(),
+          email: email.trim().toLowerCase()
+        })
+        .eq('id', subscriber.id);
+
+      if (updateError) {
+        throw updateError;
+      }
+
+      setSubscribers(prev =>
+        prev.map(sub =>
+          sub.id === subscriber.id
+            ? { ...sub, first_name, last_name, email }
+            : sub
+        )
+      );
+    } catch (err) {
+      console.error('Error editing subscriber:', err);
+      setError('Failed to edit subscriber');
+    }
+  };
+
   const exportToCSV = () => {
     if (!subscribers.length) {
       setError('No data to export');
       return;
     }
 
-    const headers = ['First Name', 'Last Name', 'Email', 'Subscribed Date'];
+    const headers = ['First Name', 'Last Name', 'Email', 'Status'];
     const csvData = subscribers.map(sub => [
       sub.first_name || '',
       sub.last_name || '',
       sub.email,
-      new Date(sub.created_at).toLocaleDateString()
+      sub.status || ''
     ]);
 
     const csvContent = [
@@ -109,24 +174,62 @@ const NewsletterSubscribers: React.FC<NewsletterSubscribersProps> = ({ initialDa
     window.URL.revokeObjectURL(url);
   };
 
-  const formatDate = (dateString: string) => {
+  const handleCSVUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
     try {
       // Handle ISO date strings
-      if (dateString.includes('T')) {
-        return new Date(dateString).toLocaleDateString();
+      setLoading(true);
+      const text = await file.text();
+      const lines = text.trim().split(/\r?\n/).slice(1); // remove header
+      const toInsert = lines
+        .map(line => line.split(',').map(cell => cell.trim()))
+        .filter(cols => cols.length >= 3 && cols[2])
+        .map(cols => ({
+          first_name: cols[0],
+          last_name: cols[1],
+          email: cols[2].toLowerCase(),
+          status: (cols[3] && ['approved','paused','denied','pending'].includes(cols[3].toLowerCase())) ? cols[3].toLowerCase() : 'pending'
+        }));
+
+      if (toInsert.length > 0) {
+        const { error: uploadError } = await supabase
+          .from('newsletter_subscribers')
+          .upsert(toInsert, { onConflict: 'email' });
+
+        if (uploadError) {
+          throw uploadError;
+        }
+        fetchSubscribers();
       }
-      // Handle Unix timestamps (in seconds)
-      if (!isNaN(Number(dateString))) {
-        return new Date(Number(dateString) * 1000).toLocaleDateString();
-      }
-      // Handle other date formats
-      return new Date(dateString).toLocaleDateString();
     } catch (err) {
-      console.error('Error formatting date:', err);
-      return 'Invalid date';
+      console.error('Error uploading CSV:', err);
+      setError('Failed to upload CSV');
+    } finally {
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      setLoading(false);
     }
   };
 
+    const getStatusBadge = (status: string) => {
+    const statusColors: Record<string, string> = {
+      pending: 'bg-yellow-100 text-yellow-800',
+      approved: 'bg-green-100 text-green-800',
+      paused: 'bg-blue-100 text-blue-800',
+      denied: 'bg-red-100 text-red-800'
+    };
+
+    return (
+      <span
+        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+          statusColors[status] || 'bg-gray-100 text-gray-800'
+        }`}
+      >
+        {status}
+      </span>
+    );
+  };
+  
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
@@ -147,6 +250,23 @@ const NewsletterSubscribers: React.FC<NewsletterSubscribersProps> = ({ initialDa
             <Download className="w-5 h-5 mr-1" />
             Export CSV
           </button>
+                    <div>
+            <input
+              type="file"
+              accept=".csv"
+              ref={fileInputRef}
+              onChange={handleCSVUpload}
+              className="hidden"
+            />
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="flex items-center text-bhgray-600 hover:text-bhgray-900"
+            >
+              <Upload className="w-5 h-5 mr-1" />
+              Upload CSV
+            </button>
+          </div>
+          
         </div>
       </div>
 
@@ -161,13 +281,16 @@ const NewsletterSubscribers: React.FC<NewsletterSubscribersProps> = ({ initialDa
           <thead className="bg-bhgray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-bhgray-500 uppercase tracking-wider">
-                Name
+                First Name
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-bhgray-500 uppercase tracking-wider">
+                Last Name
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-bhgray-500 uppercase tracking-wider">
                 Email
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-bhgray-500 uppercase tracking-wider">
-                Subscribed
+                Status
               </th>
               <th className="px-6 py-3 text-right text-xs font-medium text-bhgray-500 uppercase tracking-wider">
                 Actions
@@ -177,7 +300,7 @@ const NewsletterSubscribers: React.FC<NewsletterSubscribersProps> = ({ initialDa
           <tbody className="bg-white divide-y divide-bhgray-200">
             {loading ? (
               <tr>
-                <td colSpan={4} className="px-6 py-4 text-center">
+                <td colSpan={5} className="px-6 py-4 text-center">
                   <div className="flex justify-center">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-bhred"></div>
                   </div>
@@ -188,30 +311,64 @@ const NewsletterSubscribers: React.FC<NewsletterSubscribersProps> = ({ initialDa
                 <tr key={subscriber.id}>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-bhgray-900">
-                      {subscriber.first_name} {subscriber.last_name}
+                      {subscriber.first_name}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-bhgray-900">
+                      {subscriber.last_name}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-bhgray-600">{subscriber.email}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-bhgray-600">
-                      {formatDate(subscriber.created_at)}
-                    </div>
+                    {getStatusBadge(subscriber.status || 'pending')}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right">
-                    <button
-                      onClick={() => deleteSubscriber(subscriber.id)}
-                      className="text-red-600 hover:text-red-900"
-                    >
-                      <Trash2 className="w-5 h-5" />
-                    </button>
+                    <div className="flex justify-end space-x-2">
+                      <button
+                        onClick={() => updateStatus(subscriber.id, 'approved')}
+                        className="text-green-600 hover:text-green-900"
+                        title="Approve"
+                      >
+                        <Check className="w-5 h-5" />
+                      </button>
+                      <button
+                        onClick={() => updateStatus(subscriber.id, 'paused')}
+                        className="text-blue-600 hover:text-blue-900"
+                        title="Pause"
+                      >
+                        <PauseCircle className="w-5 h-5" />
+                      </button>
+                      <button
+                        onClick={() => updateStatus(subscriber.id, 'denied')}
+                        className="text-yellow-600 hover:text-yellow-900"
+                        title="Deny"
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
+                      <button
+                        onClick={() => editSubscriber(subscriber)}
+                        className="text-bhgray-600 hover:text-bhgray-900"
+                        title="Edit"
+                      >
+                        <Edit2 className="w-5 h-5" />
+                      </button>
+                      <button
+                        onClick={() => deleteSubscriber(subscriber.id)}
+                        className="text-red-600 hover:text-red-900"
+                        title="Delete"
+                      >
+                        <Trash2 className="w-5 h-5" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={4} className="px-6 py-4 text-center text-bhgray-500">
+                <td colSpan={5} className="px-6 py-4 text-center text-bhgray-500">
                   No subscribers found
                 </td>
               </tr>
