@@ -81,30 +81,49 @@ export const validationUtils = {
   // Validate advisor data
   validateAdvisor(advisor: Partial<Advisor>): string[] {
     const errors: string[] = [];
-    
-    if (!advisor.name?.trim()) {
-      errors.push('Name is required');
+
+    if (!advisor.first_name?.trim()) {
+      errors.push('First name is required');
     }
+
     
+    if (!advisor.last_name?.trim()) {
+      errors.push('Last name is required');
+    }
+
     if (!advisor.email?.trim()) {
       errors.push('Email is required');
     } else if (!this.isValidEmail(advisor.email)) {
       errors.push('Invalid email format');
     }
     
-    if (!advisor.phone?.trim()) {
-      errors.push('Phone number is required');
+
+    if (advisor.phone && !this.isValidPhone(advisor.phone)) {
     } else if (!this.isValidPhone(advisor.phone)) {
       errors.push('Invalid phone number format');
     }
     
-    if (!advisor.about?.trim()) {
-      errors.push('About section is required');
+
+    if (!advisor.state?.trim()) {
+      errors.push('State is required');
     }
+
+    if (!advisor.zip_code?.trim()) {
+      errors.push('ZIP code is required');
+    }
+
     
-    if (advisor.website && !this.isValidUrl(advisor.website)) {
-      errors.push('Invalid website URL format');
+    if (advisor.webpage && !this.isValidUrl(advisor.webpage)) {
+      errors.push('Invalid webpage URL format');
     }
+
+    const socialFields: (keyof Advisor)[] = ['facebook', 'x', 'linkedin', 'bluesky', 'instagram'];
+    socialFields.forEach(field => {
+      const value = advisor[field];
+      if (value && typeof value === 'string' && !this.isValidUrl(value)) {
+        errors.push(`Invalid ${field} URL format`);
+      }
+    });
     
     return errors;
   },
