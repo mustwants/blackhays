@@ -18,8 +18,10 @@ const AddConsortiumPage = () => {
     contact_email: '',
     contact_phone: '',
     membership_fee: '',
-    headquarters: ''
+    headquarters: '',
+    logo_url: ''
   });
+  const [logoFile, setLogoFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -37,7 +39,8 @@ const AddConsortiumPage = () => {
       contact_email: 'john.doe@example.com',
       contact_phone: '555-987-6543',
       membership_fee: '$5000/year',
-      headquarters: 'Washington, DC'
+      headquarters: 'Washington, DC',
+      logo_url: ''
     });
   };
 
@@ -55,11 +58,27 @@ const AddConsortiumPage = () => {
     setError(null);
 
     try {
+            let logoUrl = null;
+      if (logoFile) {
+        const fileName = `${Date.now()}-${logoFile.name}`;
+        const { error: uploadError } = await supabase
+          .storage
+          .from('consortium-logos')
+          .upload(fileName, logoFile);
+        if (uploadError) throw uploadError;
+        const { data } = supabase
+          .storage
+          .from('consortium-logos')
+          .getPublicUrl(fileName);
+        logoUrl = data.publicUrl;
+      }
+
       const { error } = await supabase
         .from('consortium_submissions')
         .insert([
           {
             ...formData,
+                        logo_url: logoUrl,
             status: 'pending'
           }
         ]);
@@ -79,8 +98,10 @@ const AddConsortiumPage = () => {
         contact_email: '',
         contact_phone: '',
         membership_fee: '',
-        headquarters: ''
+        headquarters: '',
+        logo_url: ''
       });
+      setLogoFile(null);
     } catch (err) {
       console.error('Error submitting consortium:', err);
       setError('Failed to submit consortium information. Please try again.');
@@ -157,6 +178,16 @@ const AddConsortiumPage = () => {
                   </div>
                 </div>
 
+                                <div>
+                  <label className="block text-sm font-medium text-gray-700">Logo</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setLogoFile(e.target.files?.[0] || null)}
+                    className="mt-1 block w-full text-sm text-gray-700"
+                  />
+                </div>
+                
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Website</label>
