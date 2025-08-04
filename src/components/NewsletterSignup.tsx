@@ -44,6 +44,7 @@ const NewsletterSignup: React.FC<NewsletterSignupProps> = ({ onClose }) => {
           first_name: formData.first_name.trim(),
           last_name: formData.last_name.trim(),
           email: formData.email.trim().toLowerCase(),
+                    status: 'pending',
           notify_ceo: true // Flag to indicate CEO should be notified
         }]);
 
