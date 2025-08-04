@@ -24,6 +24,23 @@ const AddInnovationPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
+    const fillTestData = () => {
+    setFormData({
+      name: 'Test Innovation Lab',
+      website: 'https://example.com',
+      type: 'research_lab',
+      focus_areas: 'Artificial Intelligence, Robotics',
+      established_year: '2015',
+      funding_source: 'Government',
+      description: 'Research lab focusing on AI and robotics.',
+      contact_name: 'Alice Smith',
+      contact_email: 'alice.smith@example.com',
+      contact_phone: '555-123-9876',
+      primary_sponsor: 'DARPA',
+      headquarters: 'Arlington, VA'
+    });
+  };
+
   const handleAdminClick = () => {
     setShowAdminPanel(true);
   };
@@ -111,6 +128,17 @@ const AddInnovationPage = () => {
                     {error}
                   </div>
                 )}
+
+                                <div className="flex justify-end">
+                  <button
+                    type="button"
+                    onClick={fillTestData}
+                    className="flex items-center text-sm text-gray-500 hover:text-gray-700"
+                  >
+                    <Beaker className="w-4 h-4 mr-1" />
+                    Use Test Data
+                  </button>
+                </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Organization Name</label>
