@@ -3,6 +3,7 @@ import { Calendar, MapPin, Link2, FileText, Check, Beaker } from 'lucide-react';
 import { useEvents } from '../hooks/useEvents';
 import Footer from '../components/Footer';
 import AdminPanel from '../components/AdminPanel';
+import { supabase } from '../lib/supabaseClient';
 
 const SubmitEventPage = () => {
   const { submitEvent } = useEvents();
@@ -16,6 +17,7 @@ const SubmitEventPage = () => {
     about: '',
     submitter_email: ''
   });
+    const [logoFile, setLogoFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -91,7 +93,22 @@ const SubmitEventPage = () => {
       validateForm();
 
       // Submit event
-      const { error } = await submitEvent(formData);
+      let logoUrl = undefined;
+      if (logoFile) {
+        const fileName = `${Date.now()}-${logoFile.name}`;
+        const { error: uploadError } = await supabase
+          .storage
+          .from('event-logos')
+          .upload(fileName, logoFile);
+        if (uploadError) throw uploadError;
+        const { data } = supabase
+          .storage
+          .from('event-logos')
+          .getPublicUrl(fileName);
+        logoUrl = data.publicUrl;
+      }
+
+      const { error } = await submitEvent({ ...formData, logo_url: logoUrl });
       if (error) throw error;
       
       setSuccess(true);
@@ -104,6 +121,7 @@ const SubmitEventPage = () => {
         about: '',
         submitter_email: ''
       });
+            setLogoFile(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to submit event');
       console.error('Error submitting event:', err);
@@ -235,6 +253,17 @@ const SubmitEventPage = () => {
                       placeholder="https://example.com"
                     />
                   </div>
+                </div>
+
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Event Logo (Optional)</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setLogoFile(e.target.files?.[0] || null)}
+                    className="mt-1 block w-full text-sm text-gray-700"
+                  />
                 </div>
 
                 <div>
