@@ -3,7 +3,7 @@ import { supabase } from '../../lib/supabaseClient';
 import { RefreshCw, Trash2, Edit2, Check, X, PauseCircle } from 'lucide-react';
 
 interface ConsortiumSubmissionsProps {
-  initialData?: any[];
+  initialData?: unknown[];
 }
 
 const ConsortiumSubmissions: React.FC<ConsortiumSubmissionsProps> = ({ initialData = [] }) => {
@@ -197,6 +197,9 @@ const ConsortiumSubmissions: React.FC<ConsortiumSubmissionsProps> = ({ initialDa
           <div key={submission.id} className="bg-white border rounded-lg p-4 shadow-sm">
             <div className="flex justify-between items-start">
               <div>
+                                {submission.logo_url && (
+                  <img src={submission.logo_url} alt={`${submission.name} logo`} className="h-12 mb-2" />
+                )}
                 <div className="flex items-center mb-1">
                   <h3 className="text-lg font-bold text-bhgray-900">{submission.name}</h3>
                   <div className="ml-2">
@@ -283,6 +286,15 @@ const ConsortiumSubmissions: React.FC<ConsortiumSubmissionsProps> = ({ initialDa
                     type="text"
                     value={editingItem.name}
                     onChange={(e) => setEditingItem({...editingItem, name: e.target.value})}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-bhred focus:ring-bhred sm:text-sm"
+                  />
+                </div>
+                                <div>
+                  <label className="block text-sm font-medium text-gray-700">Logo URL</label>
+                  <input
+                    type="text"
+                    value={editingItem.logo_url || ''}
+                    onChange={(e) => setEditingItem({...editingItem, logo_url: e.target.value})}
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-bhred focus:ring-bhred sm:text-sm"
                   />
                 </div>
