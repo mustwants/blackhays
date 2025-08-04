@@ -3,7 +3,8 @@ import { supabase } from '../supabaseClient';
 
 interface Advisor {
   id: string;
-  name: string;
+  first_name: string;
+  last_name: string;
   about: string;
   professional_title: string;
   military_branch: string;
@@ -19,9 +20,9 @@ const AdvisorsPage = () => {
       try {
         const { data, error } = await supabase
           .from('advisors')
-                    .select('id, name, email, expertise, status') // ✅ location removed
+          .select('id, first_name, last_name, about, professional_title, military_branch')
           .eq('status', 'approved')
-          .order('name', { ascending: true });
+          .order('last_name', { ascending: true });
 
         if (error) throw error;
         setAdvisors(data || []);
@@ -45,7 +46,7 @@ const AdvisorsPage = () => {
       <h1 className="text-xl font-bold mb-4">Approved Advisors</h1>
       {advisors.map((advisor) => (
         <div key={advisor.id} className="mb-3 p-4 border rounded">
-          <h2 className="text-lg font-semibold">{advisor.name}</h2>
+          <h2 className="text-lg font-semibold">{advisor.first_name} {advisor.last_name}</h2>
           <p className="italic">{advisor.professional_title} — {advisor.military_branch}</p>
           <p className="mt-1">{advisor.about}</p>
         </div>
