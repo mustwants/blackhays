@@ -134,7 +134,7 @@ const ConsultantMap = () => {
                 <MapPin className="w-5 h-5 text-white" />
               </div>
               <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 whitespace-nowrap bg-black bg-opacity-75 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                {advisor.name}
+                {advisor.first_name} {advisor.last_name}
               </div>
             </div>
           </Marker>
@@ -151,7 +151,7 @@ const ConsultantMap = () => {
             className="max-w-sm"
           >
             <div className="p-2">
-              <h3 className="text-lg font-bold text-bhgray-900">{selectedAdvisor.name}</h3>
+              <h3 className="text-lg font-bold text-bhgray-900">{selectedAdvisor.first_name} {selectedAdvisor.last_name}</h3>
               {selectedAdvisor.professional_title && (
                 <p className="text-sm text-bhgray-600 italic mb-2">
                   {selectedAdvisor.professional_title}
