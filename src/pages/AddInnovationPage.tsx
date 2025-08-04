@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Brain, MapPin, Link2, Mail, Phone, FileText, Check, Briefcase, Clock, Beaker, Lightbulb } from 'lucide-react';
+import { Brain, MapPin, Link2, Mail, Phone, Check, Briefcase, Clock, Beaker, Lightbulb, Upload } from 'lucide-react';
 import Footer from '../components/Footer';
 import AdminPanel from '../components/AdminPanel';
 import { supabase } from '../lib/supabaseClient';
@@ -23,6 +23,7 @@ const AddInnovationPage = () => {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+    const [logoFile, setLogoFile] = useState<File | null>(null);
 
     const fillTestData = () => {
     setFormData({
@@ -49,17 +50,36 @@ const AddInnovationPage = () => {
     setShowAdminPanel(false);
   };
 
+    const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    setLogoFile(file || null);
+  };
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
     setError(null);
 
     try {
+            let logoUrl: string | null = null;
+      if (logoFile) {
+        const fileExt = logoFile.name.split('.').pop();
+        const fileName = `${Date.now()}.${fileExt}`;
+        const { error: uploadError } = await supabase.storage
+          .from('innovation-logos')
+          .upload(fileName, logoFile);
+        if (uploadError) throw uploadError;
+        const { data } = supabase.storage
+          .from('innovation-logos')
+          .getPublicUrl(fileName);
+        logoUrl = data.publicUrl;
+      }
       const { error } = await supabase
         .from('innovation_submissions')
         .insert([
           {
             ...formData,
+                        logo_url: logoUrl,
             status: 'pending'
           }
         ]);
@@ -81,6 +101,7 @@ const AddInnovationPage = () => {
         primary_sponsor: '',
         headquarters: ''
       });
+            setLogoFile(null);
     } catch (err) {
       console.error('Error submitting innovation organization:', err);
       setError('Failed to submit innovation organization information. Please try again.');
@@ -300,6 +321,34 @@ const AddInnovationPage = () => {
                       placeholder="Provide a description of the organization, its mission, research focus, and any notable achievements..."
                       required
                     />
+                  </div>
+                </div>
+
+                               <div>
+                  <label className="block text-sm font-medium text-gray-700">Organization Logo (Optional)</label>
+                  <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                    <div className="space-y-1 text-center">
+                      {logoFile ? (
+                        <p className="text-sm text-gray-600">{logoFile.name}</p>
+                      ) : (
+                        <>
+                          <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                          <div className="flex text-sm text-gray-600">
+                            <label className="relative cursor-pointer bg-white rounded-md font-medium text-bhred hover:text-red-700">
+                              <span>Upload a file</span>
+                              <input
+                                type="file"
+                                accept="image/*"
+                                className="sr-only"
+                                onChange={handleLogoChange}
+                              />
+                            </label>
+                            <p className="pl-1">or drag and drop</p>
+                          </div>
+                          <p className="text-xs text-gray-500">PNG, JPG up to 5MB</p>
+                        </>
+                      )}
+                    </div>
                   </div>
                 </div>
 
