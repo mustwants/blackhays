@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, X, ChevronDown, PlusCircle, Calendar, Users, Building, Rocket, Brain, Lock, MapPin } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const NavBar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const navigate = useNavigate();
+    const location = useLocation();
 
   const handleNavClick = (id: string) => {
     setIsOpen(false);
@@ -34,7 +35,11 @@ const NavBar = () => {
       return;
     }
     if (id === 'home') {
-      navigate('/');
+      if (location.pathname === '/') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        navigate('/');
+      }
       return;
     }
     if (id === 'apply') {
