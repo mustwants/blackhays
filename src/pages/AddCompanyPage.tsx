@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Building, MapPin, Link2, Mail, Phone, FileText, Check, Users } from 'lucide-react';
+import { Building, MapPin, Link2, Mail, Phone, FileText, Check, Users, Beaker } from 'lucide-react';
 import Footer from '../components/Footer';
 import AdminPanel from '../components/AdminPanel';
 import { supabase } from '../lib/supabaseClient';
@@ -22,6 +22,22 @@ const AddCompanyPage = () => {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+
+    const fillTestData = () => {
+    setFormData({
+      name: 'Test Defense Corp',
+      website: 'https://example.com',
+      industry: 'defense',
+      focus_areas: 'AI, Cybersecurity',
+      location: 'Arlington, VA',
+      description: 'A test company working on defense technology.',
+      contact_name: 'Jane Doe',
+      contact_email: 'jane.doe@example.com',
+      contact_phone: '555-123-4567',
+      employee_count: '11-50',
+      founded_year: '2010'
+    });
+  };
 
   const handleAdminClick = () => {
     setShowAdminPanel(true);
@@ -110,6 +126,17 @@ const AddCompanyPage = () => {
                   </div>
                 )}
 
+                                <div className="flex justify-end">
+                  <button
+                    type="button"
+                    onClick={fillTestData}
+                    className="flex items-center text-sm text-gray-500 hover:text-gray-700"
+                  >
+                    <Beaker className="w-4 h-4 mr-1" />
+                    Use Test Data
+                  </button>
+                </div>
+                
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Company Name</label>
                   <div className="mt-1 relative rounded-md shadow-sm">
