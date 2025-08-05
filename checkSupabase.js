@@ -14,7 +14,7 @@ const tables = {
   newsletter_subscribers: ['email', 'first_name', 'last_name', 'status', 'notify_ceo'],
   events: ['name', 'start_date', 'end_date', 'location'],
   event_submissions: ['name', 'start_date', 'end_date', 'location', 'status', 'submitter_email'],
-  advisor_applications: ['first_name', 'last_name', 'email', 'state', 'zip_code', 'status'],
+  advisor_applications: ['name', 'email', 'state', 'zip_code', 'status'],
   company_submissions: ['name', 'website', 'status', 'submitter_email'],
   consortium_submissions: ['name', 'website', 'status', 'submitter_email'],
   innovation_submissions: ['name', 'website', 'status', 'submitter_email']
