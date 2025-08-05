@@ -208,7 +208,8 @@ const EventSubmissions: React.FC<EventSubmissionsProps> = ({ initialData = [] })
       ) : submissions.length > 0 ? (
         <div className="space-y-4">
           {filteredSubmissions.map((submission) => (
-            <div key={submission.id} className="bg-white rounded-lg shadow-sm border p-6">
+            <React.Fragment key={submission.id}>
+              <div className="bg-white rounded-lg shadow-sm border p-6">
               <div className="flex justify-between items-start">
                          <div className="flex items-start">
                   {submission.logo_url && (
@@ -367,9 +368,8 @@ const EventSubmissions: React.FC<EventSubmissionsProps> = ({ initialData = [] })
                     />
                   </div>
                 </div>
-                )}
-              </div>
-            </div>
+              )}
+            </React.Fragment>
           ))}
         </div>
       ) : (
