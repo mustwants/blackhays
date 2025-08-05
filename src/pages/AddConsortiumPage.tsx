@@ -63,12 +63,12 @@ const AddConsortiumPage = () => {
         const fileName = `${Date.now()}-${logoFile.name}`;
         const { error: uploadError } = await supabase
           .storage
-          .from('consortium-logos')
+          .from('consortium_logos')
           .upload(fileName, logoFile);
         if (uploadError) throw uploadError;
         const { data } = supabase
           .storage
-          .from('consortium-logos')
+          .from('consortium_logos')
           .getPublicUrl(fileName);
         logoUrl = data.publicUrl;
       }
