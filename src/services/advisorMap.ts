@@ -33,16 +33,30 @@ class AdvisorMapService {
         
         const { data, error } = await supabase
           .from('advisor_applications')
-          .select('id, first_name, last_name, about, professional_title, military_branch, location')
+          .select('id, name, about, professional_title, military_branch, location')
           .eq('status', 'approved')
-          .order('last_name');
+          .order('name');
 
         if (error) {
           console.error('Error fetching advisors:', error);
           throw error;
         }
 
-        return data as MapAdvisor[];
+        if (!data) return [];
+
+        return data.map(advisor => {
+          const [first_name, ...rest] = (advisor.name || '').split(' ');
+          const last_name = rest.join(' ');
+          return {
+            id: advisor.id,
+            first_name,
+            last_name,
+            location: advisor.location,
+            about: advisor.about,
+            professional_title: advisor.professional_title,
+            military_branch: advisor.military_branch
+          } as MapAdvisor;
+        });
       } catch (error) {
         console.error('Error occurred:', error);
         
