@@ -244,14 +244,34 @@ class MapService {
   }
 
   private async getEvents(): Promise<MapEntity[]> {
-    const { data } = await supabase
-      .from('events')
-      .select('*')
-      .gte('end_date', new Date().toISOString());
+    // Fetch upcoming events from both the events table and approved submissions
+    const now = new Date().toISOString();
+    const [eventsResult, submissionsResult] = await Promise.all([
+      supabase
+        .from('events')
+        .select('*')
+        .gte('end_date', now),
+      supabase
+        .from('event_submissions')
+        .select('*')
+        .eq('status', 'approved')
+        .gte('end_date', now)
+    ]);
 
-    if (!data) return [];
+    const eventsData = eventsResult.data || [];
+    const approvedSubmissions = submissionsResult.data || [];
+    const allEvents = [...eventsData, ...approvedSubmissions];
 
-    return data.map(event => ({
+    if (allEvents.length === 0) return [];
+
+    // Remove duplicates based on name, date, and location
+    const uniqueMap = new Map<string, any>();
+    allEvents.forEach(event => {
+      const key = `${event.name}|${event.start_date}|${event.location}`;
+      uniqueMap.set(key, event);
+    });
+
+    return Array.from(uniqueMap.values()).map(event => ({
       id: event.id,
       name: event.name,
       type: 'event',
