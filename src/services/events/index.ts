@@ -48,7 +48,7 @@ class EventService {
       // Process events
       if (!eventsResult.error && eventsResult.data) {
         console.log("Found events in events table:", eventsResult.data.length);
-        allEvents = [...eventsResult.data];
+        allEvents = [...allEvents, ...eventsResult.data];
       } else if (eventsResult.error) {
         console.error("Error fetching events:", eventsResult.error);
       }
