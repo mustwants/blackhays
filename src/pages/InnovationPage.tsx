@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Shield, Lightbulb, Rocket, Target, Building, Users, ArrowRight, ExternalLink, ChevronDown, Award, BarChart3, Brain, FileText } from 'lucide-react';
+import { Anchor, Network, Shield, Lightbulb, Rocket, Target, Building, Users, ArrowRight, ExternalLink, ChevronDown, Award, BarChart3, Brain, FileText } from 'lucide-react';
 import Footer from '../components/Footer';
 import AdminPanel from '../components/AdminPanel';
 
@@ -75,6 +75,48 @@ const InnovationPage = () => {
         'Follow-on production contracts',
         'Silicon Valley, Boston, Austin, and DC presence'
       ]
+       },
+    {
+      id: 'navalx',
+      title: 'NavalX Tech Bridges',
+      description: 'NavalX accelerates collaboration across the Department of the Navy through a network of regional Tech Bridges connecting industry, academia, and government.',
+      icon: Anchor,
+      link: 'https://www.secnav.navy.mil/agility/Pages/techbridges.aspx',
+      details: [
+        'National network of Tech Bridges',
+        'Rapid prototyping and experimentation',
+        'Collaboration with Navy experts and facilities',
+        'Partnership opportunities with industry and academia',
+        'Access to cooperative research and development agreements'
+      ]
+    },
+    {
+      id: 'nsin',
+      title: 'National Security Innovation Network (NSIN)',
+      description: 'NSIN builds communities of innovators to solve national security problems through hackathons, accelerators, and collaboration platforms.',
+      icon: Network,
+      link: 'https://www.nsin.mil/',
+      details: [
+        'Connects DoD with non-traditional innovators',
+        'Programs like Hacking for Defense and Propel',
+        'Problem-solving through hackathons and design sprints',
+        'Regional innovation hubs across the US',
+        'Supports venture acceleration and prototyping'
+      ]
+    },
+    {
+      id: 'xtech',
+      title: 'Army xTechSearch',
+      description: 'xTechSearch discovers and accelerates innovative technologies for Army modernization through prize competitions.',
+      icon: Target,
+      link: 'https://www.xtechsearch.army.mil/',
+      details: [
+        'Prize competitions for small businesses and startups',
+        'Focus on Army modernization priorities',
+        'Non-dilutive cash awards',
+        'Opportunities for follow-on contracts',
+        'Engagement with Army stakeholders'
+      ]
     }
   ];
 
@@ -128,7 +170,8 @@ const InnovationPage = () => {
           <h1 className="text-4xl font-bold mb-4">Government Innovation & Advisory</h1>
           <p className="text-xl text-gray-300 max-w-3xl">
             Connecting innovative technologies with government agencies through strategic advisory,
-            program guidance, and deep expertise in defense and intelligence innovation pathways.
+            program guidance, and deep expertise in AFWERX, SOFWERX, NavalX, NSIN,
+            Army xTechSearch, DIU, and other defense innovation pathways.
           </p>
         </div>
       </div>
