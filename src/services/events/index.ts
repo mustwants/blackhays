@@ -111,9 +111,7 @@ class EventService {
       const { error } = await supabase
         .from(this.submissionsEndpoint)
         .insert([submissionData])
-        .select()
-        .single();
-              .insert([submissionData]);
+        .insert([submissionData]);
 
       if (error) {
         console.error('Error submitting event:', error);
