@@ -1,46 +1,13 @@
 import React, { useState } from 'react';
-import {
-  Shield,
-  Users,
-  Target,
-  FileText,
-  ArrowRight,
-  Globe,
-  Rocket,
-  Briefcase,
-  Cpu,
-  Zap,
-  Plane,
-  Ship,
-  Check,
-  Lock,
-  Wifi,
-  Monitor,
-  Search,
-  Building,
-  Laptop,
-  Database,
-  FlaskConical,
-  Radar,
-  Radio,
-  PlusCircle
-} from 'lucide-react';
+import { ArrowRight, Search, PlusCircle, Check, Rocket } from 'lucide-react';
 import Footer from '../components/Footer';
 import AdminPanel from '../components/AdminPanel';
-
-interface Consortium {
-  id: string;
-  name: string;
-  logo: React.ElementType;
-  website: string;
-  description: string;
-  details: string[];
-  focus: string[];
-}
+import ConsortiumCard from '../components/ConsortiumCard';
+import { Consortium } from '../types/consortium';
 
 const ConsortiumsPage = () => {
   const [showAdminPanel, setShowAdminPanel] = useState(false);
-  const [expandedConsortium, setExpandedConsortium] = useState<string | null>(null);
+  const [flippedCard, setFlippedCard] = useState<string | null>(null);
 
   const handleAdminClick = () => {
     setShowAdminPanel(true);
@@ -50,15 +17,18 @@ const ConsortiumsPage = () => {
     setShowAdminPanel(false);
   };
 
-  const toggleConsortium = (id: string) => {
-    setExpandedConsortium(expandedConsortium === id ? null : id);
+  const handleFlip = (id: string) => {
+    setFlippedCard(flippedCard === id ? null : id);
   };
 
-  const consortiums = [
+  // TODO: replace placeholderLogo paths with actual consortium logos
+  const placeholderLogo = '/BHfullblack.png';
+
+  const consortiums: Consortium[] = [
     {
       id: 'c5',
       name: 'C5 Consortium',
-      logo: Shield,
+      logo: placeholderLogo,
       website: 'https://c5technologies.org',
       description: 'A consortium composed of leading companies and institutions in the C4ISR and cyber technology sectors.',
       details: [
@@ -73,7 +43,7 @@ const ConsortiumsPage = () => {
     {
       id: 'vlc',
       name: 'Vertical Lift Consortium',
-      logo: Plane,
+     logo: placeholderLogo,
       website: 'https://www.verticalliftconsortium.org',
       description: 'A collaboration of traditional and nontraditional government contractors developing innovative vertical lift technologies.',
       details: [
@@ -88,7 +58,7 @@ const ConsortiumsPage = () => {
     {
       id: 'spec',
       name: 'Space Enterprise Consortium',
-      logo: Rocket,
+      logo: placeholderLogo,
       website: 'https://space-enterprise.org',
       description: 'Created to bridge the cultural gap between military buyers and commercial space startups and small businesses through OTAs.',
       details: [
@@ -103,7 +73,7 @@ const ConsortiumsPage = () => {
     {
       id: 'sossec',
       name: 'SOSSEC',
-      logo: Shield,
+      logo: placeholderLogo,
       website: 'https://sossec.org',
       description: 'System of Systems Security (SOSSEC) works with the Defense Cyber Crime Center (DC3) to enable a Department-wide path for better cyber security tools.',
       details: [
@@ -118,7 +88,7 @@ const ConsortiumsPage = () => {
     {
       id: 'nsic',
       name: 'National Security Innovation Consortium (NSIC)',
-      logo: Building,
+      logo: placeholderLogo,
       website: 'https://nstxl.org/about/nsic',
       description: 'A consortium dedicated to supporting the integration of advanced technologies into defense, security, and intelligence operations.',
       details: [
@@ -133,7 +103,7 @@ const ConsortiumsPage = () => {
     {
       id: 'mtec',
       name: 'Medical Technology Enterprise Consortium (MTEC)',
-      logo: FlaskConical,
+      logo: placeholderLogo,
       website: 'https://mtec-sc.org',
       description: 'A biomedical technology consortium collaborating with multiple DoD stakeholders to address military medical capability gaps.',
       details: [
@@ -148,7 +118,7 @@ const ConsortiumsPage = () => {
     {
       id: 'atcc',
       name: 'Aviation and Turbine Consortium (ATCC)',
-      logo: Plane,
+      logo: placeholderLogo,
       website: 'https://atcc.us',
       description: 'Focused on accelerating the development of next-generation aviation and turbine technologies for defense applications.',
       details: [
@@ -163,7 +133,7 @@ const ConsortiumsPage = () => {
     {
       id: 'nstxl',
       name: 'National Security Technology Accelerator (NSTXL)',
-      logo: Rocket,
+      logo: placeholderLogo,
       website: 'https://nstxl.org',
       description: 'A non-profit organization that serves as the consortium management firm for multiple defense technology programs and consortia.',
       details: [
@@ -178,7 +148,7 @@ const ConsortiumsPage = () => {
     {
       id: 'iwrp',
       name: 'Information Warfare Research Project (IWRP)',
-      logo: Wifi,
+      logo: placeholderLogo,
       website: 'https://www.theiwrp.org',
       description: 'Focused on information warfare technologies to enhance Navy and Marine Corps missions.',
       details: [
@@ -193,7 +163,7 @@ const ConsortiumsPage = () => {
     {
       id: 'mscei',
       name: 'Marine Corps Systems Command Experts & Equippers Innovation (MSCEI)',
-      logo: Ship,
+      logo: placeholderLogo,
       website: 'https://www.marcorsyscom.marines.mil/MCSCIE',
       description: 'Focuses on innovative technologies to support and enhance Marine Corps missions and capabilities.',
       details: [
@@ -208,7 +178,7 @@ const ConsortiumsPage = () => {
     {
       id: 'disa-oti',
       name: 'Defense Information Systems Agency (DISA) OTA',
-      logo: Database,
+      logo: placeholderLogo,
       website: 'https://www.disa.mil',
       description: 'Focuses on innovative information technology solutions for defense networks and systems.',
       details: [
@@ -223,7 +193,7 @@ const ConsortiumsPage = () => {
     {
       id: 'ati',
       name: 'Advanced Technology International (ATI)',
-      logo: Cpu,
+      logo: placeholderLogo,
       website: 'https://www.ati.org',
       description: 'A nonprofit organization that builds and manages research and development consortia for government, industry, and academia.',
       details: [
@@ -238,7 +208,7 @@ const ConsortiumsPage = () => {
     {
       id: 'cmmc',
       name: 'Cybersecurity Maturity Model Certification (CMMC) Accreditation Body',
-      logo: Lock,
+      logo: placeholderLogo,
       website: 'https://www.cyberab.org',
       description: 'Oversees the assessment and certification of contractors meeting the cybersecurity requirements specified by the DoD.',
       details: [
@@ -253,7 +223,7 @@ const ConsortiumsPage = () => {
     {
       id: 'dotc',
       name: 'Defense Ordnance Technology Consortium (DOTC)',
-      logo: Target,
+      logo: placeholderLogo,
       website: 'https://www.dodt.org',
       description: 'Focuses on ordnance technologies, systems, and equipment to enhance warfighter capabilities.',
       details: [
@@ -268,7 +238,7 @@ const ConsortiumsPage = () => {
     {
       id: 'amtc',
       name: 'Advanced Manufacturing Technologies Consortium (AMTC)',
-      logo: Building,
+      logo: placeholderLogo,
       website: 'https://www.ati.org/industries-we-serve/advanced-materials-manufacturing',
       description: 'Focuses on advancing manufacturing technologies to enhance defense industrial capabilities.',
       details: [
@@ -283,7 +253,7 @@ const ConsortiumsPage = () => {
     {
       id: 'esc',
       name: 'Electromagnetic Spectrum Consortium (ESC)',
-      logo: Radio,
+      logo: placeholderLogo,
       website: 'https://www.electromagnetic.org',
       description: 'Focuses on electromagnetic spectrum technologies and capabilities for defense and security applications.',
       details: [
@@ -298,7 +268,7 @@ const ConsortiumsPage = () => {
     {
       id: 'nvtc',
       name: 'Naval Undersea Technology Consortium (NUTC)',
-      logo: Radar,
+      logo: placeholderLogo,
       website: 'https://www.underseatech.org',
       description: 'Focuses on technologies and capabilities for naval undersea operations and systems.',
       details: [
@@ -405,59 +375,16 @@ const ConsortiumsPage = () => {
         {/* Consortiums Grid */}
       <div className="py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {consortiums.map((consortium) => {
-                const Logo = consortium.logo;
-                return (
-                  <div key={consortium.id} className="bg-white rounded-lg shadow-lg overflow-hidden">
-                    <div className="p-8 space-y-6">
-                      <div className="flex items-center mb-4">
-                        <Logo className="w-10 h-10 text-bhred" />
-                        <h3 className="text-2xl font-bold ml-4">{consortium.name}</h3>
-                      </div>
-                      <p className="text-gray-600 mb-6">{consortium.description}</p>
-
-                      <div className="flex flex-wrap gap-2">
-                        {consortium.focus.map((area, index) => (
-                          <span key={index} className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
-                            {area}
-                          </span>
-                        ))}
-                      </div>
-
-                      <button
-                        className="flex items-center text-bhred hover:text-red-700 mt-4"
-                        onClick={() => toggleConsortium(consortium.id)}
-                      >
-                        {expandedConsortium === consortium.id ? 'Hide Details' : 'View Details'}
-                      </button>
-
-                      {expandedConsortium === consortium.id && (
-                        <div className="mt-4 space-y-3 pt-4 border-t border-gray-200">
-                          <h4 className="font-semibold text-gray-800">Key Features:</h4>
-                          {consortium.details.map((detail, index) => (
-                            <div key={index} className="flex items-start">
-                              <div className="w-2 h-2 bg-bhred rounded-full mt-2 mr-3 flex-shrink-0" />
-                              <p className="text-gray-700">{detail}</p>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-
-                      <a
-                        href={consortium.website}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center mt-4 text-bhred hover:text-red-700"
-                      >
-                        <Globe className="w-4 h-4 mr-2" />
-                        Visit Website
-                      </a>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {consortiums.map((consortium) => (
+              <ConsortiumCard
+                key={consortium.id}
+                consortium={consortium}
+                flipped={flippedCard === consortium.id}
+                onFlip={handleFlip}
+              />
+            ))}
+               </div>
           </div>
         </div>
 
