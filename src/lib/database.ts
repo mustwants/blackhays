@@ -236,13 +236,21 @@ export const db = {
     data: Omit<T, 'id' | 'created_at'>
   ) {
     console.log(`Creating new submission in ${table}:`, data);
+    
+    // Remove empty string, undefined or null fields to avoid schema errors
+    const sanitizedData = Object.fromEntries(
+      Object.entries(data).filter(([, value]) =>
+        value !== undefined && value !== null && value !== ''
+      )
+    );
+
     const submissionData = {
-      ...data,
+      ...sanitizedData,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     };
     
-    return DatabaseHelpers.safeInsert<T>(table, submissionData, { 
+    return DatabaseHelpers.safeInsert<T>(table, submissionData, {
       returnData: true,
       maxRetries: 3
     });
@@ -258,17 +266,24 @@ export const db = {
     // Strip any potential mock ID and timestamps
     const { id, created_at, updated_at, ...dataWithoutId } = mockData as any;
     
-    // Ensure we have a created_at date
+
+    // Remove empty or undefined fields and ensure timestamps
+    const sanitizedData = Object.fromEntries(
+      Object.entries(dataWithoutId).filter(([, value]) =>
+        value !== undefined && value !== null && value !== ''
+      )
+    );
+
     const data = {
-      ...dataWithoutId,
+      ...sanitizedData,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     };
     
     // Attempt to insert with retry logic
-    return DatabaseHelpers.safeInsert<T>(table, data, { 
-      returnData: true, 
-      maxRetries: 3 
+    return DatabaseHelpers.safeInsert<T>(table, data, {
+      returnData: true,
+      maxRetries: 3
     });
   }
 };
