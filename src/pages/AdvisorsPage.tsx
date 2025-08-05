@@ -20,12 +20,24 @@ const AdvisorsPage = () => {
       try {
         const { data, error } = await supabase
           .from('advisor_applications')
-          .select('id, first_name, last_name, about, professional_title, military_branch')
+          .select('id, name, about, professional_title, military_branch')
           .eq('status', 'approved')
           .order('last_name', { ascending: true });
 
         if (error) throw error;
-        setAdvisors(data || []);
+        const mapped = (data || []).map(advisor => {
+          const [first_name, ...rest] = (advisor.name || '').split(' ');
+          const last_name = rest.join(' ');
+          return {
+            id: advisor.id,
+            first_name,
+            last_name,
+            about: advisor.about,
+            professional_title: advisor.professional_title,
+            military_branch: advisor.military_branch
+          } as Advisor;
+        });
+        setAdvisors(mapped);
       } catch (err: any) {
         console.error('Error occurred:', err);
         setError(err.message);
