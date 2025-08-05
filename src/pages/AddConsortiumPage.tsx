@@ -8,6 +8,8 @@ const AddConsortiumPage = () => {
   const [showAdminPanel, setShowAdminPanel] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
+    first_name: '',
+    last_name: '',
     website: '',
     focus_area: '',
     government_partner: '',
@@ -19,6 +21,10 @@ const AddConsortiumPage = () => {
     contact_phone: '',
     membership_fee: '',
     headquarters: '',
+    street_address: '',
+    city: '',
+    state: '',
+    zip_code: '',
     logo_url: ''
   });
   const [logoFile, setLogoFile] = useState<File | null>(null);
@@ -29,6 +35,8 @@ const AddConsortiumPage = () => {
     const fillTestData = () => {
     setFormData({
       name: 'Defense Industry Consortium',
+      first_name: 'John',
+      last_name: 'Doe',
       website: 'https://example.com',
       focus_area: 'Cybersecurity',
       government_partner: 'US Army',
@@ -40,6 +48,10 @@ const AddConsortiumPage = () => {
       contact_phone: '555-987-6543',
       membership_fee: '$5000/year',
       headquarters: 'Washington, DC',
+      street_address: '456 Consortium Ave',
+      city: 'Washington',
+      state: 'DC',
+      zip_code: '20001',
       logo_url: ''
     });
   };
@@ -88,6 +100,8 @@ const AddConsortiumPage = () => {
       setSuccess(true);
       setFormData({
         name: '',
+        first_name: '',
+        last_name: '',
         website: '',
         focus_area: '',
         government_partner: '',
@@ -99,6 +113,10 @@ const AddConsortiumPage = () => {
         contact_phone: '',
         membership_fee: '',
         headquarters: '',
+        street_address: '',
+        city: '',
+        state: '',
+        zip_code: '',
         logo_url: ''
       });
       setLogoFile(null);
@@ -178,14 +196,51 @@ const AddConsortiumPage = () => {
                   </div>
                 </div>
 
-                                <div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">First Name</label>
+                    <input
+                      type="text"
+                      value={formData.first_name}
+                      onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
+                      className="mt-1 focus:ring-bhred focus:border-bhred block w-full border border-gray-300 rounded-md py-2 px-3"
+                      placeholder="First Name"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Last Name</label>
+                    <input
+                      type="text"
+                      value={formData.last_name}
+                      onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
+                      className="mt-1 focus:ring-bhred focus:border-bhred block w-full border border-gray-300 rounded-md py-2 px-3"
+                      placeholder="Last Name"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div>
                   <label className="block text-sm font-medium text-gray-700">Logo</label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => setLogoFile(e.target.files?.[0] || null)}
-                    className="mt-1 block w-full text-sm text-gray-700"
-                  />
+                  <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                    <div className="space-y-1 text-center">
+                      <div className="flex text-sm text-gray-600">
+                        <label className="relative cursor-pointer bg-white rounded-md font-medium text-bhred hover:text-red-700 focus-within:outline-none">
+                          <span>Upload a file</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="sr-only"
+                            onChange={(e) => setLogoFile(e.target.files?.[0] || null)}
+                          />
+                        </label>
+                        <p className="pl-1">or drag and drop</p>
+                      </div>
+                      <p className="text-xs text-gray-500">PNG, JPG up to 5MB</p>
+                      {logoFile && <p className="text-xs text-gray-500 mt-1">{logoFile.name}</p>}
+                    </div>
+                  </div>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -207,21 +262,69 @@ const AddConsortiumPage = () => {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Headquarters</label>
+                    <label className="block text-sm font-medium text-gray-700">Street Address</label>
                     <div className="mt-1 relative rounded-md shadow-sm">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <MapPin className="h-5 w-5 text-gray-400" />
                       </div>
                       <input
                         type="text"
-                        value={formData.headquarters}
-                        onChange={(e) => setFormData({ ...formData, headquarters: e.target.value })}
+                        value={formData.street_address}
+                        onChange={(e) => setFormData({ ...formData, street_address: e.target.value })}
                         className="focus:ring-bhred focus:border-bhred block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md"
-                        placeholder="City, State"
+                        placeholder="123 Main Street"
                         required
                       />
                     </div>
                   </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">City</label>
+                    <input
+                      type="text"
+                      value={formData.city}
+                      onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                      className="mt-1 focus:ring-bhred focus:border-bhred block w-full border border-gray-300 rounded-md py-2 px-3"
+                      placeholder="City"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">State</label>
+                    <input
+                      type="text"
+                      value={formData.state}
+                      onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                      className="mt-1 focus:ring-bhred focus:border-bhred block w-full border border-gray-300 rounded-md py-2 px-3"
+                      placeholder="State"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">ZIP Code</label>
+                    <input
+                      type="text"
+                      value={formData.zip_code}
+                      onChange={(e) => setFormData({ ...formData, zip_code: e.target.value })}
+                      className="mt-1 focus:ring-bhred focus:border-bhred block w-full border border-gray-300 rounded-md py-2 px-3"
+                      placeholder="ZIP Code"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Headquarters (Legacy)</label>
+                  <input
+                    type="text"
+                    value={formData.headquarters}
+                    onChange={(e) => setFormData({ ...formData, headquarters: `${formData.city}, ${formData.state}` })}
+                    className="mt-1 focus:ring-bhred focus:border-bhred block w-full border border-gray-300 rounded-md py-2 px-3"
+                    placeholder="Auto-filled from city and state"
+                    readOnly
+                  />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
