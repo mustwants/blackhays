@@ -288,6 +288,16 @@ class MapService {
   private getLocation(entity: Record<string, unknown>): [number, number] {
     let coords;
 
+    // Check if location is already a valid numeric array
+    if (Array.isArray((entity as any).location) && (entity as any).location.length === 2) {
+      const [lng, lat] = (entity as any).location;
+      const numLng = Number(lng);
+      const numLat = Number(lat);
+      if (!isNaN(numLng) && !isNaN(numLat)) {
+        return [numLng, numLat];
+      }
+    }
+
     // Try to parse existing location fields
     if ((entity as any).location) {
       coords = LocationService.parseLocation((entity as any).location);

@@ -47,11 +47,23 @@ class AdvisorMapService {
         return data.map(advisor => {
           const [first_name, ...rest] = (advisor.name || '').split(' ');
           const last_name = rest.join(' ');
+          
+          // Ensure location is a valid [number, number] array
+          let location: [number, number];
+          if (Array.isArray(advisor.location) && advisor.location.length === 2) {
+            location = [Number(advisor.location[0]), Number(advisor.location[1])];
+          } else if (advisor.location && typeof advisor.location === 'object' && 'x' in advisor.location && 'y' in advisor.location) {
+            location = [Number(advisor.location.x), Number(advisor.location.y)];
+          } else {
+            // Fallback to default coordinates (Washington DC)
+            location = [-77.0369, 38.9072];
+          }
+          
           return {
             id: advisor.id,
             first_name,
             last_name,
-            location: advisor.location,
+            location,
             about: advisor.about,
             professional_title: advisor.professional_title,
             military_branch: advisor.military_branch

@@ -147,7 +147,7 @@ const MockDataGenerator: React.FC<MockDataGeneratorProps> = ({ onDataGenerated }
           military_branch: militaryBranches[i % militaryBranches.length],
           years_of_mil_service: Math.floor(Math.random() * 25) + 5,
           about: `Mock advisor with extensive experience in defense and security.`,
-          location: `(${location.coords[0]}, ${location.coords[1]})`,
+          location: location.coords,
           street_address: `${Math.floor(100 + Math.random() * 9900)} Main St`,
           city: location.city,
           state: location.state,
