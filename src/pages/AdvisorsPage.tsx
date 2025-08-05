@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { supabase } from '../supabaseClient';
+import { supabase } from '../lib/supabaseClient';
 
 interface Advisor {
   id: string;
@@ -19,7 +19,7 @@ const AdvisorsPage = () => {
     const fetchAdvisors = async () => {
       try {
         const { data, error } = await supabase
-          .from('advisors')
+          .from('advisor_applications')
           .select('id, first_name, last_name, about, professional_title, military_branch')
           .eq('status', 'approved')
           .order('last_name', { ascending: true });
