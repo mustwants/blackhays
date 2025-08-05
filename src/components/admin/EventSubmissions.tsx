@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabaseClient';
-import { RefreshCw, Trash2, Edit2, Check, X, PauseCircle } from 'lucide-react';
+import { RefreshCw, Trash2, Edit2, Check, X, PauseCircle, Search } from 'lucide-react';
 
 interface EventSubmissionsProps {
   initialData?: any[];
@@ -12,6 +12,8 @@ const EventSubmissions: React.FC<EventSubmissionsProps> = ({ initialData = [] })
   const [error, setError] = useState(null);
   const [editingItem, setEditingItem] = useState(null);
   const [actionSuccess, setActionSuccess] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
 
   useEffect(() => {
     if (initialData.length > 0) {
@@ -112,6 +114,20 @@ const EventSubmissions: React.FC<EventSubmissionsProps> = ({ initialData = [] })
     }
   };
 
+  // Filter submissions based on search and status  
+  const filteredSubmissions = submissions.filter(submission => {
+    const matchesSearch = !searchTerm || 
+      submission.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      submission.location?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      submission.submitter_email?.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesStatus = statusFilter === 'all' || 
+      submission.status === statusFilter ||
+      (statusFilter === 'approved' && submission.isEvent); // Show regular events as approved
+    
+    return matchesSearch && matchesStatus;
+  });
+
   const getStatusBadge = (status: string) => {
     const statusColors = {
       pending: 'bg-yellow-100 text-yellow-800',
@@ -141,6 +157,37 @@ const EventSubmissions: React.FC<EventSubmissionsProps> = ({ initialData = [] })
           Refresh
         </button>
       </div>
+      
+      {/* Search and Filter Controls */}
+      <div className="bg-white p-4 rounded-lg shadow-sm border space-y-4">
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex-1">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <input
+                type="text"
+                placeholder="Search events by name, location, or submitter..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-bhred focus:border-bhred"
+              />
+            </div>
+          </div>
+          <div className="md:w-48">
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="w-full py-2 px-3 border border-gray-300 rounded-lg focus:ring-bhred focus:border-bhred"
+            >
+              <option value="all">All Status</option>
+              <option value="pending">Pending</option>
+              <option value="approved">Approved</option>
+              <option value="paused">Paused</option>
+              <option value="rejected">Rejected</option>
+            </select>
+          </div>
+        </div>
+      </div>
 
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
@@ -160,7 +207,7 @@ const EventSubmissions: React.FC<EventSubmissionsProps> = ({ initialData = [] })
         </div>
       ) : submissions.length > 0 ? (
         <div className="space-y-4">
-          {submissions.map((submission) => (
+          {filteredSubmissions.map((submission) => (
             <div key={submission.id} className="bg-white rounded-lg shadow-sm border p-6">
               <div className="flex justify-between items-start">
                          <div className="flex items-start">
@@ -207,8 +254,15 @@ const EventSubmissions: React.FC<EventSubmissionsProps> = ({ initialData = [] })
                   </div>
                 </div>
 
-                {!submission.isEvent && (
+                {!submission.isEvent ? (
                   <div className="flex space-x-2">
+                    <button
+                      onClick={() => setEditingItem({...submission})}
+                      className="p-2 text-blue-600 hover:bg-blue-50 rounded-full"
+                      title="Edit"
+                    >
+                      <Edit2 className="w-5 h-5" />
+                    </button>
                     <button
                       onClick={() => handleAction(submission.id, 'approve')}
                       className="p-2 text-green-600 hover:bg-green-50 rounded-full"
@@ -238,6 +292,81 @@ const EventSubmissions: React.FC<EventSubmissionsProps> = ({ initialData = [] })
                       <Trash2 className="w-5 h-5" />
                     </button>
                   </div>
+                ) : (
+                  <div className="text-xs text-gray-500 italic">
+                    Regular Event
+                  </div>
+                )}
+              </div>
+              
+              {editingItem && editingItem.id === submission.id && (
+                <div className="mt-4 space-y-3 border-t pt-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Event Name</label>
+                    <input
+                      type="text"
+                      value={editingItem.name}
+                      onChange={(e) => setEditingItem({...editingItem, name: e.target.value})}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-bhred focus:ring-bhred sm:text-sm"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Start Date</label>
+                      <input
+                        type="datetime-local"
+                        value={editingItem.start_date ? new Date(editingItem.start_date).toISOString().slice(0, 16) : ''}
+                        onChange={(e) => setEditingItem({...editingItem, start_date: e.target.value})}
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-bhred focus:ring-bhred sm:text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">End Date</label>
+                      <input
+                        type="datetime-local"
+                        value={editingItem.end_date ? new Date(editingItem.end_date).toISOString().slice(0, 16) : ''}
+                        onChange={(e) => setEditingItem({...editingItem, end_date: e.target.value})}
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-bhred focus:ring-bhred sm:text-sm"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Location</label>
+                    <input
+                      type="text"
+                      value={editingItem.location || ''}
+                      onChange={(e) => setEditingItem({...editingItem, location: e.target.value})}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-bhred focus:ring-bhred sm:text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Website</label>
+                    <input
+                      type="text"
+                      value={editingItem.website || ''}
+                      onChange={(e) => setEditingItem({...editingItem, website: e.target.value})}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-bhred focus:ring-bhred sm:text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">About</label>
+                    <textarea
+                      value={editingItem.about || ''}
+                      onChange={(e) => setEditingItem({...editingItem, about: e.target.value})}
+                      rows={3}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-bhred focus:ring-bhred sm:text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Submitter Email</label>
+                    <input
+                      type="email"
+                      value={editingItem.submitter_email || ''}
+                      onChange={(e) => setEditingItem({...editingItem, submitter_email: e.target.value})}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-bhred focus:ring-bhred sm:text-sm"
+                    />
+                  </div>
+                </div>
                 )}
               </div>
             </div>
@@ -245,7 +374,7 @@ const EventSubmissions: React.FC<EventSubmissionsProps> = ({ initialData = [] })
         </div>
       ) : (
         <div className="text-center py-8 text-gray-500">
-          No events found
+          {searchTerm || statusFilter !== 'all' ? 'No events match your search criteria' : 'No events found'}
         </div>
       )}
     </div>
