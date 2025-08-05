@@ -44,10 +44,11 @@ export class LocationService {
         if (location.startsWith('POINT')) {
           const matches = location.match(/POINT\(([-\d.]+)\s+([-\d.]+)\)/);
           if (matches) {
-            return {
-              lng: parseFloat(matches[1]),
-              lat: parseFloat(matches[2])
-            };
+            const lng = parseFloat(matches[1]);
+            const lat = parseFloat(matches[2]);
+            if (!isNaN(lng) && !isNaN(lat)) {
+              return { lng, lat };
+            }
           }
         }
         
@@ -61,10 +62,11 @@ export class LocationService {
       
       if (typeof location === 'object' && location !== null) {
         if ('x' in location && 'y' in location) {
-          return {
-            lng: parseFloat(location.x),
-            lat: parseFloat(location.y)
-          };
+          const lng = parseFloat((location as any).x);
+          const lat = parseFloat((location as any).y);
+          if (!isNaN(lng) && !isNaN(lat)) {
+            return { lng, lat };
+          }
         }
       }
       
