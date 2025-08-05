@@ -110,7 +110,6 @@ class EventService {
       // due to RLS policies. Requesting the row would trigger a 400 error.
       const { error } = await supabase
         .from(this.submissionsEndpoint)
-        .insert([submissionData])
         .insert([submissionData]);
 
       if (error) {
