@@ -40,17 +40,16 @@ const NewsletterSignup: React.FC<NewsletterSignupProps> = ({ onClose }) => {
       // First, save to Supabase
       const { error: dbError } = await supabase
         .from('newsletter_subscribers')
-        .insert([{ 
+        .upsert([{ 
           first_name: formData.first_name.trim(),
           last_name: formData.last_name.trim(),
           email: formData.email.trim().toLowerCase(),
           notify_ceo: true // Flag to indicate CEO should be notified
-        }]);
+        }], {
+          onConflict: 'email'
+        });
 
       if (dbError) {
-        if (dbError.code === '23505') { // Unique violation
-          throw new Error('This email is already subscribed to our newsletter.');
-        }
         throw dbError;
       }
       
