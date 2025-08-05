@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ExternalLink, Shield, Search, HelpCircle, Download, Check } from 'lucide-react';
 import { jsPDF } from 'jspdf';
+import html2canvas from 'html2canvas';
 import Footer from '../components/Footer';
 import AdminPanel from '../components/AdminPanel';
 
@@ -12,18 +13,20 @@ interface ChecklistItem {
   value?: string;
   type?: 'text' | 'date' | 'password' | 'number';
   mask?: boolean;
+    description?: string;
 }
 
 const DoDSmallBusinessPage = () => {
   const [showAdminPanel, setShowAdminPanel] = useState(false);
   const [checklist, setChecklist] = useState<ChecklistItem[]>([
-       {
+    {
       id: 'ein',
       label: 'EIN',
       completed: false,
       type: 'text',
       value: '',
-      link: 'https://www.irs.gov/businesses/small-businesses-self-employed/employer-id-numbers'
+      link: 'https://www.irs.gov/businesses/small-businesses-self-employed/employer-id-numbers',
+      description: 'Employer Identification Number issued by the IRS.'
     },
     {
       id: 'duns',
@@ -31,7 +34,8 @@ const DoDSmallBusinessPage = () => {
       completed: false,
       type: 'text',
       value: '',
-      link: 'https://sam.gov/content/duns-uei'
+      link: 'https://sam.gov/content/duns-uei',
+      description: 'Unique identifier for your business used in federal systems.'
     },
     {
       id: 'bank',
@@ -40,7 +44,8 @@ const DoDSmallBusinessPage = () => {
       type: 'text',
       value: '',
       mask: true,
-      link: 'https://www.irs.gov/businesses/small-businesses-self-employed/opening-a-bank-account'
+      link: 'https://www.irs.gov/businesses/small-businesses-self-employed/opening-a-bank-account',
+      description: 'Account used for federal payments; enter only the last four digits.'
     },
     {
       id: 'address',
@@ -48,7 +53,8 @@ const DoDSmallBusinessPage = () => {
       completed: false,
       type: 'text',
       value: '',
-      link: 'https://www.sba.gov/business-guide/plan-your-business/choose-your-business-location-equipment'
+      link: 'https://www.sba.gov/business-guide/plan-your-business/choose-your-business-location-equipment',
+      description: 'Business physical location.'
     },
     {
       id: 'incorp',
@@ -56,13 +62,15 @@ const DoDSmallBusinessPage = () => {
       completed: false,
       type: 'date',
       value: '',
-      link: 'https://www.sba.gov/business-guide/launch-your-business/choose-business-structure'
+      link: 'https://www.sba.gov/business-guide/launch-your-business/choose-business-structure',
+      description: 'Date your business was officially formed.'
     },
     {
       id: 'login',
       label: 'Create a Login.gov account',
       completed: false,
-      link: 'https://login.gov/'
+      link: 'https://login.gov/',
+      description: 'Single sign-on for U.S. government services.'
     },
     { 
       id: 'cage',
@@ -70,34 +78,39 @@ const DoDSmallBusinessPage = () => {
       completed: false,
       type: 'text',
       value: '',
-      link: 'https://cage.dla.mil/'
+      link: 'https://cage.dla.mil/',
+      description: 'Commercial and Government Entity code used for federal contracting.'
     },
     {
       id: 'sam',
       label: 'Register in SAM',
       completed: false,
-      link: 'https://sam.gov/content/home'
+      link: 'https://sam.gov/content/home',
+      description: 'System for Award Management registration.'
     },
     {
       id: 'sbir',
       label: 'Register in SBIR',
       completed: false,
-      link: 'https://www.sbir.gov/registration'
+      link: 'https://www.sbir.gov/registration',
+      description: 'Small Business Innovation Research registration.'
     },
     {
       id: 'sbc',
       label: 'Register SBC and get Certificate',
       completed: false,
-      link: 'https://certify.sba.gov/'
+      link: 'https://certify.sba.gov/',
+      description: 'Small Business Certification through the SBA.'
     },
     {
       id: 'dsip',
       label: 'Set up your DSIP for submissions',
       completed: false,
-      link: 'https://www.dodsbirsttr.mil/submissions/'
+      link: 'https://www.dodsbirsttr.mil/submissions/',
+      description: 'Defense SBIR/STTR Innovation Portal for proposal submissions.'
     }
   ]);
-
+  const [infoItem, setInfoItem] = useState<string | null>(null);
   const handleAdminClick = () => {
     setShowAdminPanel(true);
   };
@@ -129,35 +142,15 @@ const DoDSmallBusinessPage = () => {
     ));
   };
 
-  const exportToPDF = () => {
-    const pdf = new jsPDF();
-    pdf.setFontSize(16);
-    pdf.text('DoD Small Business Checklist', 10, 20);
-
-    let y = 30;
-    const pageHeight = pdf.internal.pageSize.getHeight();
-
-    checklist.forEach(item => {
-      let display = item.label;
-      if (item.value) {
-        const masked = item.mask
-          ? `${'*'.repeat(Math.max(0, item.value.length - 4))}${item.value.slice(-4)}`
-          : item.value;
-        display += `: ${masked}`;
-      }
-
-      if (item.link) {
-        pdf.textWithLink(display, 10, y, { url: item.link });
-      } else {
-        pdf.text(display, 10, y);
-      }
-
-      y += 10;
-      if (y > pageHeight - 10) {
-        pdf.addPage();
-        y = 20;
-      }
-    });
+  const exportToPDF = async () => {
+    const element = document.getElementById('checklist-content');
+    if (!element) return;
+    const canvas = await html2canvas(element);
+    const imgData = canvas.toDataURL('image/png');
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
 
     pdf.save('dod-small-business-checklist.pdf');
   };
@@ -214,7 +207,7 @@ const DoDSmallBusinessPage = () => {
               {checklist.map((item) => (
                 <div
                   key={item.id}
-                  className="flex flex-col p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                  className="flex flex-col p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors relative"
                 >
                   <div className="flex items-center mb-2">
                     <button
@@ -227,16 +220,15 @@ const DoDSmallBusinessPage = () => {
                         item.completed ? 'text-green-600' : 'text-gray-400'
                       }`} />
                     </button>
-                    <span className="ml-2 text-gray-700 font-medium">{item.label}</span>
-                    {item.link && (
-                      <a
-                        href={item.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="ml-auto text-bhred hover:text-red-700"
+                    <span className="ml-2 text-gray-700 font-medium flex-grow">{item.label}</span>
+                    {item.description && (
+                      <button
+                        onClick={() => setInfoItem(infoItem === item.id ? null : item.id)}
+                        className="text-gray-400 hover:text-bhred"
+                        aria-label={`Info about ${item.label}`}
                       >
-                        <ExternalLink className="w-4 h-4" />
-                      </a>
+                        <HelpCircle className="w-4 h-4" />
+                      </button>
                     )}
                   </div>
                   {item.type && (
@@ -244,9 +236,25 @@ const DoDSmallBusinessPage = () => {
                       type={item.type}
                       value={item.value || ''}
                       onChange={(e) => updateValue(item.id, e.target.value)}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-bhred focus:ring-bhred text-sm"
-                      placeholder={`Enter ${item.label}`}
-                    />
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-bhred focus:ring-bhred text-sm"
+                    placeholder={`Enter ${item.label}`}
+                  />
+                )}
+                  {infoItem === item.id && item.description && (
+                    <div className="absolute top-full left-0 mt-2 p-4 bg-white border rounded shadow-lg z-10">
+                      <p className="text-sm text-gray-600">{item.description}</p>
+                      {item.link && (
+                        <a
+                          href={item.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center text-bhred hover:text-red-700 text-sm mt-2"
+                        >
+                          Learn more
+                          <ExternalLink className="w-4 h-4 ml-1" />
+                        </a>
+                      )}
+                    </div>
                   )}
                 </div>
               ))}
