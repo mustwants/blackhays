@@ -164,7 +164,7 @@ class MapService {
 
     return data.map(advisor => ({
       id: advisor.id,
-      name: `${advisor.first_name} ${advisor.last_name}`,
+      name: advisor.name ?? '',
       type: 'advisor',
       description: advisor.about,
       location: this.getLocation(advisor),
