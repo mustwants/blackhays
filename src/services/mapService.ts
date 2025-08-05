@@ -254,7 +254,7 @@ class MapService {
       supabase
         .from('event_submissions')
         .select('*')
-        .eq('status', 'approved')
+        .in('status', ['approved', 'pending'])
         .gte('end_date', now)
     ]);
 
@@ -280,7 +280,8 @@ class MapService {
       website: event.website,
       details: {
         start_date: event.start_date,
-        end_date: event.end_date
+        end_date: event.end_date,
+        status: event.status
       }
     }));
   }
