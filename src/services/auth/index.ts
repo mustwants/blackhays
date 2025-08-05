@@ -55,8 +55,11 @@ class SupabaseAuthService implements AuthService {
       }
       
       return { 
-        user: adminUser,
-        session: sessionData.session
+        data: {
+          user: adminUser,
+          session: sessionData.session
+        },
+        error: null
       };
     }
 
@@ -69,10 +72,10 @@ class SupabaseAuthService implements AuthService {
 
     if (error) {
       console.error('Supabase auth error:', error);
-      throw error;
+      return { data: null, error };
     }
 
-    return data;
+    return { data, error: null };
   }
 
   async logout() {
