@@ -1,12 +1,5 @@
 import { Event, Advisor } from '../types';
 
-const formatDate = (date: Date): string => {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-};
-
 export const validationUtils = {
   // Validate email format
   isValidEmail(email: string): boolean {
@@ -61,12 +54,7 @@ export const validationUtils = {
     if (!event.start_date || !event.end_date) {
       errors.push('Event dates are required');
     } else {
-            const today = formatDate(new Date());
-
-      if (event.start_date < today) {
-        errors.push('Start date cannot be in the past');
-      }
-      if (event.end_date < event.start_date) {
+    if (event.end_date < event.start_date) {
         errors.push('End date cannot be before start date');
       }
     }
