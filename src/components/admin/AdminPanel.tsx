@@ -194,7 +194,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
 
         {/* Content */}
         <div className="flex-1 overflow-auto p-6">
-          {activeTab === 'dashboard' && <AdminDashboard />}
+          {activeTab === 'dashboard' && <AdminDashboard onCategoryClick={setActiveTab} />}
           {activeTab === 'advisors' && (
             <div>
               <h3 className="text-lg font-bold mb-4">Advisor Applications</h3>

@@ -19,7 +19,11 @@ interface DashboardStats {
   newsletterCount: number;
 }
 
-const AdminDashboard = () => {
+interface AdminDashboardProps {
+  onCategoryClick?: (category: string) => void;
+}
+
+const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCategoryClick }) => {
   const [stats, setStats] = useState<DashboardStats>({
     advisors: { total: 0, approved: 0, pending: 0, paused: 0, rejected: 0 },
     events: { total: 0, approved: 0, pending: 0, paused: 0, rejected: 0 },
@@ -132,14 +136,21 @@ const AdminDashboard = () => {
     title, 
     stats, 
     icon: Icon,
-    color
+    color,
+    onClick
   }: { 
     title: string;
     stats: CategoryStats;
     icon: React.ElementType;
     color: string;
-  }) => (
-    <div className={`bg-white rounded-lg shadow-md p-6 border-l-4 ${color}`}>
+    onClick?: () => void;
+  }) => {
+    const cardClasses = `bg-white rounded-lg shadow-md p-6 border-l-4 ${color} ${
+      onClick ? 'cursor-pointer hover:shadow-lg transform hover:-translate-y-1 transition-all' : ''
+    }`;
+    
+    return (
+    <div className={cardClasses} onClick={onClick}>
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
         <Icon className="w-6 h-6 text-gray-500" />
@@ -164,7 +175,8 @@ const AdminDashboard = () => {
         </div>
       </div>
     </div>
-  );
+    );
+  };
 
   if (loading) {
     return (
@@ -205,33 +217,39 @@ const AdminDashboard = () => {
           stats={stats.advisors}
           icon={Users}
           color="border-blue-500"
+          onClick={() => onCategoryClick?.('advisors')}
         />
         <StatCard
           title="Events"
           stats={stats.events}
           icon={Calendar}
           color="border-green-500"
+          onClick={() => onCategoryClick?.('events')}
         />
         <StatCard
           title="Companies"
           stats={stats.companies}
           icon={Building}
           color="border-purple-500"
+          onClick={() => onCategoryClick?.('companies')}
         />
         <StatCard
           title="Consortiums"
           stats={stats.consortiums}
           icon={Rocket}
           color="border-red-500"
+          onClick={() => onCategoryClick?.('consortiums')}
         />
         <StatCard
           title="Innovations"
           stats={stats.innovations}
           icon={Brain}
           color="border-amber-500"
+          onClick={() => onCategoryClick?.('innovations')}
         />
         
-        <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-indigo-500">
+        <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-indigo-500 cursor-pointer hover:shadow-lg transform hover:-translate-y-1 transition-all"
+             onClick={() => onCategoryClick?.('newsletter')}>
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-gray-800">Newsletter Subscribers</h3>
             <Mail className="w-6 h-6 text-gray-500" />
