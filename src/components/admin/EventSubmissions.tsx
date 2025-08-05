@@ -369,6 +369,7 @@ const EventSubmissions: React.FC<EventSubmissionsProps> = ({ initialData = [] })
                   </div>
                 </div>
               )}
+              </div>
             </React.Fragment>
           ))}
         </div>
