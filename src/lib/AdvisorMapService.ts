@@ -32,7 +32,7 @@ class AdvisorMapService {
         }
 
         const { data, error } = await supabase
-          .from('advisors')
+          .from('advisor_applications')
           .select('id, first_name, last_name, about, professional_title, military_branch')
           .eq('status', 'approved')
           .order('last_name');
