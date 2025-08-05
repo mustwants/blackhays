@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ExternalLink, Shield, Search, HelpCircle, Download, Check } from 'lucide-react';
 import { jsPDF } from 'jspdf';
-import html2canvas from 'html2canvas';
 import Footer from '../components/Footer';
 import AdminPanel from '../components/AdminPanel';
 
@@ -19,6 +18,14 @@ interface ChecklistItem {
 const DoDSmallBusinessPage = () => {
   const [showAdminPanel, setShowAdminPanel] = useState(false);
   const [checklist, setChecklist] = useState<ChecklistItem[]>([
+        {
+      id: 'legalName',
+      label: 'Legal Name of Company',
+      completed: false,
+      type: 'text',
+      value: '',
+      description: 'Official name of your business.'
+    },
     {
       id: 'ein',
       label: 'EIN',
@@ -48,13 +55,37 @@ const DoDSmallBusinessPage = () => {
       description: 'Account used for federal payments; enter only the last four digits.'
     },
     {
-      id: 'address',
-      label: 'Physical Address',
+      id: 'street',
+      label: 'Street Address',
       completed: false,
       type: 'text',
       value: '',
       link: 'https://www.sba.gov/business-guide/plan-your-business/choose-your-business-location-equipment',
-      description: 'Business physical location.'
+      description: 'Business physical street address.'
+    },
+    {
+      id: 'city',
+      label: 'City',
+      completed: false,
+      type: 'text',
+      value: '',
+      description: 'City where your business is located.'
+    },
+    {
+      id: 'state',
+      label: 'State',
+      completed: false,
+      type: 'text',
+      value: '',
+      description: 'State where your business is located.'
+    },
+    {
+      id: 'zip',
+      label: 'Zip Code',
+      completed: false,
+      type: 'text',
+      value: '',
+      description: 'Zip code of your business address.'
     },
     {
       id: 'incorp',
@@ -97,10 +128,16 @@ const DoDSmallBusinessPage = () => {
     },
     {
       id: 'sbc',
-      label: 'Register SBC and get Certificate',
+      label: 'Register SBC',
       completed: false,
       link: 'https://certify.sba.gov/',
       description: 'Small Business Certification through the SBA.'
+    },
+        {
+      id: 'certificate',
+      label: 'Downloaded Certificate',
+      completed: false,
+      description: 'Confirmation of SBC registration download.'
     },
     {
       id: 'dsip',
@@ -142,15 +179,72 @@ const DoDSmallBusinessPage = () => {
     ));
   };
 
-  const exportToPDF = async () => {
-    const element = document.getElementById('checklist-content');
-    if (!element) return;
-    const canvas = await html2canvas(element);
-    const imgData = canvas.toDataURL('image/png');
+  const exportToPDF = () => {
     const pdf = new jsPDF('p', 'mm', 'a4');
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+   const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+    let y = 20;
+
+    const getItem = (id: string) => checklist.find(item => item.id === id);
+    const getValue = (id: string) => getItem(id)?.value || '';
+
+    const companyName = getValue('legalName');
+    pdf.setFontSize(16);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text(companyName || 'Legal Name of Company', pageWidth / 2, y, { align: 'center' });
+    y += 12;
+
+    pdf.setFontSize(12);
+    pdf.setFont('helvetica', 'normal');
+
+    const fields = [
+      { id: 'legalName', label: 'Legal Name of Company' },
+      { id: 'ein', label: 'EIN' },
+      { id: 'duns', label: 'DUNS/UEI' },
+      { id: 'bank', label: 'Bank Account (Last 4)', mask: true },
+      { id: 'street', label: 'Street Address' },
+      { id: 'city', label: 'City' },
+      { id: 'state', label: 'State' },
+      { id: 'zip', label: 'Zip Code' },
+      { id: 'incorp', label: 'Date of Incorporation' },
+      { id: 'cage', label: 'Acquire CAGE Code' }
+    ];
+
+    fields.forEach(field => {
+      let value = getValue(field.id);
+      if (field.mask && value) {
+        value = `x-${value}`;
+      }
+      if (field.id === 'incorp' && value) {
+        value = new Date(value).toLocaleDateString('en-US');
+      }
+      pdf.text(`${field.label}: ${value}`, 20, y);
+      y += 8;
+    });
+
+    y += 4;
+
+    const checks = [
+      { id: 'login', label: 'Create a Login.gov account' },
+      { id: 'sam', label: 'Register in SAM' },
+      { id: 'sbir', label: 'Register in SBIR' },
+      { id: 'sbc', label: 'Register SBC' },
+      { id: 'certificate', label: 'Downloaded Certificate' },
+      { id: 'dsip', label: 'Set up your DSIP for submissions' }
+    ];
+
+    checks.forEach(check => {
+      pdf.rect(20, y - 4, 4, 4);
+      if (getItem(check.id)?.completed) {
+        pdf.line(20, y - 4, 24, y);
+        pdf.line(24, y - 4, 20, y);
+      }
+      pdf.text(check.label, 30, y);
+      y += 8;
+    });
+
+    pdf.setFontSize(10);
+    pdf.text('Powered by BlackHays Group', pageWidth / 2, pageHeight - 10, { align: 'center' });
 
     pdf.save('dod-small-business-checklist.pdf');
   };
