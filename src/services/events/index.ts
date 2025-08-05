@@ -104,19 +104,24 @@ class EventService {
       };
 
       // Insert directly using Supabase client with public access
-      const { data, error } = await supabase
+      //
+      // We don't request the inserted row back because the anonymous
+      // public role doesn't have permission to select non-approved rows
+      // due to RLS policies. Requesting the row would trigger a 400 error.
+      const { error } = await supabase
         .from(this.submissionsEndpoint)
         .insert([submissionData])
         .select()
         .single();
+              .insert([submissionData]);
 
       if (error) {
         console.error('Error submitting event:', error);
         throw error;
       }
 
-      console.log('Successfully submitted event:', data);
-      return { data, error: null };
+      console.log('Successfully submitted event');
+      return { data: null, error: null };
     } catch (error) {
       console.error('Error in submitEvent:', error);
       return { 
