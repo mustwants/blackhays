@@ -1,6 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Map, { Marker, Popup, NavigationControl, ScaleControl, Source, Layer } from 'react-map-gl';
-import { Search, Filter, Layers, MapPin, Users, Building, Rocket, Calendar, Lightbulb } from 'lucide-react';
+import {
+  Search,
+  Filter,
+  Layers,
+  MapPin,
+  Users,
+  Building,
+  Rocket,
+  Calendar,
+  Lightbulb,
+  Tag,
+  X
+} from 'lucide-react';
 import { mapService, type MapEntity } from '../services/mapService';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
@@ -42,6 +54,9 @@ const MapExplorer = () => {
     zoom: 3.5
   });
   const [searchTerm, setSearchTerm] = useState('');
+    const [searchLocation, setSearchLocation] = useState('');
+  const [searchDate, setSearchDate] = useState('');
+  const [searchEventType, setSearchEventType] = useState('');
   const [filters, setFilters] = useState({
     advisor: true,
     company: true,
@@ -50,6 +65,8 @@ const MapExplorer = () => {
     event: true
   });
   const [showFilters, setShowFilters] = useState(false);
+    const [controlsCollapsed, setControlsCollapsed] = useState(false);
+  const [legendCollapsed, setLegendCollapsed] = useState(false);
 
   const mapRef = useRef(null);
   const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN;
@@ -80,6 +97,26 @@ const MapExplorer = () => {
     if (searchTerm && !entity.name.toLowerCase().includes(searchTerm.toLowerCase())) {
       return false;
     }
+        if (
+      searchLocation &&
+      !entity.address?.toLowerCase().includes(searchLocation.toLowerCase())
+    ) {
+      return false;
+    }
+    if (entity.type === 'event') {
+      const startDate = entity.details?.start_date
+        ? entity.details.start_date.slice(0, 10)
+        : '';
+      const eventType = (
+        (entity.details?.event_type || entity.details?.type || '') as string
+      ).toLowerCase();
+      if (searchDate && startDate !== searchDate) {
+        return false;
+      }
+      if (searchEventType && !eventType.includes(searchEventType.toLowerCase())) {
+        return false;
+      }
+    }
     return true;
   });
 
@@ -89,6 +126,14 @@ const MapExplorer = () => {
       [type]: !prev[type]
     }));
   };
+    const typeDescriptions: Record<string, string> = {
+    advisor: 'Connect with defense advisors and experts.',
+    company: 'Companies driving defense innovation.',
+    consortium: 'Collaborative defense partnerships.',
+    innovation: 'Innovation labs and organizations.',
+    event: 'Upcoming events in the ecosystem.'
+  };
+
 
   if (!MAPBOX_TOKEN) {
     return (
@@ -101,57 +146,136 @@ const MapExplorer = () => {
   return (
     <div className="relative w-full h-[calc(100vh-13rem)]">
       {/* Search and Filter Controls */}
-      <div className="absolute top-4 left-4 z-10 w-80 bg-white rounded-lg shadow-lg overflow-hidden">
-        <div className="p-4">
-          <div className="relative mb-3">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search the map..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-bhred focus:border-bhred"
-            />
-          </div>
-          
-          <div className="flex justify-between items-center mb-2">
+      {controlsCollapsed ? (
+        <button
+          onClick={() => setControlsCollapsed(false)}
+          className="absolute top-4 left-4 z-10 bg-white p-2 rounded-lg shadow-lg"
+          title="Show search and filters"
+        >
+          <Filter className="w-5 h-5" />
+        </button>
+      ) : (
+        <div className="absolute top-4 left-4 z-10 w-80 bg-white rounded-lg shadow-lg overflow-hidden">
+          <div className="p-4 relative">
             <button
-              onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center text-gray-700 hover:text-bhred"
+              onClick={() => setControlsCollapsed(true)}
+              className="absolute top-2 right-2 text-gray-500 hover:text-bhred"
             >
-              <Filter className="w-4 h-4 mr-1" />
-              Filters
+              <X className="w-4 h-4" />
             </button>
-          </div>
-          
-          {showFilters && (
-            <div className="bg-gray-50 p-3 rounded-lg mt-2 space-y-2">
-              <div className="text-sm font-medium text-gray-700 mb-2">Show on map:</div>
-              <div className="grid grid-cols-2 gap-2">
-                {Object.entries(filters).map(([type, enabled]) => {
-                  const Icon = typeIcons[type as keyof typeof typeIcons];
-                  return (
-                    <button
-                      key={type}
-                      onClick={() => toggleFilter(type as keyof typeof filters)}
-                      className={`flex items-center justify-between px-3 py-2 rounded-md transition-colors ${
-                        enabled 
-                          ? `bg-${type === 'advisor' ? 'blue' : type === 'company' ? 'green' : type === 'consortium' ? 'purple' : type === 'innovation' ? 'amber' : 'red'}-100 text-${type === 'advisor' ? 'blue' : type === 'company' ? 'green' : type === 'consortium' ? 'purple' : type === 'innovation' ? 'amber' : 'red'}-800 border border-${type === 'advisor' ? 'blue' : type === 'company' ? 'green' : type === 'consortium' ? 'purple' : type === 'innovation' ? 'amber' : 'red'}-200`
-                          : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
-                      }`}
-                    >
-                      <div className="flex items-center">
-                        <Icon className="w-4 h-4 mr-2" />
-                        <span className="capitalize">{type}s</span>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
+            <div className="relative mb-3">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search by name..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-bhred focus:border-bhred"
+              />
             </div>
-          )}
+            <div className="relative mb-3">
+              <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search by location..."
+                value={searchLocation}
+                onChange={(e) => setSearchLocation(e.target.value)}
+                className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-bhred focus:border-bhred"
+              />
+            </div>
+            <div className="relative mb-3">
+              <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <input
+                type="date"
+                value={searchDate}
+                onChange={(e) => setSearchDate(e.target.value)}
+                className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-bhred focus:border-bhred"
+              />
+            </div>
+            <div className="relative mb-3">
+              <Tag className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search by event type..."
+                value={searchEventType}
+                onChange={(e) => setSearchEventType(e.target.value)}
+                className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-bhred focus:border-bhred"
+              />
+            </div>
+
+            <div className="flex justify-between items-center mb-2">
+              <button
+                onClick={() => setShowFilters(!showFilters)}
+                className="flex items-center text-gray-700 hover:text-bhred"
+              >
+                <Filter className="w-4 h-4 mr-1" />
+                Filters
+              </button>
+            </div>
+
+            {showFilters && (
+              <div className="bg-gray-50 p-3 rounded-lg mt-2 space-y-2">
+                <div className="text-sm font-medium text-gray-700 mb-2">Show on map:</div>
+                <div className="grid grid-cols-2 gap-2">
+                  {Object.entries(filters).map(([type, enabled]) => {
+                    const Icon = typeIcons[type as keyof typeof typeIcons];
+                    return (
+                      <div key={type} className="relative group">
+                        <button
+                          onClick={() => toggleFilter(type as keyof typeof filters)}
+                          className={`flex items-center justify-between px-3 py-2 rounded-md transition-colors ${
+                            enabled
+                              ? `bg-${
+                                  type === 'advisor'
+                                    ? 'blue'
+                                    : type === 'company'
+                                      ? 'green'
+                                      : type === 'consortium'
+                                        ? 'purple'
+                                        : type === 'innovation'
+                                          ? 'amber'
+                                          : 'red'
+                                }-100 text-${
+                                  type === 'advisor'
+                                    ? 'blue'
+                                    : type === 'company'
+                                      ? 'green'
+                                      : type === 'consortium'
+                                        ? 'purple'
+                                        : type === 'innovation'
+                                          ? 'amber'
+                                          : 'red'
+                                }-800 border border-${
+                                  type === 'advisor'
+                                    ? 'blue'
+                                    : type === 'company'
+                                      ? 'green'
+                                      : type === 'consortium'
+                                        ? 'purple'
+                                        : type === 'innovation'
+                                          ? 'amber'
+                                          : 'red'
+                                }-200`
+                              : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                          }`}
+                        >
+                          <div className="flex items-center">
+                            <Icon className="w-4 h-4 mr-2" />
+                            <span className="capitalize">{type}s</span>
+                          </div>
+                        </button>
+                        <div className="absolute left-1/2 transform -translate-x-1/2 top-full mt-1 hidden group-hover:block bg-gray-800 text-white text-xs rounded px-2 py-1 z-10 w-max">
+                          {typeDescriptions[type]}
+                        </div>
+                      </div>
+                     );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       {error && (
         <div className="absolute top-4 left-4 right-4 z-10 bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded">
@@ -240,23 +364,42 @@ const MapExplorer = () => {
       </Map>
 
       {/* Legend */}
-      <div className="absolute bottom-4 left-4 z-10 bg-white p-3 rounded-lg shadow-lg">
-        <div className="flex items-center text-sm font-medium text-gray-700 mb-2">
-          <Layers className="w-4 h-4 mr-2" />
-          Map Legend
+      {legendCollapsed ? (
+        <button
+          onClick={() => setLegendCollapsed(false)}
+          className="absolute bottom-4 left-4 z-10 bg-white p-2 rounded-lg shadow-lg"
+          title="Show legend"
+        >
+          <Layers className="w-5 h-5" />
+        </button>
+      ) : (
+        <div className="absolute bottom-4 left-4 z-10 bg-white p-3 rounded-lg shadow-lg">
+          <div className="flex items-center text-sm font-medium text-gray-700 mb-2">
+            <Layers className="w-4 h-4 mr-2" />
+            Map Legend
+            <button
+              onClick={() => setLegendCollapsed(true)}
+              className="ml-2 text-gray-500 hover:text-bhred"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+          <div className="space-y-2">
+            {Object.entries(typeIcons).map(([type]) => (
+              <div key={type} className="flex items-center relative group">
+                <div
+                  className="w-4 h-4 rounded-full mr-2"
+                  style={{ backgroundColor: typeColors[type as keyof typeof typeColors] }}
+                ></div>
+                <span className="text-xs text-gray-600 capitalize">{type}s</span>
+                <div className="absolute left-1/2 transform -translate-x-1/2 -top-8 hidden group-hover:block bg-gray-800 text-white text-xs rounded px-2 py-1 z-10 w-max">
+                  {typeDescriptions[type]}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
-        <div className="space-y-2">
-          {Object.entries(typeIcons).map(([type]) => (
-            <div key={type} className="flex items-center">
-              <div 
-                className="w-4 h-4 rounded-full mr-2"
-                style={{ backgroundColor: typeColors[type as keyof typeof typeColors] }}
-              ></div>
-              <span className="text-xs text-gray-600 capitalize">{type}s</span>
-            </div>
-          ))}
-        </div>
-      </div>
+      )}
     </div>
   );
 };
