@@ -4,14 +4,19 @@ import { useNavigate } from 'react-router-dom';
 import Footer from '../components/Footer';
 import AdminPanel from '../components/AdminPanel';
 import { supabase } from '../lib/supabaseClient';
+import EventMap from '../components/EventMap';
+import EventCalendar from '../components/EventCalendar';
+import EventDetailModal, { EventInfo } from '../components/EventDetailModal';
 
 const EventsPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showAdminPanel, setShowAdminPanel] = useState(false);
-  const [events, setEvents] = useState([]);
+  const [events, setEvents] = useState<EventInfo[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-    const navigate = useNavigate();
+  const [error, setError] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<'list' | 'map' | 'calendar'>('list');
+  const [selectedEvent, setSelectedEvent] = useState<EventInfo | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchEvents();
@@ -43,16 +48,16 @@ const EventsPage = () => {
         console.error("Error fetching events:", eventsResult.error);
       }
       
-      let allEvents = [];
+      let allEvents: EventInfo[] = [];
       
       // Add approved submissions
       if (approvedSubmissionsResult.data) {
-        allEvents = [...allEvents, ...approvedSubmissionsResult.data];
+        allEvents = [...allEvents, ...(approvedSubmissionsResult.data as EventInfo[])];
       }
       
       // Add events
       if (eventsResult.data) {
-        allEvents = [...eventsResult.data];
+        allEvents = [...allEvents, ...(eventsResult.data as EventInfo[])];
       }
       
       // Remove duplicates
@@ -134,10 +139,42 @@ const EventsPage = () => {
               Submit Event
             </button>
           </div>
+                    <div className="flex justify-center mt-4 space-x-2">
+            <button
+              onClick={() => setViewMode('list')}
+              className={`px-4 py-2 rounded-lg border ${
+                viewMode === 'list'
+                  ? 'bg-bhred text-white border-bhred'
+                  : 'bg-white text-gray-700'
+              }`}
+            >
+              List
+            </button>
+            <button
+              onClick={() => setViewMode('map')}
+              className={`px-4 py-2 rounded-lg border ${
+                viewMode === 'map'
+                  ? 'bg-bhred text-white border-bhred'
+                  : 'bg-white text-gray-700'
+              }`}
+            >
+              Map
+            </button>
+            <button
+              onClick={() => setViewMode('calendar')}
+              className={`px-4 py-2 rounded-lg border ${
+                viewMode === 'calendar'
+                  ? 'bg-bhred text-white border-bhred'
+                  : 'bg-white text-gray-700'
+              }`}
+            >
+              Calendar
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Events Grid */}
+      {/* Events Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {error && (
           <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded mb-6">
@@ -151,58 +188,66 @@ const EventsPage = () => {
             <p className="mt-4 text-gray-600">Loading events...</p>
           </div>
         ) : filteredEvents.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredEvents.map((event, index) => (
-              <div
-                key={`${event.id}-${index}`}
-                className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow"
-              >
-                <div className="p-6">
-                                    {event.logo_url && (
-                    <img
-                      src={event.logo_url}
-                      alt={`${event.name} logo`}
-                      className="h-24 w-full object-contain mb-4"
-                    />
-                  )}
-                  <h3 className="text-xl font-bold text-bhgray-900 mb-2">
-                    {event.name}
-                  </h3>
-                  <div className="space-y-2 mb-4">
-                    <div className="flex items-center text-bhgray-600">
-                      <Calendar className="w-5 h-5 mr-2" />
-                      {new Date(event.start_date).toLocaleDateString()} - 
-                      {new Date(event.end_date).toLocaleDateString()}
-                    </div>
-                    <div className="flex items-center text-bhgray-600">
-                      <MapPin className="w-5 h-5 mr-2" />
-                      {event.location}
-                    </div>
+            viewMode === 'list' ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {filteredEvents.map((event, index) => (
+                <div
+                  key={`${event.id}-${index}`}
+                  onClick={() => setSelectedEvent(event)}
+                  className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow cursor-pointer"
+                >
+                  <div className="p-6">
+                    {event.logo_url && (
+                      <img
+                        src={event.logo_url}
+                        alt={`${event.name} logo`}
+                        className="h-24 w-full object-contain mb-4"
+                      />
+                    )}
+                    <h3 className="text-xl font-bold text-bhgray-900 mb-2">
+                      {event.name}
+                    </h3>
+                    <div className="space-y-2 mb-4">
+                      <div className="flex items-center text-bhgray-600">
+                        <Calendar className="w-5 h-5 mr-2" />
+                        {new Date(event.start_date).toLocaleDateString()} -
+                        {new Date(event.end_date).toLocaleDateString()}
+                      </div>
+                      <div className="flex items-center text-bhgray-600">
+                        <MapPin className="w-5 h-5 mr-2" />
+                        {event.location}
+                      </div>
+                    {event.about && (
+                      <p className="text-bhgray-600 mb-6">
+                        {event.about}
+                      </p>
+                    )}
+                    {event.website && (
+                      <a
+                        href={event.website}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center text-bhred hover:text-red-700"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <Globe className="w-4 h-4 mr-1" />
+                        Visit Website
+                      </a>
+                    )}
                   </div>
-                  {event.about && (
-                    <p className="text-bhgray-600 mb-6">
-                      {event.about}
-                    </p>
-                  )}
-                  {event.website && (
-                    <a
-                      href={event.website}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center text-bhred hover:text-red-700"
-                    >
-                      <Globe className="w-4 h-4 mr-1" />
-                      Visit Website
-                    </a>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
+                  </div>
+                  </div>
+                            ))}
+            </div>
+          ) : viewMode === 'map' ? (
+            <EventMap events={filteredEvents} onSelectEvent={setSelectedEvent} />
+          ) : (
+            <EventCalendar events={filteredEvents} onSelectEvent={setSelectedEvent} />
+          )
         ) : (
           <div className="text-center py-12">
             <p className="text-gray-600">
-              {searchTerm ? "No events found matching your search." : "No upcoming events found."}
+              {searchTerm ? 'No events found matching your search.' : 'No upcoming events found.'}
             </p>
           </div>
         )}
