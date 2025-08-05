@@ -8,10 +8,16 @@ const AddCompanyPage = () => {
   const [showAdminPanel, setShowAdminPanel] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
+    first_name: '',
+    last_name: '',
     website: '',
     industry: '',
     focus_areas: '',
     location: '',
+    street_address: '',
+    city: '',
+    state: '',
+    zip_code: '',
     description: '',
     contact_name: '',
     contact_email: '',
@@ -31,10 +37,16 @@ const AddCompanyPage = () => {
     const fillTestData = () => {
     setFormData({
       name: 'Test Defense Corp',
+      first_name: 'Jane',
+      last_name: 'Doe',
       website: 'https://example.com',
       industry: 'defense',
       focus_areas: 'AI, Cybersecurity',
       location: 'Arlington, VA',
+      street_address: '123 Defense St',
+      city: 'Arlington',
+      state: 'VA',
+      zip_code: '22202',
       description: 'A test company working on defense technology.',
       contact_name: 'Jane Doe',
       contact_email: 'jane.doe@example.com',
@@ -102,10 +114,16 @@ const AddCompanyPage = () => {
       setSuccess(true);
       setFormData({
         name: '',
+        first_name: '',
+        last_name: '',
         website: '',
         industry: '',
         focus_areas: '',
         location: '',
+        street_address: '',
+        city: '',
+        state: '',
+        zip_code: '',
         description: '',
         contact_name: '',
         contact_email: '',
@@ -196,6 +214,31 @@ const AddCompanyPage = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
+                    <label className="block text-sm font-medium text-gray-700">First Name</label>
+                    <input
+                      type="text"
+                      value={formData.first_name}
+                      onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
+                      className="mt-1 focus:ring-bhred focus:border-bhred block w-full border border-gray-300 rounded-md py-2 px-3"
+                      placeholder="First Name"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Last Name</label>
+                    <input
+                      type="text"
+                      value={formData.last_name}
+                      onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
+                      className="mt-1 focus:ring-bhred focus:border-bhred block w-full border border-gray-300 rounded-md py-2 px-3"
+                      placeholder="Last Name"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
                     <label className="block text-sm font-medium text-gray-700">Website</label>
                     <div className="mt-1 relative rounded-md shadow-sm">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -213,20 +256,56 @@ const AddCompanyPage = () => {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Location</label>
+                    <label className="block text-sm font-medium text-gray-700">Street Address</label>
                     <div className="mt-1 relative rounded-md shadow-sm">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <MapPin className="h-5 w-5 text-gray-400" />
                       </div>
                       <input
                         type="text"
-                        value={formData.location}
-                        onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                        value={formData.street_address}
+                        onChange={(e) => setFormData({ ...formData, street_address: e.target.value })}
                         className="focus:ring-bhred focus:border-bhred block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md"
-                        placeholder="City, State, Country"
+                        placeholder="123 Main Street"
                         required
                       />
                     </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">City</label>
+                    <input
+                      type="text"
+                      value={formData.city}
+                      onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                      className="mt-1 focus:ring-bhred focus:border-bhred block w-full border border-gray-300 rounded-md py-2 px-3"
+                      placeholder="City"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">State</label>
+                    <input
+                      type="text"
+                      value={formData.state}
+                      onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                      className="mt-1 focus:ring-bhred focus:border-bhred block w-full border border-gray-300 rounded-md py-2 px-3"
+                      placeholder="State"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">ZIP Code</label>
+                    <input
+                      type="text"
+                      value={formData.zip_code}
+                      onChange={(e) => setFormData({ ...formData, zip_code: e.target.value })}
+                      className="mt-1 focus:ring-bhred focus:border-bhred block w-full border border-gray-300 rounded-md py-2 px-3"
+                      placeholder="ZIP Code"
+                      required
+                    />
                   </div>
                 </div>
 
