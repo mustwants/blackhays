@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Shield, Clock, MessageCircle, Target, Users, Building, Award, Mail, Lightbulb, MapPin, Phone } from 'lucide-react';
+import { Shield, Clock, MessageCircle, Target, Users, Award, Mail, Lightbulb, MapPin, Phone } from 'lucide-react';
 import Footer from '../components/Footer';
 import AdminPanel from '../components/AdminPanel';
+import ConsultantMap from '../components/ConsultantMap';
 
 const AboutPage = () => {
   const [showAdminPanel, setShowAdminPanel] = useState(false);
@@ -115,7 +116,18 @@ const AboutPage = () => {
           </div>
         </div>
       </div>
-
+      {/* Professionals Map */}
+      <div className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-bold text-center mb-12">Our Professionals</h2>
+          <ConsultantMap />
+          <p className="mt-6 text-center">
+            <a href="/#our-team" className="text-bhred font-medium hover:underline">
+              Meet all our professionals
+            </a>
+          </p>
+        </div>
+      </div>
       {/* Contact Section */}
       <div className="py-16 bg-black text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
