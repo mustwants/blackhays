@@ -32,7 +32,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
     setRefreshKey(prev => prev + 1);
     setTimeout(() => {
       setRefreshKey(prev => prev + 1);
-    }, 3000);
+    }, 5000);
   };
 
   const handleLogin = async (e: React.FormEvent) => {

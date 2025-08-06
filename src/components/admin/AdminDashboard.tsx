@@ -97,17 +97,17 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCategoryClick }) => {
     try {
       const { data, error } = await supabase
         .from(table)
-        .select('status')
+        .select('status, created_at')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
 
       const stats = {
         total: data?.length || 0,
-        approved: data?.filter(item => item?.status === 'approved').length || 0,
-        pending: data?.filter(item => item?.status === 'pending').length || 0,
-        paused: data?.filter(item => item?.status === 'paused').length || 0,
-        rejected: data?.filter(item => item?.status === 'rejected').length || 0
+        approved: data?.filter(item => item.status === 'approved').length || 0,
+        pending: data?.filter(item => item.status === 'pending').length || 0,
+        paused: data?.filter(item => item.status === 'paused').length || 0,
+        rejected: data?.filter(item => item.status === 'rejected').length || 0
       };
 
       return stats;
@@ -121,7 +121,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCategoryClick }) => {
     try {
       const { data, error } = await supabase
         .from('newsletter_subscribers')
-        .select('id')
+        .select('id, created_at')
         .order('created_at', { ascending: false });
 
       if (error) throw error;

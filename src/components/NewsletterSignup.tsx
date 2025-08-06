@@ -39,20 +39,20 @@ const NewsletterSignup: React.FC<NewsletterSignupProps> = ({ onClose }) => {
     try {
       console.log('Attempting to subscribe newsletter:', formData);
       
-      const { error: dbError } = await supabase
+      const { data, error: dbError } = await supabase
         .from('newsletter_subscribers')
-        .insert({ 
+        .insert([{ 
           first_name: formData.first_name.trim(),
           last_name: formData.last_name.trim(),
           email: formData.email.trim().toLowerCase(),
-          status: 'pending',
+          status: 'approved',
           notify_ceo: true
-        });
+        }]);
 
       if (dbError) {
         console.error('Database error:', dbError);
         if (dbError.code === '23505') {
-          setError('This email is already subscribed to our newsletter.');
+          setError('This email address is already subscribed.');
         } else {
           setError('Failed to subscribe. Please try again.');
         }
@@ -60,7 +60,7 @@ const NewsletterSignup: React.FC<NewsletterSignupProps> = ({ onClose }) => {
         return;
       }
       
-      console.log('Successfully saved to database');
+      console.log('Successfully subscribed to newsletter');
       setStatus('success');
       
       // Reset form
