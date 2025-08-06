@@ -39,7 +39,7 @@ const NewsletterSignup: React.FC<NewsletterSignupProps> = ({ onClose }) => {
     try {
       console.log('Attempting to subscribe newsletter:', formData);
       
-      // Save to Supabase with better error handling
+      // Save to Supabase
       const { error: dbError } = await supabase
         .from('newsletter_subscribers')
         .insert([{ 
@@ -47,7 +47,7 @@ const NewsletterSignup: React.FC<NewsletterSignupProps> = ({ onClose }) => {
           last_name: formData.last_name.trim(),
           email: formData.email.trim().toLowerCase(),
           notify_ceo: true,
-          status: 'pending'
+          status: 'approved'
         }]);
 
       if (dbError) {
@@ -62,32 +62,6 @@ const NewsletterSignup: React.FC<NewsletterSignupProps> = ({ onClose }) => {
       }
       
       console.log('Successfully saved to database');
-      
-      // Send CEO notification (don't fail if this doesn't work)
-      try {
-        const response = await fetch('https://formsubmit.co/ajax/CEO@blackhaysgroup.com', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          },
-          body: JSON.stringify({
-            name: `${formData.first_name} ${formData.last_name}`,
-            email: formData.email,
-            message: `New newsletter subscription from ${formData.first_name} ${formData.last_name} (${formData.email})`,
-            _subject: 'New Newsletter Subscriber'
-          })
-        });
-        
-        if (response.ok) {
-          console.log('CEO notification sent successfully');
-        } else {
-          console.warn('CEO notification failed but subscription succeeded');
-        }
-      } catch (emailError) {
-        console.warn('CEO notification failed but subscription succeeded:', emailError);
-      }
-      
       setStatus('success');
       
       // Reset form
