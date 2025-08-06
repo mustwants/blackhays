@@ -102,6 +102,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCategoryClick }) => {
 
       if (error) throw error;
 
+      console.log(`${table} stats:`, data?.length || 0, 'total records');
+      
       const stats = {
         total: data.length,
         approved: data.filter(item => item.status === 'approved').length,
@@ -110,6 +112,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCategoryClick }) => {
         rejected: data.filter(item => item.status === 'rejected').length
       };
 
+      console.log(`${table} breakdown:`, stats);
       return stats;
     } catch (err) {
       console.error(`Error fetching ${table} stats:`, err);
@@ -125,6 +128,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCategoryClick }) => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
+      console.log('Newsletter subscribers count:', count);
       return count || 0;
     } catch (err) {
       console.error('Error fetching newsletter stats:', err);

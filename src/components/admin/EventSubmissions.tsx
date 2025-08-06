@@ -27,6 +27,7 @@ const EventSubmissions: React.FC<EventSubmissionsProps> = ({ initialData = [] })
   const fetchSubmissions = async () => {
     setLoading(true);
     setError(null);
+    setSubmissions([]); // Clear existing data first
     try {
       // Get both events and event_submissions
       const [eventsResult, submissionsResult] = await Promise.all([
@@ -44,6 +45,7 @@ const EventSubmissions: React.FC<EventSubmissionsProps> = ({ initialData = [] })
 
       // Process events
       if (!eventsResult.error && eventsResult.data) {
+        console.log(`Found ${eventsResult.data.length} events in events table`);
         allEvents = [...eventsResult.data.map(event => ({
           ...event,
           isEvent: true // Flag to identify regular events
@@ -52,6 +54,7 @@ const EventSubmissions: React.FC<EventSubmissionsProps> = ({ initialData = [] })
 
       // Process submissions
       if (!submissionsResult.error && submissionsResult.data) {
+        console.log(`Found ${submissionsResult.data.length} events in event_submissions table`);
         allEvents = [...allEvents, ...submissionsResult.data];
       }
 
@@ -61,10 +64,11 @@ const EventSubmissions: React.FC<EventSubmissionsProps> = ({ initialData = [] })
       );
 
       setSubmissions(allEvents);
-      console.log(`Loaded ${allEvents.length} total events (${submissionsResult.data?.length || 0} submissions, ${eventsResult.data?.length || 0} events)`);
+      console.log(`Total events loaded: ${allEvents.length} (${submissionsResult.data?.length || 0} submissions + ${eventsResult.data?.length || 0} events)`);
     } catch (err) {
       console.error("Error fetching events:", err);
       setError(`Failed to load events: ${err.message}`);
+      setSubmissions([]); // Ensure clean state on error
     } finally {
       setLoading(false);
     }

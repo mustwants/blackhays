@@ -22,26 +22,33 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
       
       console.log('Generating advisors...');
       await generateTestAdvisors();
+      console.log('✅ Completed advisors');
       
       console.log('Generating events...');
       await generateTestEvents();
+      console.log('✅ Completed events');
       
       console.log('Generating companies...');
       await generateTestCompanies();
+      console.log('✅ Completed companies');
       
       console.log('Generating consortiums...');
       await generateTestConsortiums();
+      console.log('✅ Completed consortiums');
       
       console.log('Generating innovations...');
       await generateTestInnovations();
+      console.log('✅ Completed innovations');
       
       console.log('Generating newsletter subscribers...');
       await generateTestNewsletterSubscribers();
+      console.log('✅ Completed newsletter subscribers');
 
-      setSuccess('Successfully generated 5 test items for each category!');
+      setSuccess('Successfully generated 30 test items total (5 for each category)!');
       
       // Notify parent component to refresh data
       if (onDataGenerated) {
+        console.log('🔄 Triggering component refresh...');
         onDataGenerated();
       }
       
