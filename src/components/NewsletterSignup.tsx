@@ -41,12 +41,12 @@ const NewsletterSignup: React.FC<NewsletterSignupProps> = ({ onClose }) => {
       
       const { data, error: dbError } = await supabase
         .from('newsletter_subscribers')
-        .insert([{ 
+        .insert({ 
           first_name: formData.first_name.trim(),
           last_name: formData.last_name.trim(),
           email: formData.email.trim().toLowerCase(),
-          status: 'approved'
-        }]);
+          status: 'pending'
+        });
 
       if (dbError) {
         console.error('Database error:', dbError);

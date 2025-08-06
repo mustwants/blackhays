@@ -67,13 +67,13 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
   const generateTestAdvisors = async () => {
     const advisors = [
       {
-        name: 'John Mitchell',
-        email: `john.mitchell.${Date.now()}.1@example.com`,
+        name: 'John Mitchell Smith',
+        email: `john.mitchell.${Date.now()}.${Math.random().toString(36).substr(2, 5)}@example.com`,
         phone: '555-101-2001',
         professional_title: 'Former Navy Admiral',
         military_branch: 'Navy',
         years_of_service: '25',
-        service_status: ['Active Duty'],
+        service_status: ['Veteran'],
         other_branch: '',
         other_status: '',
         about: 'Former Navy Admiral with 25 years of experience in naval operations and defense acquisition.',

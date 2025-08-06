@@ -121,6 +121,31 @@ const ConsultantApplication = () => {
       const { error } = await submitApplication(formData);
       if (error) throw error;
       setSuccess(true);
+      // Reset form on success
+      setFormData({
+        name: '',
+        email: '',
+        state: '',
+        zip_code: '',
+        phone: '',
+        address: '',
+        city: '',
+        webpage: '',
+        facebook: '',
+        x: '',
+        linkedin: '',
+        bluesky: '',
+        instagram: '',
+        professional_title: '',
+        military_branch: '',
+        years_of_service: '',
+        service_status: [],
+        other_branch: '',
+        other_status: '',
+        about: ''
+      });
+      
+      // Navigate after 3 seconds
       setTimeout(() => navigate('/'), 3000);
     } catch (err) {
             console.error(err);
