@@ -98,7 +98,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCategoryClick }) => {
       const { data, error } = await supabase
         .from(table)
         .select('status')
-       .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
 

@@ -25,8 +25,9 @@ const EventSubmissions: React.FC<EventSubmissionsProps> = ({ initialData = [] })
   }, [initialData]);
 
   const fetchSubmissions = async () => {
-    setLoading(true);
     setError(null);
+    setLoading(true);
+    
     try {
       // Get both events and event_submissions
       const [eventsResult, submissionsResult] = await Promise.all([
@@ -59,8 +60,8 @@ const EventSubmissions: React.FC<EventSubmissionsProps> = ({ initialData = [] })
 
       // Sort by date
       allEvents.sort((a, b) => {
-       const dateA = a.created_at ? new Date(a.created_at).getTime() : Date.now();
-       const dateB = b.created_at ? new Date(b.created_at).getTime() : Date.now();
+        const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
+        const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
         return dateB - dateA;
       });
 
@@ -68,7 +69,7 @@ const EventSubmissions: React.FC<EventSubmissionsProps> = ({ initialData = [] })
       console.log(`Total events loaded: ${allEvents.length} (${submissionsResult.data?.length || 0} submissions + ${eventsResult.data?.length || 0} events)`);
     } catch (err) {
       console.error("Error fetching events:", err);
-     setError(`Failed to load events: ${err?.message || 'Unknown error'}`);
+      setError(`Failed to load events: ${err?.message || 'Unknown error'}`);
     } finally {
       setLoading(false);
     }
