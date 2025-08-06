@@ -107,48 +107,6 @@ const NewsletterSignup: React.FC<NewsletterSignupProps> = ({ onClose }) => {
       setStatus('error');
     }
   };
-        throw dbError;
-      }
-      
-      // Then, send notification to CEO
-      // In a real-world scenario, this should be handled by a backend service
-      // For now, we're using a simplified approach with a direct fetch
-      try {
-        // Send notification via a simple endpoint
-        // This could be a serverless function, webhook, or email API
-        await fetch('https://formsubmit.co/ajax/CEO@blackhaysgroup.com', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          },
-          body: JSON.stringify({
-            name: `${formData.first_name} ${formData.last_name}`,
-            email: formData.email,
-            message: `New newsletter subscription from ${formData.first_name} ${formData.last_name} (${formData.email})`,
-            _subject: 'New Newsletter Subscriber'
-          })
-        });
-      } catch (emailError) {
-        // Log email error but don't fail the whole subscription
-        console.error('Failed to send CEO notification:', emailError);
-        // Update the database to indicate notification failed
-        await supabase
-          .from('newsletter_subscribers')
-          .update({ notify_ceo: false })
-          .eq('email', formData.email.trim().toLowerCase());
-      }
-      
-      setStatus('success');
-      setTimeout(() => {
-        if (onClose) onClose();
-      }, 2000);
-    } catch (err) {
-      console.error('Newsletter subscription error:', err);
-      setError(err instanceof Error ? err.message : 'Failed to subscribe. Please try again.');
-      setStatus('error');
-    }
-  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
