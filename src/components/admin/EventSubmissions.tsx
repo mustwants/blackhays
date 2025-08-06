@@ -27,6 +27,7 @@ const EventSubmissions: React.FC<EventSubmissionsProps> = ({ initialData = [] })
   const fetchSubmissions = async () => {
     setError(null);
     setLoading(true);
+    setSubmissions([]); // Clear existing data before loading new data
     
     try {
       // Get both events and event_submissions
@@ -60,8 +61,8 @@ const EventSubmissions: React.FC<EventSubmissionsProps> = ({ initialData = [] })
 
       // Sort by date
       allEvents.sort((a, b) => {
-        const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
-        const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
+        const dateA = a.created_at ? new Date(a.created_at).getTime() : Date.now();
+        const dateB = b.created_at ? new Date(b.created_at).getTime() : Date.now();
         return dateB - dateA;
       });
 
@@ -70,6 +71,7 @@ const EventSubmissions: React.FC<EventSubmissionsProps> = ({ initialData = [] })
     } catch (err) {
       console.error("Error fetching events:", err);
       setError(`Failed to load events: ${err?.message || 'Unknown error'}`);
+      setSubmissions([]); // Ensure submissions is cleared on error
     } finally {
       setLoading(false);
     }

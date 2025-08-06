@@ -32,16 +32,16 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
     // Force refresh all admin components
     setRefreshKey(prev => prev + 1);
     
-    // Add a longer delay to ensure all data is inserted before refreshing
+    // Add longer delays to ensure all data is inserted before refreshing
     setTimeout(() => {
       setRefreshKey(prev => prev + 1);
       // If dashboard is active, trigger another refresh after stats are calculated
       if (activeTab === 'dashboard') {
         setTimeout(() => {
           setRefreshKey(prev => prev + 1);
-        }, 500);
+        }, 1000); // Increased delay for dashboard
       }
-    }, 1500);
+    }, 2000); // Increased initial delay
   };
 
   const handleLogin = async (e: React.FormEvent) => {
