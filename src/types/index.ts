@@ -31,7 +31,7 @@ export interface Advisor extends BaseSubmission {
   state: string;
   zip_code: string;
   phone?: string;
-  address?: string;
+  street_address?: string;
   city?: string;
   webpage?: string;
   facebook?: string;

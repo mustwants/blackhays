@@ -39,7 +39,7 @@ const ConsultantApplication = () => {
     state: '',
     zip_code: '',
         phone: '',
-    address: '',
+    street_address: '',
     city: '',
     webpage: '',
     facebook: '',
@@ -128,7 +128,7 @@ const ConsultantApplication = () => {
         state: '',
         zip_code: '',
         phone: '',
-        address: '',
+        street_address: '123 Defense St',
         city: '',
         webpage: '',
         facebook: '',
@@ -246,8 +246,8 @@ const ConsultantApplication = () => {
                     <label className="block text-sm font-medium text-bhgray-700">Address</label>
                     <input
                       type="text"
-                       value={formData.address}
-                      onChange={e => setFormData({ ...formData, address: e.target.value })}
+                      value={formData.street_address}
+                      onChange={e => setFormData({ ...formData, street_address: e.target.value })}
                       className="mt-1 block w-full rounded-md border-bhgray-300 shadow-sm focus:border-bhred focus:ring-bhred"
                       placeholder="Full address"
                     />
