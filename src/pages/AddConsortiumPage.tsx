@@ -48,10 +48,6 @@ const AddConsortiumPage = () => {
       contact_phone: '555-987-6543',
       membership_fee: '$5000/year',
       headquarters: 'Washington, DC',
-      street_address: '456 Consortium Ave',
-      city: 'Washington',
-      state: 'DC',
-      zip_code: '20001',
       logo_url: ''
     });
   };
@@ -113,10 +109,6 @@ const AddConsortiumPage = () => {
         contact_phone: '',
         membership_fee: '',
         headquarters: '',
-        street_address: '',
-        city: '',
-        state: '',
-        zip_code: '',
         logo_url: ''
       });
       setLogoFile(null);
@@ -243,88 +235,38 @@ const AddConsortiumPage = () => {
                   </div>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Website</label>
-                    <div className="mt-1 relative rounded-md shadow-sm">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <Link2 className="h-5 w-5 text-gray-400" />
-                      </div>
-                      <input
-                        type="url"
-                        value={formData.website}
-                        onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                        className="focus:ring-bhred focus:border-bhred block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md"
-                        placeholder="https://example.org"
-                        required
-                      />
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Website</label>
+                  <div className="mt-1 relative rounded-md shadow-sm">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Link2 className="h-5 w-5 text-gray-400" />
                     </div>
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Street Address</label>
-                    <div className="mt-1 relative rounded-md shadow-sm">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <MapPin className="h-5 w-5 text-gray-400" />
-                      </div>
-                      <input
-                        type="text"
-                        value={formData.street_address}
-                        onChange={(e) => setFormData({ ...formData, street_address: e.target.value })}
-                        className="focus:ring-bhred focus:border-bhred block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md"
-                        placeholder="123 Main Street"
-                        required
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">City</label>
                     <input
-                      type="text"
-                      value={formData.city}
-                      onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                      className="mt-1 focus:ring-bhred focus:border-bhred block w-full border border-gray-300 rounded-md py-2 px-3"
-                      placeholder="City"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">State</label>
-                    <input
-                      type="text"
-                      value={formData.state}
-                      onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-                      className="mt-1 focus:ring-bhred focus:border-bhred block w-full border border-gray-300 rounded-md py-2 px-3"
-                      placeholder="State"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">ZIP Code</label>
-                    <input
-                      type="text"
-                      value={formData.zip_code}
-                      onChange={(e) => setFormData({ ...formData, zip_code: e.target.value })}
-                      className="mt-1 focus:ring-bhred focus:border-bhred block w-full border border-gray-300 rounded-md py-2 px-3"
-                      placeholder="ZIP Code"
+                      type="url"
+                      value={formData.website}
+                      onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+                      className="focus:ring-bhred focus:border-bhred block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md"
+                      placeholder="https://example.org"
                       required
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Headquarters (Legacy)</label>
-                  <input
-                    type="text"
-                    value={formData.headquarters}
-                    onChange={(e) => setFormData({ ...formData, headquarters: `${formData.city}, ${formData.state}` })}
-                    className="mt-1 focus:ring-bhred focus:border-bhred block w-full border border-gray-300 rounded-md py-2 px-3"
-                    placeholder="Auto-filled from city and state"
-                    readOnly
-                  />
+                  <label className="block text-sm font-medium text-gray-700">Headquarters</label>
+                  <div className="mt-1 relative rounded-md shadow-sm">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <MapPin className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <input
+                      type="text"
+                      value={formData.headquarters}
+                      onChange={(e) => setFormData({ ...formData, headquarters: e.target.value })}
+                      className="focus:ring-bhred focus:border-bhred block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md"
+                      placeholder="Washington, DC"
+                      required
+                    />
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
