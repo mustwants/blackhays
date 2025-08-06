@@ -1,4 +1,5 @@
 import { supabase } from '../../lib/supabaseClient';
+import { isConnected } from '../../lib/supabaseClient';
 
 // Hardcoded admin credentials for direct comparison
 const ADMIN_CREDENTIALS = {
@@ -64,6 +65,18 @@ class SupabaseAuthService implements AuthService {
     }
 
     // If not admin, try Supabase auth
+    // Check connection status before attempting Supabase auth
+    if (!isConnected()) {
+      console.error('Database connection unavailable');
+      return { 
+        data: null, 
+        error: { 
+          message: 'Database connection is currently unavailable. Please try again later.',
+          code: 'connection_unavailable'
+        }
+      };
+    }
+
     console.log("Attempting Supabase login");
     const { data, error } = await supabase.auth.signInWithPassword({
       email: normalizedEmail,
