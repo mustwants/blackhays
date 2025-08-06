@@ -61,15 +61,15 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
     const advisors = [
       {
         name: 'John Mitchell',
-        email: `john.mitchell.${Date.now()}.${Math.random().toString(36).substr(2, 9)}@example.com`,
+        email: `john.mitchell.${Date.now()}.1.${Math.random().toString(36).substr(2, 5)}@example.com`,
         phone: '555-101-2001',
         professional_title: 'Former Navy Admiral',
         military_branch: 'navy',
-        years_of_service: '25', 
+        years_of_service: '25',
         service_status: ['veteran'],
-        // Remove service_status as it doesn't exist in schema
         about: 'Former Navy Admiral with 25 years of experience in naval operations and defense acquisition.',
         address: '123 Defense Way',
+        city: 'Arlington',
         zip_code: '22201',
         headshot_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face',
         business_logo_url: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=200&h=200&fit=crop',
@@ -77,7 +77,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
       },
       {
         name: 'Sarah Rodriguez',
-        email: `sarah.rodriguez.${Date.now()}.${Math.random().toString(36).substr(2, 9)}@example.com`,
+        email: `sarah.rodriguez.${Date.now()}.2.${Math.random().toString(36).substr(2, 5)}@example.com`,
         phone: '555-201-3002',
         professional_title: 'Cybersecurity Expert',
         military_branch: 'air_force',
@@ -85,6 +85,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         service_status: ['veteran'],
         about: 'Cybersecurity specialist with expertise in defense systems and threat intelligence.',
         address: '456 Tech Street',
+        city: 'San Francisco',
         zip_code: '94107',
         headshot_url: 'https://images.unsplash.com/photo-1494790108755-2616b332e234?w=400&h=400&fit=crop&crop=face',
         business_logo_url: 'https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=200&h=200&fit=crop',
@@ -92,7 +93,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
       },
       {
         name: 'Michael Chen',
-        email: `michael.chen.${Date.now()}.${Math.random().toString(36).substr(2, 9)}@example.com`,
+        email: `michael.chen.${Date.now()}.3.${Math.random().toString(36).substr(2, 5)}@example.com`,
         phone: '555-301-4003',
         professional_title: 'Defense Technology Consultant',
         military_branch: 'army',
@@ -100,6 +101,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         service_status: ['veteran'],
         about: 'Army veteran specializing in emerging technologies and defense innovation programs.',
         address: '789 Innovation Blvd',
+        city: 'Boulder',
         zip_code: '80301',
         headshot_url: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face',
         business_logo_url: 'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=200&h=200&fit=crop',
@@ -107,7 +109,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
       },
       {
         name: 'Lisa Thompson',
-        email: `lisa.thompson.${Date.now()}.${Math.random().toString(36).substr(2, 9)}@example.com`,
+        email: `lisa.thompson.${Date.now()}.4.${Math.random().toString(36).substr(2, 5)}@example.com`,
         phone: '555-401-5004',
         professional_title: 'Intelligence Analyst',
         military_branch: 'marines',
@@ -115,6 +117,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         service_status: ['veteran'],
         about: 'Former Marine intelligence analyst with expertise in strategic planning and operations.',
         address: '321 Strategy Lane',
+        city: 'Huntsville',
         zip_code: '35801',
         headshot_url: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=face',
         business_logo_url: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=200&h=200&fit=crop',
@@ -122,7 +125,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
       },
       {
         name: 'David Park',
-        email: `david.park.${Date.now()}.${Math.random().toString(36).substr(2, 9)}@example.com`,
+        email: `david.park.${Date.now()}.5.${Math.random().toString(36).substr(2, 5)}@example.com`,
         phone: '555-501-6005',
         professional_title: 'Space Force Advisor',
         military_branch: 'space_force',
@@ -130,6 +133,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         service_status: ['active'],
         about: 'Space Force officer with expertise in satellite systems and space-based defense technologies.',
         address: '654 Satellite Drive',
+        city: 'Colorado Springs',
         zip_code: '80914',
         headshot_url: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face',
         business_logo_url: 'https://images.unsplash.com/photo-1614064641938-3bbee52942c7?w=200&h=200&fit=crop',
@@ -139,6 +143,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
 
     try {
       // Insert advisors one by one to avoid constraint conflicts
+      console.log(`Attempting to insert ${advisors.length} advisors...`);
       for (let i = 0; i < advisors.length; i++) {
         const advisor = advisors[i];
         // Add a small delay between insertions to ensure uniqueness
@@ -147,6 +152,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         }
         
         try {
+          console.log(`Inserting advisor ${i + 1}:`, advisor.name, advisor.email);
           const { error } = await supabase.from('advisor_applications').insert([advisor]);
           if (error) {
             console.error(`Error inserting advisor ${i + 1}:`, error);
@@ -159,7 +165,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
           console.error(`Exception inserting advisor ${i + 1}:`, advisorError);
         }
       }
-      console.log('Successfully created advisor test data');
+      console.log('Completed advisor test data generation');
     } catch (err) {
       console.error('Error in generateTestAdvisors:', err);
       throw err;
@@ -175,7 +181,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         location: 'Washington, DC',
         website: 'https://example.com/dis2025',
         about: 'Annual summit bringing together defense innovators, contractors, and government officials.',
-        submitter_email: `test.event1.${Date.now()}@example.com`,
+        submitter_email: `test.event1.${Date.now()}.1.${Math.random().toString(36).substr(2, 5)}@example.com`,
         logo_url: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=300&h=150&fit=crop',
         status: 'pending'
       },
@@ -186,7 +192,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         location: 'San Diego, CA',
         website: 'https://example.com/cyberconf2025',
         about: 'Leading cybersecurity conference focused on defense and government applications.',
-        submitter_email: `test.event2.${Date.now()}@example.com`,
+        submitter_email: `test.event2.${Date.now()}.2.${Math.random().toString(36).substr(2, 5)}@example.com`,
         logo_url: 'https://images.unsplash.com/photo-1563986768494-4dee2763ff3f?w=300&h=150&fit=crop',
         status: 'pending'
       },
@@ -197,7 +203,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         location: 'Colorado Springs, CO',
         website: 'https://example.com/spacetech2025',
         about: 'Exhibition showcasing the latest in space and satellite technologies.',
-        submitter_email: `test.event3.${Date.now()}@example.com`,
+        submitter_email: `test.event3.${Date.now()}.3.${Math.random().toString(36).substr(2, 5)}@example.com`,
         logo_url: 'https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=300&h=150&fit=crop',
         status: 'pending'
       },
@@ -208,7 +214,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         location: 'Boston, MA',
         website: 'https://example.com/aidefense2025',
         about: 'Symposium exploring artificial intelligence applications in defense and security.',
-        submitter_email: `test.event4.${Date.now()}@example.com`,
+        submitter_email: `test.event4.${Date.now()}.4.${Math.random().toString(36).substr(2, 5)}@example.com`,
         logo_url: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=300&h=150&fit=crop',
         status: 'pending'
       },
@@ -219,19 +225,33 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         location: 'Norfolk, VA',
         website: 'https://example.com/maritime2025',
         about: 'Forum dedicated to naval and maritime defense technologies and strategies.',
-        submitter_email: `test.event5.${Date.now()}@example.com`,
+        submitter_email: `test.event5.${Date.now()}.5.${Math.random().toString(36).substr(2, 5)}@example.com`,
         logo_url: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=300&h=150&fit=crop',
         status: 'pending'
       }
     ];
 
     try {
-      const { error } = await supabase.from('event_submissions').insert(events);
-      if (error) {
-        console.error('Error inserting events:', error);
-        throw new Error(`Failed to create event test data: ${error.message}`);
+      console.log(`Attempting to insert ${events.length} events...`);
+      for (let i = 0; i < events.length; i++) {
+        const event = events[i];
+        if (i > 0) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+        
+        try {
+          console.log(`Inserting event ${i + 1}:`, event.name, event.submitter_email);
+          const { error } = await supabase.from('event_submissions').insert([event]);
+          if (error) {
+            console.error(`Error inserting event ${i + 1}:`, error);
+          } else {
+            console.log(`Successfully inserted event ${i + 1}: ${event.name}`);
+          }
+        } catch (eventError) {
+          console.error(`Exception inserting event ${i + 1}:`, eventError);
+        }
       }
-      console.log('Successfully created event test data');
+      console.log('Completed event test data generation');
     } catch (err) {
       console.error('Error in generateTestEvents:', err);
       throw err;
@@ -248,7 +268,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         location: 'Arlington, VA',
         description: 'Leading provider of AI-powered cybersecurity solutions for defense and government agencies.',
         contact_name: 'Jennifer Walsh',
-        contact_email: `jennifer.walsh.test.${Date.now()}.1@example.com`,
+        contact_email: `jennifer.walsh.${Date.now()}.1.${Math.random().toString(36).substr(2, 5)}@example.com`,
         contact_phone: '555-201-3001',
         employee_count: '51-200',
         founded_year: '2018',
@@ -267,7 +287,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         location: 'Los Angeles, CA',
         description: 'Pioneering quantum technologies for next-generation aerospace and defense applications.',
         contact_name: 'Robert Kim',
-        contact_email: `robert.kim.test.${Date.now()}.2@example.com`,
+        contact_email: `robert.kim.${Date.now()}.2.${Math.random().toString(36).substr(2, 5)}@example.com`,
         contact_phone: '555-201-3002',
         employee_count: '11-50',
         founded_year: '2020',
@@ -286,7 +306,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         location: 'Austin, TX',
         description: 'Developing autonomous robotic systems for military and defense applications.',
         contact_name: 'Maria Santos',
-        contact_email: `maria.santos.test.${Date.now()}.3@example.com`,
+        contact_email: `maria.santos.${Date.now()}.3.${Math.random().toString(36).substr(2, 5)}@example.com`,
         contact_phone: '555-201-3003',
         employee_count: '201-500',
         founded_year: '2016',
@@ -305,7 +325,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         location: 'Reston, VA',
         description: 'Specialized cybersecurity firm providing advanced network defense solutions.',
         contact_name: 'Thomas Anderson',
-        contact_email: `thomas.anderson.test.${Date.now()}.4@example.com`,
+        contact_email: `thomas.anderson.${Date.now()}.4.${Math.random().toString(36).substr(2, 5)}@example.com`,
         contact_phone: '555-201-3004',
         employee_count: '1-10',
         founded_year: '2022',
@@ -324,8 +344,8 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         location: 'Huntsville, AL',
         description: 'Research and development of advanced materials for defense and aerospace applications.',
         contact_name: 'Emily Johnson',
-        contact_email: `emily.johnson.test.${Date.now()}.5@example.com`,
-        contact_phone: '555-201-3005',
+        contact_email: `emily.johnson.${Date.now()}.5.${Math.random().toString(36).substr(2, 5)}@example.com`,
+        contact_email: `kevin.zhang.${Date.now()}.2.${Math.random().toString(36).substr(2, 5)}@example.com`,
         employee_count: '51-200',
         founded_year: '2015',
         linkedin: 'https://linkedin.com/company/advanced-materials',
@@ -337,10 +357,15 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
       }
     ];
 
-    // Insert companies one by one to avoid constraint conflicts
+    console.log(`Attempting to insert ${companies.length} companies...`);
     for (let i = 0; i < companies.length; i++) {
       const company = companies[i];
+      if (i > 0) {
+        contact_email: `michelle.taylor.${Date.now()}.3.${Math.random().toString(36).substr(2, 5)}@example.com`,
+      }
+      
       try {
+        console.log(`Inserting company ${i + 1}:`, company.name, company.contact_email);
         const { error } = await supabase.from('company_submissions').insert([company]);
         if (error) {
           console.error(`Error inserting company ${i + 1}:`, error);
@@ -351,7 +376,8 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         console.error(`Exception inserting company ${i + 1}:`, companyError);
       }
     }
-  };
+    console.log('Completed company test data generation');
+        contact_email: `carlos.rodriguez.${Date.now()}.4.${Math.random().toString(36).substr(2, 5)}@example.com`,
 
   const generateTestConsortiums = async () => {
     const consortiums = [
@@ -364,10 +390,10 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         eligibility_criteria: 'Open to defense contractors, technology companies, and research institutions.',
         description: 'Collaborative network bringing together defense contractors and research institutions to accelerate innovation.',
         contact_name: 'Patricia Williams',
-        contact_email: `patricia.williams.test.${Date.now()}.1@example.com`,
+        contact_email: `patricia.williams.${Date.now()}.1.${Math.random().toString(36).substr(2, 5)}@example.com`,
         contact_phone: '555-301-4001',
         membership_fee: '$10,000/year',
-        headquarters: 'Washington, DC',
+        contact_email: `linda.chang.${Date.now()}.5.${Math.random().toString(36).substr(2, 5)}@example.com`,
         logo_url: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=200&h=200&fit=crop',
         status: 'pending'
       },
@@ -377,10 +403,15 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         focus_area: 'Cybersecurity',
         government_partner: 'US Army Cyber Command',
         established_year: '2020',
-        eligibility_criteria: 'Cybersecurity firms and defense contractors with active security clearances.',
+      console.log(`Attempting to insert ${innovations.length} innovations...`);
         description: 'Alliance of cybersecurity companies working to enhance defense against cyber threats.',
         contact_name: 'Mark Davis',
-        contact_email: `mark.davis.test.${Date.now()}.2@example.com`,
+        if (i > 0) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+        
+        contact_email: `mark.davis.${Date.now()}.2.${Math.random().toString(36).substr(2, 5)}@example.com`,
+          console.log(`Inserting innovation ${i + 1}:`, innovation.name, innovation.contact_email);
         contact_phone: '555-301-4002',
         membership_fee: '$15,000/year',
         headquarters: 'Colorado Springs, CO',
@@ -391,56 +422,61 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         name: 'Space Technology Consortium',
         website: 'https://example.com/stc',
         focus_area: 'Space Technology',
-        government_partner: 'Space Force',
+      console.log('Completed innovation test data generation');
         established_year: '2021',
         eligibility_criteria: 'Companies and organizations involved in space technology development.',
         description: 'Consortium focused on advancing space technologies for national security applications.',
         contact_name: 'Rachel Lee',
-        contact_email: `rachel.lee.test.${Date.now()}.3@example.com`,
+        contact_email: `rachel.lee.${Date.now()}.3.${Math.random().toString(36).substr(2, 5)}@example.com`,
         contact_phone: '555-301-4003',
         membership_fee: '$12,000/year',
         headquarters: 'Houston, TX',
         logo_url: 'https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=200&h=200&fit=crop',
         status: 'pending'
       },
-      {
+        email: `john.smith.${Date.now()}.1.${Math.random().toString(36).substr(2, 5)}@example.com`,
         name: 'Maritime Defense Network',
         website: 'https://example.com/mdn',
         focus_area: 'Maritime Defense',
         government_partner: 'US Navy',
         established_year: '2018',
         eligibility_criteria: 'Naval contractors and maritime technology developers.',
-        description: 'Network of companies specializing in naval and maritime defense technologies.',
+        email: `jane.doe.${Date.now()}.2.${Math.random().toString(36).substr(2, 5)}@example.com`,
         contact_name: 'James Wilson',
-        contact_email: `james.wilson.test.${Date.now()}.4@example.com`,
+        contact_email: `james.wilson.${Date.now()}.4.${Math.random().toString(36).substr(2, 5)}@example.com`,
         contact_phone: '555-301-4004',
         membership_fee: '$8,000/year',
         headquarters: 'San Diego, CA',
         logo_url: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=200&h=200&fit=crop',
-        status: 'pending'
+        email: `michael.johnson.${Date.now()}.3.${Math.random().toString(36).substr(2, 5)}@example.com`,
       },
       {
         name: 'Advanced Manufacturing Coalition',
         website: 'https://example.com/amc',
         focus_area: 'Advanced Manufacturing',
         government_partner: 'Defense Logistics Agency',
-        established_year: '2017',
+        email: `sarah.williams.${Date.now()}.4.${Math.random().toString(36).substr(2, 5)}@example.com`,
         eligibility_criteria: 'Manufacturing companies serving defense and government markets.',
         description: 'Coalition of advanced manufacturing companies supporting defense supply chain innovation.',
         contact_name: 'Susan Brown',
-        contact_email: `susan.brown.test.${Date.now()}.5@example.com`,
+        contact_email: `susan.brown.${Date.now()}.5.${Math.random().toString(36).substr(2, 5)}@example.com`,
         contact_phone: '555-301-4005',
         membership_fee: '$5,000/year',
-        headquarters: 'Detroit, MI',
+        email: `robert.brown.${Date.now()}.5.${Math.random().toString(36).substr(2, 5)}@example.com`,
         logo_url: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=200&h=200&fit=crop',
         status: 'pending'
       }
     ];
 
-    // Insert consortiums one by one to avoid constraint conflicts
+    console.log(`Attempting to insert ${subscribers.length} newsletter subscribers...`);
     for (let i = 0; i < consortiums.length; i++) {
       const consortium = consortiums[i];
+      if (i > 0) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+      
       try {
+        console.log(`Inserting subscriber ${i + 1}:`, subscriber.first_name, subscriber.last_name, subscriber.email);
         const { error } = await supabase.from('consortium_submissions').insert([consortium]);
         if (error) {
           console.error(`Error inserting consortium ${i + 1}:`, error);
@@ -451,12 +487,18 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         console.error(`Exception inserting consortium ${i + 1}:`, consortiumError);
       }
     }
+    console.log('Completed newsletter subscriber test data generation');
   };
 
   const generateTestInnovations = async () => {
     const innovations = [
       {
+      if (i > 0) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+      
         name: 'Quantum Research Lab',
+        console.log(`Inserting company ${i + 1}:`, company.name, company.contact_email);
         website: 'https://example.com/quantumlab',
         type: 'research_lab',
         focus_areas: 'Quantum computing, Cryptography, Quantum sensors',
@@ -467,6 +509,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         contact_email: `alice.cooper.test.${Date.now()}.1@example.com`,
         contact_phone: '555-401-5001',
         primary_sponsor: 'DARPA',
+    console.log('Completed company test data generation');
         headquarters: 'Cambridge, MA',
         logo_url: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=200&h=200&fit=crop',
         status: 'pending'
@@ -496,7 +539,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         funding_source: 'government',
         description: 'Government research institute developing biodefense technologies and medical countermeasures.',
         contact_name: 'Dr. Michelle Taylor',
-        contact_email: `michelle.taylor.test.${Date.now()}.3@example.com`,
+        contact_email: `patricia.williams.${Date.now()}.1.${Math.random().toString(36).substr(2, 5)}@example.com`,
         contact_phone: '555-401-5003',
         primary_sponsor: 'Department of Health and Human Services',
         headquarters: 'Atlanta, GA',
@@ -512,7 +555,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         funding_source: 'academic',
         description: 'University laboratory researching hypersonic technologies for defense applications.',
         contact_name: 'Dr. Carlos Rodriguez',
-        contact_email: `carlos.rodriguez.test.${Date.now()}.4@example.com`,
+        contact_email: `mark.davis.${Date.now()}.2.${Math.random().toString(36).substr(2, 5)}@example.com`,
         contact_phone: '555-401-5004',
         primary_sponsor: 'Air Force Research Laboratory',
         headquarters: 'Wright-Patterson AFB, OH',
@@ -557,7 +600,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
       console.error('Error in generateTestInnovations:', err);
       throw err;
     }
-  };
+        contact_email: `rachel.lee.${Date.now()}.3.${Math.random().toString(36).substr(2, 5)}@example.com`,
 
   const generateTestNewsletterSubscribers = async () => {
     const subscribers = [
@@ -573,7 +616,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         last_name: 'Doe',
         email: `jane.doe.newsletter.${Date.now()}.2@example.com`,
         notify_ceo: true,
-        status: 'approved'
+        contact_email: `james.wilson.${Date.now()}.4.${Math.random().toString(36).substr(2, 5)}@example.com`,
       },
       {
         first_name: 'Michael',
@@ -589,7 +632,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         notify_ceo: true,
         status: 'approved'
       },
-      {
+        contact_email: `susan.brown.${Date.now()}.5.${Math.random().toString(36).substr(2, 5)}@example.com`,
         first_name: 'Robert',
         last_name: 'Brown',
         email: `robert.brown.newsletter.${Date.now()}.5@example.com`,
@@ -598,10 +641,15 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
       }
     ];
 
-    // Insert subscribers one by one to avoid constraint conflicts
+    console.log(`Attempting to insert ${consortiums.length} consortiums...`);
     for (let i = 0; i < subscribers.length; i++) {
       const subscriber = subscribers[i];
+      if (i > 0) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+      
       try {
+        console.log(`Inserting consortium ${i + 1}:`, consortium.name, consortium.contact_email);
         const { error } = await supabase.from('newsletter_subscribers').insert([subscriber]);
         if (error) {
           console.error(`Error inserting subscriber ${i + 1}:`, error);
@@ -612,6 +660,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         console.error(`Exception inserting subscriber ${i + 1}:`, subscriberError);
       }
     }
+    console.log('Completed consortium test data generation');
   };
 
   return (
@@ -625,7 +674,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
       
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded flex items-start">
-          <AlertCircle className="h-5 w-5 text-red-500 mr-2 mt-0.5" />
+        contact_email: `alice.cooper.${Date.now()}.1.${Math.random().toString(36).substr(2, 5)}@example.com`,
           <div>{error}</div>
         </div>
       )}
