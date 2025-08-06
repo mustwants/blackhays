@@ -29,13 +29,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
   const [refreshKey, setRefreshKey] = useState(0);
 
   const handleDataGenerated = () => {
-    // Force refresh all admin components
     setRefreshKey(prev => prev + 1);
-    
-    // Add delay to ensure all data is inserted before refreshing
     setTimeout(() => {
       setRefreshKey(prev => prev + 1);
-    }, 5000);
+    }, 3000);
   };
 
   const handleLogin = async (e: React.FormEvent) => {
