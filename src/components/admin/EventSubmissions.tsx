@@ -63,8 +63,8 @@ const EventSubmissions: React.FC<EventSubmissionsProps> = ({ initialData = [] })
 
       // Sort by date
       allEvents.sort((a, b) => {
-        const dateA = new Date(a.created_at || new Date()).getTime();
-        const dateB = new Date(b.created_at || new Date()).getTime();
+        const dateA = new Date(a.created_at || new Date().toISOString()).getTime();
+        const dateB = new Date(b.created_at || new Date().toISOString()).getTime();
         return dateB - dateA;
       });
 
