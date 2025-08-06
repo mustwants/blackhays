@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Lock, Shield, LogOut, Users, Calendar, Building, Rocket, Brain, Mail, BarChart3 } from 'lucide-react';
+import { Lock, Shield, LogOut, Users, Calendar, Building, Rocket, Brain, Mail, BarChart3, Database } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import AdminUserManagement from './AdminUserManagement';
 import EventSubmissions from './EventSubmissions';
@@ -8,6 +8,7 @@ import ConsortiumSubmissions from './ConsortiumSubmissions';
 import InnovationSubmissions from './InnovationSubmissions';
 import NewsletterSubscribers from '../NewsletterSubscribers';
 import AdminDashboard from './AdminDashboard';
+import TestDataGenerator from './TestDataGenerator';
 
 interface AdminPanelProps {
   onClose?: () => void;
@@ -52,6 +53,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
 
   const tabs = [
     { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
+    { id: 'testdata', label: 'Test Data', icon: Database },
     { id: 'advisors', label: 'Advisor Applications', icon: Users },
     { id: 'events', label: 'Event Submissions', icon: Calendar },
     { id: 'companies', label: 'Company Submissions', icon: Building },
@@ -195,6 +197,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
         {/* Content */}
         <div className="flex-1 overflow-auto p-6">
           {activeTab === 'dashboard' && <AdminDashboard onCategoryClick={setActiveTab} />}
+          {activeTab === 'testdata' && <TestDataGenerator />}
           {activeTab === 'advisors' && (
             <div>
               <h3 className="text-lg font-bold mb-4">Advisor Applications</h3>
