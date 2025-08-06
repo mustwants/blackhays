@@ -29,7 +29,7 @@ const NewsletterSubscribers: React.FC<NewsletterSubscribersProps> = ({ initialDa
       // Fetch all subscribers ordered by creation date
       const { data, error: fetchError } = await supabase
         .from('newsletter_subscribers')
-        .select('id, first_name, last_name, email, status, created_at, updated_at, notify_ceo')
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (fetchError) {

@@ -40,7 +40,7 @@ export default function ConsortiumSubmissions() {
       setLoading(true);
       const { data, error } = await supabase
         .from('consortium_submissions')
-        .select('id, name, website, focus_area, government_partner, established_year, eligibility_criteria, description, contact_name, contact_email, contact_phone, membership_fee, headquarters, logo_url, status, created_at, updated_at')
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (error) throw error;

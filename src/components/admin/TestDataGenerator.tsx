@@ -2,7 +2,11 @@ import React, { useState } from 'react';
 import { RefreshCw, Database, AlertCircle, Check, Users, Calendar, Building, Rocket, Brain, Mail } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
 
-const TestDataGenerator = () => {
+interface TestDataGeneratorProps {
+  onDataGenerated?: () => void;
+}
+
+const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -35,6 +39,11 @@ const TestDataGenerator = () => {
       await generateTestNewsletterSubscribers();
 
       setSuccess('Successfully generated 5 test items for each category!');
+      
+      // Notify parent component to refresh data
+      if (onDataGenerated) {
+        onDataGenerated();
+      }
       
       // Clear success message after 3 seconds
       setTimeout(() => {

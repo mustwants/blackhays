@@ -41,7 +41,7 @@ export default function InnovationSubmissions() {
       setLoading(true);
       const { data, error } = await supabase
         .from('innovation_submissions')
-        .select('id, name, website, type, focus_areas, established_year, funding_source, description, contact_name, contact_email, contact_phone, primary_sponsor, headquarters, location, logo_url, status, created_at, updated_at')
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (error) throw error;

@@ -15,6 +15,10 @@ interface AdminPanelProps {
   onClose?: () => void;
 }
 
+interface AdminPanelProps {
+  onClose?: () => void;
+}
+
 const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
   const { isAuthenticated, isLoading, user, login, logout } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -22,6 +26,12 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState<string | null>(null);
   const [loginLoading, setLoginLoading] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const handleDataGenerated = () => {
+    // Force refresh all admin components
+    setRefreshKey(prev => prev + 1);
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -198,15 +208,15 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
         {/* Content */}
         <div className="flex-1 overflow-auto p-6">
           {activeTab === 'dashboard' && <AdminDashboard onCategoryClick={setActiveTab} />}
-          {activeTab === 'testdata' && <TestDataGenerator />}
+          {activeTab === 'testdata' && <TestDataGenerator onDataGenerated={handleDataGenerated} />}
           {activeTab === 'advisors' && (
-            <AdvisorApplications />
+            <AdvisorApplications key={`advisors-${refreshKey}`} />
           )}
-          {activeTab === 'events' && <EventSubmissions />}
-          {activeTab === 'companies' && <CompanySubmissions />}
-          {activeTab === 'consortiums' && <ConsortiumSubmissions />}
-          {activeTab === 'innovations' && <InnovationSubmissions />}
-          {activeTab === 'newsletter' && <NewsletterSubscribers />}
+          {activeTab === 'events' && <EventSubmissions key={`events-${refreshKey}`} />}
+          {activeTab === 'companies' && <CompanySubmissions key={`companies-${refreshKey}`} />}
+          {activeTab === 'consortiums' && <ConsortiumSubmissions key={`consortiums-${refreshKey}`} />}
+          {activeTab === 'innovations' && <InnovationSubmissions key={`innovations-${refreshKey}`} />}
+          {activeTab === 'newsletter' && <NewsletterSubscribers key={`newsletter-${refreshKey}`} />}
           {activeTab === 'users' && <AdminUserManagement />}
         </div>
       </div>

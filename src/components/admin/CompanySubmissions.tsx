@@ -43,7 +43,7 @@ export default function CompanySubmissions() {
       setLoading(true);
       const { data, error } = await supabase
         .from('company_submissions')
-        .select('id, name, website, industry, focus_areas, location, description, contact_name, contact_email, contact_phone, employee_count, founded_year, linkedin, twitter, facebook, logo_url, product_image_url, status, created_at, updated_at')
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
