@@ -61,7 +61,7 @@ const TestDataGenerator = () => {
         about: 'Former Navy Admiral with 25 years of experience in naval operations and defense acquisition.',
         address: '123 Defense Way',
         zip_code: '22201',
-        location: `POINT(-77.0864 38.8799)`, // Convert back to POINT format for database
+        location: { x: -77.0864, y: 38.8799 },
         headshot_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face',
         business_logo_url: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=200&h=200&fit=crop',
         status: 'pending'
@@ -76,7 +76,7 @@ const TestDataGenerator = () => {
         about: 'Cybersecurity specialist with expertise in defense systems and threat intelligence.',
         address: '456 Tech Street',
         zip_code: '94107',
-        location: `POINT(-122.4194 37.7749)`,
+        location: { x: -122.4194, y: 37.7749 },
         headshot_url: 'https://images.unsplash.com/photo-1494790108755-2616b332e234?w=400&h=400&fit=crop&crop=face',
         business_logo_url: 'https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=200&h=200&fit=crop',
         status: 'pending'
@@ -91,7 +91,7 @@ const TestDataGenerator = () => {
         about: 'Army veteran specializing in emerging technologies and defense innovation programs.',
         address: '789 Innovation Blvd',
         zip_code: '80301',
-        location: `POINT(-104.9903 39.7392)`,
+        location: { x: -104.9903, y: 39.7392 },
         headshot_url: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face',
         business_logo_url: 'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=200&h=200&fit=crop',
         status: 'pending'
@@ -106,7 +106,7 @@ const TestDataGenerator = () => {
         about: 'Former Marine intelligence analyst with expertise in strategic planning and operations.',
         address: '321 Strategy Lane',
         zip_code: '35801',
-        location: `POINT(-86.5861 34.7304)`,
+        location: { x: -86.5861, y: 34.7304 },
         headshot_url: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=face',
         business_logo_url: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=200&h=200&fit=crop',
         status: 'pending'
@@ -121,7 +121,7 @@ const TestDataGenerator = () => {
         about: 'Space Force officer with expertise in satellite systems and space-based defense technologies.',
         address: '654 Satellite Drive',
         zip_code: '80914',
-        location: `POINT(-104.8214 38.8339)`,
+        location: { x: -104.8214, y: 38.8339 },
         headshot_url: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face',
         business_logo_url: 'https://images.unsplash.com/photo-1614064641938-3bbee52942c7?w=200&h=200&fit=crop',
         status: 'pending'
@@ -441,7 +441,7 @@ const TestDataGenerator = () => {
         contact_phone: '555-401-5001',
         primary_sponsor: 'DARPA',
         headquarters: 'Cambridge, MA',
-        location: `POINT(-71.0942 42.3601)`,
+        location: { x: -71.0942, y: 42.3601 },
         logo_url: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=200&h=200&fit=crop',
         status: 'pending'
       },
@@ -458,7 +458,7 @@ const TestDataGenerator = () => {
         contact_phone: '555-401-5002',
         primary_sponsor: 'Defense Innovation Unit',
         headquarters: 'Palo Alto, CA',
-        location: `POINT(-122.1430 37.4419)`,
+        location: { x: -122.1430, y: 37.4419 },
         logo_url: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=200&h=200&fit=crop',
         status: 'pending'
       },
@@ -475,7 +475,7 @@ const TestDataGenerator = () => {
         contact_phone: '555-401-5003',
         primary_sponsor: 'Department of Health and Human Services',
         headquarters: 'Atlanta, GA',
-        location: `POINT(-84.3880 33.7490)`,
+        location: { x: -84.3880, y: 33.7490 },
         logo_url: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=200&h=200&fit=crop',
         status: 'pending'
       },
@@ -492,7 +492,7 @@ const TestDataGenerator = () => {
         contact_phone: '555-401-5004',
         primary_sponsor: 'Air Force Research Laboratory',
         headquarters: 'Wright-Patterson AFB, OH',
-        location: `POINT(-84.0467 39.8283)`,
+        location: { x: -84.0467, y: 39.8283 },
         logo_url: 'https://images.unsplash.com/photo-1614064641938-3bbee52942c7?w=200&h=200&fit=crop',
         status: 'pending'
       },
@@ -509,7 +509,7 @@ const TestDataGenerator = () => {
         contact_phone: '555-401-5005',
         primary_sponsor: 'National Science Foundation',
         headquarters: 'Seattle, WA',
-        location: `POINT(-122.3321 47.6062)`,
+        location: { x: -122.3321, y: 47.6062 },
         logo_url: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=200&h=200&fit=crop',
         status: 'pending'
       }
