@@ -50,10 +50,11 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
     setLoginError(null);
     
     try {
+      const { error } = await login(email, password);
       // Clear success message after 5 seconds
       if (error) {
         throw new Error(error.message || 'Login failed');
-      }, 5000);
+      }
     } catch (err) {
       console.error('Login error:', err);
       setLoginError(err instanceof Error ? err.message : 'Login failed');
