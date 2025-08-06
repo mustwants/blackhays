@@ -27,7 +27,6 @@ const EventSubmissions: React.FC<EventSubmissionsProps> = ({ initialData = [] })
   const fetchSubmissions = async () => {
     setLoading(true);
     setError(null);
-    setSubmissions([]); // Clear existing data first
     try {
       // Get both events and event_submissions
       const [eventsResult, submissionsResult] = await Promise.all([
@@ -68,7 +67,6 @@ const EventSubmissions: React.FC<EventSubmissionsProps> = ({ initialData = [] })
     } catch (err) {
       console.error("Error fetching events:", err);
       setError(`Failed to load events: ${err.message}`);
-      setSubmissions([]); // Ensure clean state on error
     } finally {
       setLoading(false);
     }

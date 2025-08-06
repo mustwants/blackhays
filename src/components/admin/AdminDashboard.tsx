@@ -105,11 +105,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCategoryClick }) => {
       console.log(`${table} stats:`, data?.length || 0, 'total records');
       
       const stats = {
-        total: data.length,
-        approved: data.filter(item => item.status === 'approved').length,
-        pending: data.filter(item => item.status === 'pending').length,
-        paused: data.filter(item => item.status === 'paused').length,
-        rejected: data.filter(item => item.status === 'rejected').length
+        total: data?.length || 0,
+        approved: data?.filter(item => item.status === 'approved').length || 0,
+        pending: data?.filter(item => item.status === 'pending').length || 0,
+        paused: data?.filter(item => item.status === 'paused').length || 0,
+        rejected: data?.filter(item => item.status === 'rejected').length || 0
       };
 
       console.log(`${table} breakdown:`, stats);
