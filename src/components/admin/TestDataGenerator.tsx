@@ -61,7 +61,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
     const advisors = [
       {
         name: 'John Mitchell', // This stays as 'name' - it's correct
-        email: `john.mitchell.test.${Date.now()}@example.com`,
+        email: `john.mitchell.test.${Date.now()}.1@example.com`,
         phone: '555-101-2001',
         professional_title: 'Former Navy Admiral',
         military_branch: 'navy',
@@ -77,7 +77,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
       },
       {
         name: 'Sarah Rodriguez',
-        email: `sarah.rodriguez.test.${Date.now()}@example.com`,
+        email: `sarah.rodriguez.test.${Date.now()}.2@example.com`,
         phone: '555-101-2002',
         professional_title: 'Cybersecurity Expert',
         military_branch: 'air_force',
@@ -92,7 +92,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
       },
       {
         name: 'Michael Chen',
-        email: `michael.chen.test.${Date.now()}@example.com`,
+        email: `michael.chen.test.${Date.now()}.3@example.com`,
         phone: '555-101-2003',
         professional_title: 'Defense Technology Consultant',
         military_branch: 'army',
@@ -107,7 +107,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
       },
       {
         name: 'Lisa Thompson',
-        email: `lisa.thompson.test.${Date.now()}@example.com`,
+        email: `lisa.thompson.test.${Date.now()}.4@example.com`,
         phone: '555-101-2004',
         professional_title: 'Intelligence Analyst',
         military_branch: 'marines',
@@ -122,7 +122,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
       },
       {
         name: 'David Park',
-        email: `david.park.test.${Date.now()}@example.com`,
+        email: `david.park.test.${Date.now()}.5@example.com`,
         phone: '555-101-2005',
         professional_title: 'Space Force Advisor',
         military_branch: 'space_force',
@@ -138,10 +138,20 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
     ];
 
     try {
-      const { error } = await supabase.from('advisor_applications').insert(advisors);
-      if (error) {
-        console.error('Error inserting advisors:', error);
-        throw new Error(`Failed to create advisor test data: ${error.message}`);
+      // Insert advisors one by one to avoid constraint conflicts
+      for (let i = 0; i < advisors.length; i++) {
+        const advisor = advisors[i];
+        try {
+          const { error } = await supabase.from('advisor_applications').insert([advisor]);
+          if (error) {
+            console.error(`Error inserting advisor ${i + 1}:`, error);
+            // Continue with other advisors even if one fails
+          } else {
+            console.log(`Successfully inserted advisor ${i + 1}: ${advisor.name}`);
+          }
+        } catch (advisorError) {
+          console.error(`Exception inserting advisor ${i + 1}:`, advisorError);
+        }
       }
       console.log('Successfully created advisor test data');
     } catch (err) {
@@ -232,7 +242,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         location: 'Arlington, VA',
         description: 'Leading provider of AI-powered cybersecurity solutions for defense and government agencies.',
         contact_name: 'Jennifer Walsh',
-        contact_email: `jennifer.walsh.test.${Date.now()}@example.com`,
+        contact_email: `jennifer.walsh.test.${Date.now()}.1@example.com`,
         contact_phone: '555-201-3001',
         employee_count: '51-200',
         founded_year: '2018',
@@ -251,7 +261,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         location: 'Los Angeles, CA',
         description: 'Pioneering quantum technologies for next-generation aerospace and defense applications.',
         contact_name: 'Robert Kim',
-        contact_email: `robert.kim.test.${Date.now()}@example.com`,
+        contact_email: `robert.kim.test.${Date.now()}.2@example.com`,
         contact_phone: '555-201-3002',
         employee_count: '11-50',
         founded_year: '2020',
@@ -270,7 +280,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         location: 'Austin, TX',
         description: 'Developing autonomous robotic systems for military and defense applications.',
         contact_name: 'Maria Santos',
-        contact_email: `maria.santos.test.${Date.now()}@example.com`,
+        contact_email: `maria.santos.test.${Date.now()}.3@example.com`,
         contact_phone: '555-201-3003',
         employee_count: '201-500',
         founded_year: '2016',
@@ -289,7 +299,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         location: 'Reston, VA',
         description: 'Specialized cybersecurity firm providing advanced network defense solutions.',
         contact_name: 'Thomas Anderson',
-        contact_email: `thomas.anderson.test.${Date.now()}@example.com`,
+        contact_email: `thomas.anderson.test.${Date.now()}.4@example.com`,
         contact_phone: '555-201-3004',
         employee_count: '1-10',
         founded_year: '2022',
@@ -308,7 +318,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         location: 'Huntsville, AL',
         description: 'Research and development of advanced materials for defense and aerospace applications.',
         contact_name: 'Emily Johnson',
-        contact_email: `emily.johnson.test.${Date.now()}@example.com`,
+        contact_email: `emily.johnson.test.${Date.now()}.5@example.com`,
         contact_phone: '555-201-3005',
         employee_count: '51-200',
         founded_year: '2015',
@@ -321,8 +331,19 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
       }
     ];
 
-    for (const company of companies) {
-      await supabase.from('company_submissions').insert([company]);
+    // Insert companies one by one to avoid constraint conflicts
+    for (let i = 0; i < companies.length; i++) {
+      const company = companies[i];
+      try {
+        const { error } = await supabase.from('company_submissions').insert([company]);
+        if (error) {
+          console.error(`Error inserting company ${i + 1}:`, error);
+        } else {
+          console.log(`Successfully inserted company ${i + 1}: ${company.name}`);
+        }
+      } catch (companyError) {
+        console.error(`Exception inserting company ${i + 1}:`, companyError);
+      }
     }
   };
 
@@ -337,7 +358,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         eligibility_criteria: 'Open to defense contractors, technology companies, and research institutions.',
         description: 'Collaborative network bringing together defense contractors and research institutions to accelerate innovation.',
         contact_name: 'Patricia Williams',
-        contact_email: `patricia.williams.test.${Date.now()}@example.com`,
+        contact_email: `patricia.williams.test.${Date.now()}.1@example.com`,
         contact_phone: '555-301-4001',
         membership_fee: '$10,000/year',
         headquarters: 'Washington, DC',
@@ -353,7 +374,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         eligibility_criteria: 'Cybersecurity firms and defense contractors with active security clearances.',
         description: 'Alliance of cybersecurity companies working to enhance defense against cyber threats.',
         contact_name: 'Mark Davis',
-        contact_email: `mark.davis.test.${Date.now()}@example.com`,
+        contact_email: `mark.davis.test.${Date.now()}.2@example.com`,
         contact_phone: '555-301-4002',
         membership_fee: '$15,000/year',
         headquarters: 'Colorado Springs, CO',
@@ -369,7 +390,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         eligibility_criteria: 'Companies and organizations involved in space technology development.',
         description: 'Consortium focused on advancing space technologies for national security applications.',
         contact_name: 'Rachel Lee',
-        contact_email: `rachel.lee.test.${Date.now()}@example.com`,
+        contact_email: `rachel.lee.test.${Date.now()}.3@example.com`,
         contact_phone: '555-301-4003',
         membership_fee: '$12,000/year',
         headquarters: 'Houston, TX',
@@ -385,7 +406,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         eligibility_criteria: 'Naval contractors and maritime technology developers.',
         description: 'Network of companies specializing in naval and maritime defense technologies.',
         contact_name: 'James Wilson',
-        contact_email: `james.wilson.test.${Date.now()}@example.com`,
+        contact_email: `james.wilson.test.${Date.now()}.4@example.com`,
         contact_phone: '555-301-4004',
         membership_fee: '$8,000/year',
         headquarters: 'San Diego, CA',
@@ -401,7 +422,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         eligibility_criteria: 'Manufacturing companies serving defense and government markets.',
         description: 'Coalition of advanced manufacturing companies supporting defense supply chain innovation.',
         contact_name: 'Susan Brown',
-        contact_email: `susan.brown.test.${Date.now()}@example.com`,
+        contact_email: `susan.brown.test.${Date.now()}.5@example.com`,
         contact_phone: '555-301-4005',
         membership_fee: '$5,000/year',
         headquarters: 'Detroit, MI',
@@ -410,8 +431,19 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
       }
     ];
 
-    for (const consortium of consortiums) {
-      await supabase.from('consortium_submissions').insert([consortium]);
+    // Insert consortiums one by one to avoid constraint conflicts
+    for (let i = 0; i < consortiums.length; i++) {
+      const consortium = consortiums[i];
+      try {
+        const { error } = await supabase.from('consortium_submissions').insert([consortium]);
+        if (error) {
+          console.error(`Error inserting consortium ${i + 1}:`, error);
+        } else {
+          console.log(`Successfully inserted consortium ${i + 1}: ${consortium.name}`);
+        }
+      } catch (consortiumError) {
+        console.error(`Exception inserting consortium ${i + 1}:`, consortiumError);
+      }
     }
   };
 
@@ -426,7 +458,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         funding_source: 'government',
         description: 'Leading research laboratory specializing in quantum technologies for defense applications.',
         contact_name: 'Dr. Alice Cooper',
-        contact_email: `alice.cooper.test.${Date.now()}@example.com`,
+        contact_email: `alice.cooper.test.${Date.now()}.1@example.com`,
         contact_phone: '555-401-5001',
         primary_sponsor: 'DARPA',
         headquarters: 'Cambridge, MA',
@@ -442,7 +474,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         funding_source: 'mixed',
         description: 'Innovation center focused on developing AI solutions for defense and national security.',
         contact_name: 'Dr. Kevin Zhang',
-        contact_email: `kevin.zhang.test.${Date.now()}@example.com`,
+        contact_email: `kevin.zhang.test.${Date.now()}.2@example.com`,
         contact_phone: '555-401-5002',
         primary_sponsor: 'Defense Innovation Unit',
         headquarters: 'Palo Alto, CA',
@@ -458,7 +490,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         funding_source: 'government',
         description: 'Government research institute developing biodefense technologies and medical countermeasures.',
         contact_name: 'Dr. Michelle Taylor',
-        contact_email: `michelle.taylor.test.${Date.now()}@example.com`,
+        contact_email: `michelle.taylor.test.${Date.now()}.3@example.com`,
         contact_phone: '555-401-5003',
         primary_sponsor: 'Department of Health and Human Services',
         headquarters: 'Atlanta, GA',
@@ -474,7 +506,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         funding_source: 'academic',
         description: 'University laboratory researching hypersonic technologies for defense applications.',
         contact_name: 'Dr. Carlos Rodriguez',
-        contact_email: `carlos.rodriguez.test.${Date.now()}@example.com`,
+        contact_email: `carlos.rodriguez.test.${Date.now()}.4@example.com`,
         contact_phone: '555-401-5004',
         primary_sponsor: 'Air Force Research Laboratory',
         headquarters: 'Wright-Patterson AFB, OH',
@@ -490,7 +522,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         funding_source: 'nonprofit',
         description: 'Nonprofit institute advancing autonomous systems research for defense and civilian applications.',
         contact_name: 'Dr. Linda Chang',
-        contact_email: `linda.chang.test.${Date.now()}@example.com`,
+        contact_email: `linda.chang.test.${Date.now()}.5@example.com`,
         contact_phone: '555-401-5005',
         primary_sponsor: 'National Science Foundation',
         headquarters: 'Seattle, WA',
@@ -500,10 +532,19 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
     ];
 
     try {
-      const { error } = await supabase.from('innovation_submissions').insert(innovations);
-      if (error) {
-        console.error('Error inserting innovations:', error);
-        throw new Error(`Failed to create innovation test data: ${error.message}`);
+      // Insert innovations one by one to avoid constraint conflicts
+      for (let i = 0; i < innovations.length; i++) {
+        const innovation = innovations[i];
+        try {
+          const { error } = await supabase.from('innovation_submissions').insert([innovation]);
+          if (error) {
+            console.error(`Error inserting innovation ${i + 1}:`, error);
+          } else {
+            console.log(`Successfully inserted innovation ${i + 1}: ${innovation.name}`);
+          }
+        } catch (innovationError) {
+          console.error(`Exception inserting innovation ${i + 1}:`, innovationError);
+        }
       }
       console.log('Successfully created innovation test data');
     } catch (err) {
@@ -517,42 +558,53 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
       {
         first_name: 'John',
         last_name: 'Smith',
-        email: `john.smith.newsletter.${Date.now()}@example.com`,
+        email: `john.smith.newsletter.${Date.now()}.1@example.com`,
         notify_ceo: true,
         status: 'pending'
       },
       {
         first_name: 'Jane',
         last_name: 'Doe',
-        email: `jane.doe.newsletter.${Date.now()}@example.com`,
+        email: `jane.doe.newsletter.${Date.now()}.2@example.com`,
         notify_ceo: true,
         status: 'approved'
       },
       {
         first_name: 'Michael',
         last_name: 'Johnson',
-        email: `michael.johnson.newsletter.${Date.now()}@example.com`,
+        email: `michael.johnson.newsletter.${Date.now()}.3@example.com`,
         notify_ceo: false,
         status: 'pending'
       },
       {
         first_name: 'Sarah',
         last_name: 'Williams',
-        email: `sarah.williams.newsletter.${Date.now()}@example.com`,
+        email: `sarah.williams.newsletter.${Date.now()}.4@example.com`,
         notify_ceo: true,
         status: 'approved'
       },
       {
         first_name: 'Robert',
         last_name: 'Brown',
-        email: `robert.brown.newsletter.${Date.now()}@example.com`,
+        email: `robert.brown.newsletter.${Date.now()}.5@example.com`,
         notify_ceo: true,
         status: 'pending'
       }
     ];
 
-    for (const subscriber of subscribers) {
-      await supabase.from('newsletter_subscribers').insert([subscriber]);
+    // Insert subscribers one by one to avoid constraint conflicts
+    for (let i = 0; i < subscribers.length; i++) {
+      const subscriber = subscribers[i];
+      try {
+        const { error } = await supabase.from('newsletter_subscribers').insert([subscriber]);
+        if (error) {
+          console.error(`Error inserting subscriber ${i + 1}:`, error);
+        } else {
+          console.log(`Successfully inserted subscriber ${i + 1}: ${subscriber.first_name} ${subscriber.last_name}`);
+        }
+      } catch (subscriberError) {
+        console.error(`Exception inserting subscriber ${i + 1}:`, subscriberError);
+      }
     }
   };
 
