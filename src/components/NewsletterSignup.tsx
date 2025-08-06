@@ -49,7 +49,6 @@ const NewsletterSignup: React.FC<NewsletterSignupProps> = ({ onClose }) => {
           status: 'approved',
           notify_ceo: true
         }]);
-        }]);
 
       if (dbError) {
         console.error('Database error:', dbError);
