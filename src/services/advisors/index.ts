@@ -137,7 +137,7 @@ class AdvisorService {
         other_status: '',
         about: 'Intelligence specialist with expertise in cybersecurity and emerging technologies.',
         status: 'approved',
-        address: '456 Innovation Ave',
+        street_address: '456 Innovation Ave',
         city: 'San Francisco',
         state: 'CA',
         zip_code: '94107',

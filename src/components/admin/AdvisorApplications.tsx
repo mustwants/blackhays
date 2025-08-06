@@ -143,7 +143,7 @@ const AdvisorApplications = () => {
                         {(advisor.city || advisor.state) && (
                           <div className="text-sm text-gray-500 flex items-center">
                             <MapPin className="w-4 h-4 mr-1" />
-                            {advisor.city}, {advisor.state}
+                            {advisor.city ? `${advisor.city}, ` : ''}{advisor.state}
                           </div>
                         )}
                       </div>
