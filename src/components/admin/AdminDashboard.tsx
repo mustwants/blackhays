@@ -96,6 +96,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCategoryClick }) => {
   const fetchCategoryStats = async (table: string, startDate: Date): Promise<CategoryStats> => {
     try {
       const { data, error } = await supabase
+        .from(table)
         .select('status')
         .order('created_at', { ascending: false });
 

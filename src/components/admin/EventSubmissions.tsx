@@ -29,7 +29,6 @@ const EventSubmissions: React.FC<EventSubmissionsProps> = ({ initialData = [] })
     setLoading(true);
     
     try {
-      // Get both events and event_submissions
       const [eventsResult, submissionsResult] = await Promise.all([
         supabase
           .from('events')
@@ -60,8 +59,8 @@ const EventSubmissions: React.FC<EventSubmissionsProps> = ({ initialData = [] })
 
       // Sort by date
       allEvents.sort((a, b) => {
-        const dateA = a.created_at ? new Date(a.created_at).getTime() : new Date().getTime();
-        const dateB = b.created_at ? new Date(b.created_at).getTime() : new Date().getTime();
+        const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
+        const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
         return dateB - dateA;
       });
 
