@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabaseClient';
+import { useAuth } from '../../hooks/useAuth';
 import { Search, Filter, Edit2, Trash2, Check, X, Pause, Eye, ExternalLink } from 'lucide-react';
 
 interface CompanySubmission {
@@ -26,6 +27,7 @@ interface CompanySubmission {
 }
 
 export default function CompanySubmissions() {
+  const { isAuthenticated, isLoading } = useAuth();
   const [submissions, setSubmissions] = useState<CompanySubmission[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -35,8 +37,10 @@ export default function CompanySubmissions() {
   const [editData, setEditData] = useState<Partial<CompanySubmission>>({});
 
   useEffect(() => {
-    fetchSubmissions();
-  }, []);
+    if (isAuthenticated && !isLoading) {
+      fetchSubmissions();
+    }
+  }, [isAuthenticated, isLoading]);
 
   const fetchSubmissions = async () => {
     try {
