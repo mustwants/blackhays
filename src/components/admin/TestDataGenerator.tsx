@@ -44,7 +44,7 @@ const TestDataGenerator = () => {
         email: `john.mitchell.test.${Date.now()}@example.com`,
         phone: '555-101-2001',
         professional_title: 'Former Navy Admiral',
-        military_branch: 'Navy',
+        military_branch: 'navy',
         years_of_service: '25',
         service_status: ['veteran'],
         about: 'Former Navy Admiral with 25 years of experience in naval operations and defense acquisition.',
@@ -60,7 +60,7 @@ const TestDataGenerator = () => {
         email: `sarah.rodriguez.test.${Date.now()}@example.com`,
         phone: '555-101-2002',
         professional_title: 'Cybersecurity Expert',
-        military_branch: 'Air Force',
+        military_branch: 'air_force',
         years_of_service: '18',
         service_status: ['veteran'],
         about: 'Cybersecurity specialist with expertise in defense systems and threat intelligence.',
@@ -76,7 +76,7 @@ const TestDataGenerator = () => {
         email: `michael.chen.test.${Date.now()}@example.com`,
         phone: '555-101-2003',
         professional_title: 'Defense Technology Consultant',
-        military_branch: 'Army',
+        military_branch: 'army',
         years_of_service: '20',
         service_status: ['veteran'],
         about: 'Army veteran specializing in emerging technologies and defense innovation programs.',
@@ -92,7 +92,7 @@ const TestDataGenerator = () => {
         email: `lisa.thompson.test.${Date.now()}@example.com`,
         phone: '555-101-2004',
         professional_title: 'Intelligence Analyst',
-        military_branch: 'Marines',
+        military_branch: 'marines',
         years_of_service: '15',
         service_status: ['veteran'],
         about: 'Former Marine intelligence analyst with expertise in strategic planning and operations.',
@@ -108,7 +108,7 @@ const TestDataGenerator = () => {
         email: `david.park.test.${Date.now()}@example.com`,
         phone: '555-101-2005',
         professional_title: 'Space Force Advisor',
-        military_branch: 'Space Force',
+        military_branch: 'space_force',
         years_of_service: '12',
         service_status: ['active'],
         about: 'Space Force officer with expertise in satellite systems and space-based defense technologies.',
@@ -194,9 +194,15 @@ const TestDataGenerator = () => {
     const companies = [
       {
         name: 'Apex Defense Technologies',
+        first_name: 'Jennifer',
+        last_name: 'Walsh',
         website: 'https://example.com/apex',
         industry: 'cybersecurity',
         focus_areas: 'AI-powered threat detection, Network security, Incident response',
+        street_address: '1234 Innovation Drive',
+        city: 'Arlington',
+        state: 'VA',
+        zip_code: '22201',
         location: 'Arlington, VA',
         description: 'Leading provider of AI-powered cybersecurity solutions for defense and government agencies.',
         contact_name: 'Jennifer Walsh',
@@ -213,9 +219,15 @@ const TestDataGenerator = () => {
       },
       {
         name: 'Quantum Aerospace Solutions',
+        first_name: 'Robert',
+        last_name: 'Kim',
         website: 'https://example.com/quantum',
         industry: 'aerospace',
         focus_areas: 'Quantum computing, Satellite communications, Space systems',
+        street_address: '5678 Quantum Boulevard',
+        city: 'Los Angeles',
+        state: 'CA',
+        zip_code: '90210',
         location: 'Los Angeles, CA',
         description: 'Pioneering quantum technologies for next-generation aerospace and defense applications.',
         contact_name: 'Robert Kim',
@@ -232,9 +244,15 @@ const TestDataGenerator = () => {
       },
       {
         name: 'Tactical Robotics Inc',
+        first_name: 'Maria',
+        last_name: 'Santos',
         website: 'https://example.com/tactical',
         industry: 'robotics',
         focus_areas: 'Autonomous systems, Military robotics, Drone technology',
+        street_address: '9101 Robotics Way',
+        city: 'Austin',
+        state: 'TX',
+        zip_code: '78701',
         location: 'Austin, TX',
         description: 'Developing autonomous robotic systems for military and defense applications.',
         contact_name: 'Maria Santos',
@@ -251,9 +269,15 @@ const TestDataGenerator = () => {
       },
       {
         name: 'SecureNet Defense',
+        first_name: 'Thomas',
+        last_name: 'Anderson',
         website: 'https://example.com/securenet',
         industry: 'cybersecurity',
         focus_areas: 'Network defense, Threat intelligence, Zero-trust architecture',
+        street_address: '2468 Security Street',
+        city: 'Reston',
+        state: 'VA',
+        zip_code: '20190',
         location: 'Reston, VA',
         description: 'Specialized cybersecurity firm providing advanced network defense solutions.',
         contact_name: 'Thomas Anderson',
@@ -270,9 +294,15 @@ const TestDataGenerator = () => {
       },
       {
         name: 'Advanced Materials Corp',
+        first_name: 'Emily',
+        last_name: 'Johnson',
         website: 'https://example.com/advmat',
         industry: 'defense',
         focus_areas: 'Advanced composites, Armor materials, Lightweight structures',
+        street_address: '1357 Materials Plaza',
+        city: 'Huntsville',
+        state: 'AL',
+        zip_code: '35801',
         location: 'Huntsville, AL',
         description: 'Research and development of advanced materials for defense and aerospace applications.',
         contact_name: 'Emily Johnson',
@@ -289,8 +319,290 @@ const TestDataGenerator = () => {
       }
     ];
 
-    for (const advisor of advisors) {
-      await supabase.from('advisor_applications').insert([advisor]);
+    for (const company of companies) {
+      await supabase.from('company_submissions').insert([company]);
+    }
+  };
+
+  const generateTestConsortiums = async () => {
+    const consortiums = [
+      {
+        name: 'Defense Innovation Consortium',
+        first_name: 'Patricia',
+        last_name: 'Williams',
+        website: 'https://example.com/dic',
+        focus_area: 'Defense Innovation',
+        government_partner: 'Department of Defense',
+        established_year: '2019',
+        eligibility_criteria: 'Open to defense contractors, technology companies, and research institutions.',
+        description: 'Collaborative network bringing together defense contractors and research institutions to accelerate innovation.',
+        contact_name: 'Patricia Williams',
+        contact_email: `patricia.williams.test.${Date.now()}@example.com`,
+        contact_phone: '555-301-4001',
+        membership_fee: '$10,000/year',
+        street_address: '4321 Consortium Court',
+        city: 'Washington',
+        state: 'DC',
+        zip_code: '20001',
+        headquarters: 'Washington, DC',
+        logo_url: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=200&h=200&fit=crop',
+        status: 'pending'
+      },
+      {
+        name: 'Cyber Defense Alliance',
+        first_name: 'Mark',
+        last_name: 'Davis',
+        website: 'https://example.com/cda',
+        focus_area: 'Cybersecurity',
+        government_partner: 'US Army Cyber Command',
+        established_year: '2020',
+        eligibility_criteria: 'Cybersecurity firms and defense contractors with active security clearances.',
+        description: 'Alliance of cybersecurity companies working to enhance defense against cyber threats.',
+        contact_name: 'Mark Davis',
+        contact_email: `mark.davis.test.${Date.now()}@example.com`,
+        contact_phone: '555-301-4002',
+        membership_fee: '$15,000/year',
+        street_address: '8765 Cyber Lane',
+        city: 'Colorado Springs',
+        state: 'CO',
+        zip_code: '80906',
+        headquarters: 'Colorado Springs, CO',
+        logo_url: 'https://images.unsplash.com/photo-1563986768494-4dee2763ff3f?w=200&h=200&fit=crop',
+        status: 'pending'
+      },
+      {
+        name: 'Space Technology Consortium',
+        first_name: 'Rachel',
+        last_name: 'Lee',
+        website: 'https://example.com/stc',
+        focus_area: 'Space Technology',
+        government_partner: 'Space Force',
+        established_year: '2021',
+        eligibility_criteria: 'Companies and organizations involved in space technology development.',
+        description: 'Consortium focused on advancing space technologies for national security applications.',
+        contact_name: 'Rachel Lee',
+        contact_email: `rachel.lee.test.${Date.now()}@example.com`,
+        contact_phone: '555-301-4003',
+        membership_fee: '$12,000/year',
+        street_address: '2468 Space Center Drive',
+        city: 'Houston',
+        state: 'TX',
+        zip_code: '77058',
+        headquarters: 'Houston, TX',
+        logo_url: 'https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=200&h=200&fit=crop',
+        status: 'pending'
+      },
+      {
+        name: 'Maritime Defense Network',
+        first_name: 'James',
+        last_name: 'Wilson',
+        website: 'https://example.com/mdn',
+        focus_area: 'Maritime Defense',
+        government_partner: 'US Navy',
+        established_year: '2018',
+        eligibility_criteria: 'Naval contractors and maritime technology developers.',
+        description: 'Network of companies specializing in naval and maritime defense technologies.',
+        contact_name: 'James Wilson',
+        contact_email: `james.wilson.test.${Date.now()}@example.com`,
+        contact_phone: '555-301-4004',
+        membership_fee: '$8,000/year',
+        street_address: '1357 Harbor Way',
+        city: 'San Diego',
+        state: 'CA',
+        zip_code: '92101',
+        headquarters: 'San Diego, CA',
+        logo_url: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=200&h=200&fit=crop',
+        status: 'pending'
+      },
+      {
+        name: 'Advanced Manufacturing Coalition',
+        first_name: 'Susan',
+        last_name: 'Brown',
+        website: 'https://example.com/amc',
+        focus_area: 'Advanced Manufacturing',
+        government_partner: 'Defense Logistics Agency',
+        established_year: '2017',
+        eligibility_criteria: 'Manufacturing companies serving defense and government markets.',
+        description: 'Coalition of advanced manufacturing companies supporting defense supply chain innovation.',
+        contact_name: 'Susan Brown',
+        contact_email: `susan.brown.test.${Date.now()}@example.com`,
+        contact_phone: '555-301-4005',
+        membership_fee: '$5,000/year',
+        street_address: '9876 Manufacturing Blvd',
+        city: 'Detroit',
+        state: 'MI',
+        zip_code: '48201',
+        headquarters: 'Detroit, MI',
+        logo_url: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=200&h=200&fit=crop',
+        status: 'pending'
+      }
+    ];
+
+    for (const consortium of consortiums) {
+      await supabase.from('consortium_submissions').insert([consortium]);
+    }
+  };
+
+  const generateTestInnovations = async () => {
+    const innovations = [
+      {
+        name: 'Quantum Research Lab',
+        first_name: 'Dr. Alice',
+        last_name: 'Cooper',
+        website: 'https://example.com/quantumlab',
+        type: 'research_lab',
+        focus_areas: 'Quantum computing, Cryptography, Quantum sensors',
+        established_year: '2020',
+        funding_source: 'government',
+        description: 'Leading research laboratory specializing in quantum technologies for defense applications.',
+        contact_name: 'Dr. Alice Cooper',
+        contact_email: `alice.cooper.test.${Date.now()}@example.com`,
+        contact_phone: '555-401-5001',
+        primary_sponsor: 'DARPA',
+        street_address: '1122 Quantum Street',
+        city: 'Cambridge',
+        state: 'MA',
+        zip_code: '02139',
+        headquarters: 'Cambridge, MA',
+        logo_url: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=200&h=200&fit=crop',
+        status: 'pending'
+      },
+      {
+        name: 'AI Defense Innovation Center',
+        first_name: 'Dr. Kevin',
+        last_name: 'Zhang',
+        website: 'https://example.com/aidefense',
+        type: 'innovation_center',
+        focus_areas: 'Artificial Intelligence, Machine Learning, Computer Vision',
+        established_year: '2019',
+        funding_source: 'mixed',
+        description: 'Innovation center focused on developing AI solutions for defense and national security.',
+        contact_name: 'Dr. Kevin Zhang',
+        contact_email: `kevin.zhang.test.${Date.now()}@example.com`,
+        contact_phone: '555-401-5002',
+        primary_sponsor: 'Defense Innovation Unit',
+        street_address: '3344 AI Avenue',
+        city: 'Palo Alto',
+        state: 'CA',
+        zip_code: '94301',
+        headquarters: 'Palo Alto, CA',
+        logo_url: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=200&h=200&fit=crop',
+        status: 'pending'
+      },
+      {
+        name: 'Biodefense Research Institute',
+        first_name: 'Dr. Michelle',
+        last_name: 'Taylor',
+        website: 'https://example.com/biodefense',
+        type: 'government_lab',
+        focus_areas: 'Biodefense, Medical countermeasures, Threat detection',
+        established_year: '2015',
+        funding_source: 'government',
+        description: 'Government research institute developing biodefense technologies and medical countermeasures.',
+        contact_name: 'Dr. Michelle Taylor',
+        contact_email: `michelle.taylor.test.${Date.now()}@example.com`,
+        contact_phone: '555-401-5003',
+        primary_sponsor: 'Department of Health and Human Services',
+        street_address: '5566 Research Drive',
+        city: 'Atlanta',
+        state: 'GA',
+        zip_code: '30309',
+        headquarters: 'Atlanta, GA',
+        logo_url: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=200&h=200&fit=crop',
+        status: 'pending'
+      },
+      {
+        name: 'Hypersonics Technology Lab',
+        first_name: 'Dr. Carlos',
+        last_name: 'Rodriguez',
+        website: 'https://example.com/hypersonics',
+        type: 'university_lab',
+        focus_areas: 'Hypersonic vehicles, Propulsion systems, Aerodynamics',
+        established_year: '2018',
+        funding_source: 'academic',
+        description: 'University laboratory researching hypersonic technologies for defense applications.',
+        contact_name: 'Dr. Carlos Rodriguez',
+        contact_email: `carlos.rodriguez.test.${Date.now()}@example.com`,
+        contact_phone: '555-401-5004',
+        primary_sponsor: 'Air Force Research Laboratory',
+        street_address: '7788 University Circle',
+        city: 'Wright-Patterson AFB',
+        state: 'OH',
+        zip_code: '45433',
+        headquarters: 'Wright-Patterson AFB, OH',
+        logo_url: 'https://images.unsplash.com/photo-1614064641938-3bbee52942c7?w=200&h=200&fit=crop',
+        status: 'pending'
+      },
+      {
+        name: 'Autonomous Systems Institute',
+        first_name: 'Dr. Linda',
+        last_name: 'Chang',
+        website: 'https://example.com/autonomous',
+        type: 'nonprofit',
+        focus_areas: 'Autonomous vehicles, Swarm robotics, Decision algorithms',
+        established_year: '2021',
+        funding_source: 'nonprofit',
+        description: 'Nonprofit institute advancing autonomous systems research for defense and civilian applications.',
+        contact_name: 'Dr. Linda Chang',
+        contact_email: `linda.chang.test.${Date.now()}@example.com`,
+        contact_phone: '555-401-5005',
+        primary_sponsor: 'National Science Foundation',
+        street_address: '9900 Autonomous Way',
+        city: 'Seattle',
+        state: 'WA',
+        zip_code: '98101',
+        headquarters: 'Seattle, WA',
+        logo_url: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=200&h=200&fit=crop',
+        status: 'pending'
+      }
+    ];
+
+    for (const innovation of innovations) {
+      await supabase.from('innovation_submissions').insert([innovation]);
+    }
+  };
+
+  const generateTestNewsletterSubscribers = async () => {
+    const subscribers = [
+      {
+        first_name: 'John',
+        last_name: 'Smith',
+        email: `john.smith.newsletter.${Date.now()}@example.com`,
+        notify_ceo: true,
+        status: 'pending'
+      },
+      {
+        first_name: 'Jane',
+        last_name: 'Doe',
+        email: `jane.doe.newsletter.${Date.now()}@example.com`,
+        notify_ceo: true,
+        status: 'approved'
+      },
+      {
+        first_name: 'Michael',
+        last_name: 'Johnson',
+        email: `michael.johnson.newsletter.${Date.now()}@example.com`,
+        notify_ceo: false,
+        status: 'pending'
+      },
+      {
+        first_name: 'Sarah',
+        last_name: 'Williams',
+        email: `sarah.williams.newsletter.${Date.now()}@example.com`,
+        notify_ceo: true,
+        status: 'approved'
+      },
+      {
+        first_name: 'Robert',
+        last_name: 'Brown',
+        email: `robert.brown.newsletter.${Date.now()}@example.com`,
+        notify_ceo: true,
+        status: 'pending'
+      }
+    ];
+
+    for (const subscriber of subscribers) {
+      await supabase.from('newsletter_subscribers').insert([subscriber]);
     }
   };
 
