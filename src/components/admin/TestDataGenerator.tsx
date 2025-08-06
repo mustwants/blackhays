@@ -67,19 +67,16 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
   const generateTestAdvisors = async () => {
     const advisors = [
       {
-        name: 'John Mitchell',
+        name: 'John Mitchell', 
         email: `john.mitchell.${Date.now()}.1.${Math.random().toString(36).substr(2, 9)}@example.com`,
         phone: '555-101-2001',
         professional_title: 'Former Navy Admiral',
         military_branch: 'navy',
-        years_of_mil_service: '25',
-        years_of_us_civil_service: '5',
-        service_status: ['Retired'],
+        years_of_service: '25',
         other_status: 'Retired',
         about: 'Former Navy Admiral with 25 years of experience in naval operations and defense acquisition.',
-        address: '123 Defense Way',
+        address: '123 Defense Way, Arlington, VA 22201',
         city: 'Arlington',
-        state: 'VA',
         zip_code: '22201',
         headshot_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face',
         business_logo_url: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=200&h=200&fit=crop',
@@ -91,14 +88,11 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         phone: '555-201-3002',
         professional_title: 'Cybersecurity Expert',
         military_branch: 'air_force',
-        years_of_mil_service: '18',
-        years_of_us_civil_service: '3',
-        service_status: ['Active Reserve'],
+        years_of_service: '18',
         other_status: 'Active Reserve',
         about: 'Cybersecurity specialist with expertise in defense systems and threat intelligence.',
-        address: '456 Tech Street',
+        address: '456 Tech Street, San Francisco, CA 94107',
         city: 'San Francisco',
-        state: 'CA',
         zip_code: '94107',
         headshot_url: 'https://images.unsplash.com/photo-1494790108755-2616b332e234?w=400&h=400&fit=crop&crop=face',
         business_logo_url: 'https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=200&h=200&fit=crop',
@@ -110,14 +104,11 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         phone: '555-301-4003',
         professional_title: 'Defense Technology Consultant',
         military_branch: 'army',
-        years_of_mil_service: '20',
-        years_of_us_civil_service: '8',
-        service_status: ['Veteran'],
+        years_of_service: '20',
         other_status: 'Veteran',
         about: 'Army veteran specializing in emerging technologies and defense innovation programs.',
-        address: '789 Innovation Blvd',
+        address: '789 Innovation Blvd, Boulder, CO 80301',
         city: 'Boulder',
-        state: 'CO',
         zip_code: '80301',
         headshot_url: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face',
         business_logo_url: 'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=200&h=200&fit=crop',
@@ -129,14 +120,11 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         phone: '555-401-5004',
         professional_title: 'Intelligence Analyst',
         military_branch: 'marines',
-        years_of_mil_service: '15',
-        years_of_us_civil_service: '10',
-        service_status: ['DoD Civilian'],
+        years_of_service: '15',
         other_status: 'DoD Civilian',
         about: 'Former Marine intelligence analyst with expertise in strategic planning and operations.',
-        address: '321 Strategy Lane',
+        address: '321 Strategy Lane, Huntsville, AL 35801',
         city: 'Huntsville',
-        state: 'AL',
         zip_code: '35801',
         headshot_url: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=face',
         business_logo_url: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=200&h=200&fit=crop',
@@ -148,14 +136,11 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         phone: '555-501-6005',
         professional_title: 'Space Force Advisor',
         military_branch: 'space_force',
-        years_of_mil_service: '12',
-        years_of_us_civil_service: '2',
-        service_status: ['Active Duty'],
+        years_of_service: '12',
         other_status: 'Active Duty',
         about: 'Space Force officer with expertise in satellite systems and space-based defense technologies.',
-        address: '654 Satellite Drive',
+        address: '654 Satellite Drive, Colorado Springs, CO 80914',
         city: 'Colorado Springs',
-        state: 'CO',
         zip_code: '80914',
         headshot_url: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face',
         business_logo_url: 'https://images.unsplash.com/photo-1614064641938-3bbee52942c7?w=200&h=200&fit=crop',
@@ -164,29 +149,26 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
     ];
 
     try {
-      // Insert advisors one by one to avoid constraint conflicts
-      console.log(`✅ Attempting to insert ${advisors.length} advisors...`);
+      console.log(`Attempting to insert ${advisors.length} advisors...`);
       for (let i = 0; i < advisors.length; i++) {
         const advisor = advisors[i];
-        // Add a small delay between insertions to ensure uniqueness
         if (i > 0) {
           await new Promise(resolve => setTimeout(resolve, 100));
         }
         
         try {
-          console.log(`✅ Inserting advisor ${i + 1}:`, advisor.name, advisor.email);
+          console.log(`Inserting advisor ${i + 1}:`, advisor.name, advisor.email);
           const { error } = await supabase.from('advisor_applications').insert([advisor]);
           if (error) {
             console.error(`Error inserting advisor ${i + 1}:`, error);
-            // Continue with other advisors even if one fails
           } else {
-            console.log(`✅ Successfully inserted advisor ${i + 1}: ${advisor.name}`);
+            console.log(`Successfully inserted advisor ${i + 1}: ${advisor.name}`);
           }
         } catch (advisorError) {
           console.error(`Exception inserting advisor ${i + 1}:`, advisorError);
         }
       }
-      console.log('✅ Completed advisor test data generation');
+      console.log('Completed advisor test data generation');
     } catch (err) {
       console.error('Error in generateTestAdvisors:', err);
       throw err;

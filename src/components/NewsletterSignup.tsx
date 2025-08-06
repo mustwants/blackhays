@@ -37,19 +37,76 @@ const NewsletterSignup: React.FC<NewsletterSignupProps> = ({ onClose }) => {
     }
 
     try {
-      // First, save to Supabase
+      console.log('Attempting to subscribe newsletter:', formData);
+      
+      // Save to Supabase with better error handling
       const { error: dbError } = await supabase
         .from('newsletter_subscribers')
-        .upsert([{ 
+        .insert([{ 
           first_name: formData.first_name.trim(),
           last_name: formData.last_name.trim(),
           email: formData.email.trim().toLowerCase(),
-          notify_ceo: true // Flag to indicate CEO should be notified
-        }], {
-          onConflict: 'email'
-        });
+          notify_ceo: true,
+          status: 'pending'
+        }]);
 
       if (dbError) {
+        console.error('Database error:', dbError);
+        if (dbError.code === '23505') {
+          setError('This email is already subscribed to our newsletter.');
+        } else {
+          setError(`Failed to subscribe: ${dbError.message}`);
+        }
+        setStatus('error');
+        return;
+      }
+      
+      console.log('Successfully saved to database');
+      
+      // Send CEO notification (don't fail if this doesn't work)
+      try {
+        const response = await fetch('https://formsubmit.co/ajax/CEO@blackhaysgroup.com', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({
+            name: `${formData.first_name} ${formData.last_name}`,
+            email: formData.email,
+            message: `New newsletter subscription from ${formData.first_name} ${formData.last_name} (${formData.email})`,
+            _subject: 'New Newsletter Subscriber'
+          })
+        });
+        
+        if (response.ok) {
+          console.log('CEO notification sent successfully');
+        } else {
+          console.warn('CEO notification failed but subscription succeeded');
+        }
+      } catch (emailError) {
+        console.warn('CEO notification failed but subscription succeeded:', emailError);
+      }
+      
+      setStatus('success');
+      
+      // Reset form
+      setFormData({
+        first_name: '',
+        last_name: '',
+        email: ''
+      });
+      
+      setTimeout(() => {
+        if (onClose) onClose();
+      }, 2000);
+      
+    } catch (err) {
+      console.error('Newsletter subscription error:', err);
+      setError('Failed to subscribe. Please try again.');
+      setStatus('error');
+    }
+  };
         throw dbError;
       }
       

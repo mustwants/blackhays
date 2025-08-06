@@ -97,12 +97,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCategoryClick }) => {
     try {
       const { data, error } = await supabase
         .from(table)
+        .select('*')
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
 
-      console.log(`${table} stats:`, data?.length || 0, 'total records');
-      console.log(`${table} raw data:`, data);
       
       const stats = {
         total: data?.length || 0,
@@ -124,7 +124,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCategoryClick }) => {
     try {
       const { data, error } = await supabase
         .from('newsletter_subscribers')
-        .select('id')
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
