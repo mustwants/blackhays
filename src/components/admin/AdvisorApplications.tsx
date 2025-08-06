@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAdvisors } from '../../hooks/useAdvisors';
+import { supabase } from '../../lib/supabaseClient';
 import { Search, Filter, Edit2, Trash2, Check, X, Pause, Eye, ExternalLink, MapPin, Phone, Mail } from 'lucide-react';
 
 const AdvisorApplications = () => {
