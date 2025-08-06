@@ -97,12 +97,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCategoryClick }) => {
     try {
       const { data, error } = await supabase
         .from(table)
-        .select('status, created_at')
+        .select('status')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
 
-      
       const stats = {
         total: data?.length || 0,
         approved: data?.filter(item => item?.status === 'approved').length || 0,
@@ -111,7 +110,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCategoryClick }) => {
         rejected: data?.filter(item => item?.status === 'rejected').length || 0
       };
 
-      console.log(`${table} breakdown:`, stats);
       return stats;
     } catch (err) {
       console.error(`Error fetching ${table} stats:`, err);
