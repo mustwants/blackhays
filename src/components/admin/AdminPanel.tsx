@@ -31,6 +31,13 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
   const handleDataGenerated = () => {
     // Force refresh all admin components
     setRefreshKey(prev => prev + 1);
+    // Also refresh the active tab if it's dashboard
+    if (activeTab === 'dashboard') {
+      // Small delay to ensure data is inserted before refresh
+      setTimeout(() => {
+        setRefreshKey(prev => prev + 1);
+      }, 1000);
+    }
   };
 
   const handleLogin = async (e: React.FormEvent) => {

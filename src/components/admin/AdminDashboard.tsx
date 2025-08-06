@@ -98,7 +98,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCategoryClick }) => {
       const { data, error } = await supabase
         .from(table)
         .select('status')
-        .gte('created_at', startDate.toISOString());
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
 
@@ -122,7 +122,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCategoryClick }) => {
       const { count, error } = await supabase
         .from('newsletter_subscribers')
         .select('*', { count: 'exact', head: true })
-        .gte('created_at', startDate.toISOString());
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
       return count || 0;
