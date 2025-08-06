@@ -47,6 +47,7 @@ const EventSubmissions: React.FC<EventSubmissionsProps> = ({ initialData = [] })
         console.log(`Found ${eventsResult.data.length} events in events table`);
         allEvents = [...eventsResult.data.map(event => ({
           ...event,
+          created_at: event.created_at || new Date().toISOString(),
           isEvent: true // Flag to identify regular events
         }))];
       }
@@ -54,13 +55,16 @@ const EventSubmissions: React.FC<EventSubmissionsProps> = ({ initialData = [] })
       // Process submissions
       if (!submissionsResult.error && submissionsResult.data) {
         console.log(`Found ${submissionsResult.data.length} events in event_submissions table`);
-        allEvents = [...allEvents, ...submissionsResult.data];
+        allEvents = [...allEvents, ...submissionsResult.data.map(submission => ({
+          ...submission,
+          created_at: submission.created_at || new Date().toISOString()
+        }))];
       }
 
       // Sort by date
       allEvents.sort((a, b) => {
-        const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
-        const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
+        const dateA = new Date(a.created_at).getTime();
+        const dateB = new Date(b.created_at).getTime();
         return dateB - dateA;
       });
 
