@@ -39,9 +39,9 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
       if (activeTab === 'dashboard') {
         setTimeout(() => {
           setRefreshKey(prev => prev + 1);
-        }, 1000); // Increased delay for dashboard
+        }, 2000); // Increased delay for dashboard
       }
-    }, 2000); // Increased initial delay
+    }, 3000); // Increased initial delay
   };
 
   const handleLogin = async (e: React.FormEvent) => {

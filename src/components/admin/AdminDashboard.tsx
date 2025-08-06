@@ -96,7 +96,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCategoryClick }) => {
   const fetchCategoryStats = async (table: string, startDate: Date): Promise<CategoryStats> => {
     try {
       const { data, error } = await supabase
-        .from(table)
         .select('status')
         .order('created_at', { ascending: false });
 
@@ -125,7 +124,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCategoryClick }) => {
     try {
       const { count, error } = await supabase
         .from('newsletter_subscribers')
-        .select('*', { count: 'exact', head: true })
         .order('created_at', { ascending: false });
 
       if (error) throw error;
