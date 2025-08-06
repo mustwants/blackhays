@@ -31,11 +31,11 @@ const EventSubmissions: React.FC<EventSubmissionsProps> = ({ initialData = [] })
       const [eventsResult, submissionsResult] = await Promise.all([
         supabase
           .from('events')
-          .select('*')
+          .select('id, name, start_date, end_date, location, website, about, logo_url, created_at, updated_at')
           .order('created_at', { ascending: false }),
         supabase
           .from('event_submissions')
-          .select('*')
+          .select('id, name, start_date, end_date, location, website, about, submitter_email, logo_url, status, created_at, updated_at')
           .order('created_at', { ascending: false })
       ]);
 

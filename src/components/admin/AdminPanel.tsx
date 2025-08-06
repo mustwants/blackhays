@@ -9,6 +9,7 @@ import InnovationSubmissions from './InnovationSubmissions';
 import NewsletterSubscribers from '../NewsletterSubscribers';
 import AdminDashboard from './AdminDashboard';
 import TestDataGenerator from './TestDataGenerator';
+import AdvisorApplications from './AdvisorApplications';
 
 interface AdminPanelProps {
   onClose?: () => void;
@@ -199,16 +200,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
           {activeTab === 'dashboard' && <AdminDashboard onCategoryClick={setActiveTab} />}
           {activeTab === 'testdata' && <TestDataGenerator />}
           {activeTab === 'advisors' && (
-            <div>
-              <h3 className="text-lg font-bold mb-4">Advisor Applications</h3>
-              <div className="text-gray-600 mb-4">
-                All advisor applications are listed here. You can search, filter by status, and manage each application.
-              </div>
-              {/* Note: AdvisorApplications component would need to be created or the existing useAdvisors hook integrated */}
-              <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded">
-                Advisor applications management is handled through the useAdvisors hook. This section needs integration.
-              </div>
-            </div>
+            <AdvisorApplications />
           )}
           {activeTab === 'events' && <EventSubmissions />}
           {activeTab === 'companies' && <CompanySubmissions />}
