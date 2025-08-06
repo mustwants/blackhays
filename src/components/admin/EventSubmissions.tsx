@@ -57,7 +57,9 @@ const EventSubmissions: React.FC<EventSubmissionsProps> = ({ initialData = [] })
         console.log(`Found ${submissionsResult.data.length} events in event_submissions table`);
         allEvents = [...allEvents, ...submissionsResult.data.map(submission => ({
           ...submission,
-          created_at: submission.created_at || new Date().toISOString()
+          created_at: submission.created_at || new Date().toISOString(),
+          start_date: submission.start_date || new Date().toISOString(),
+          end_date: submission.end_date || new Date().toISOString()
         }))];
       }
 
