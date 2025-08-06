@@ -60,8 +60,8 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
   const generateTestAdvisors = async () => {
     const advisors = [
       {
-        name: 'John Mitchell', // This stays as 'name' - it's correct
-        email: `john.mitchell.test.${Date.now()}.1@example.com`,
+        name: 'John Mitchell',
+        email: `john.mitchell.${Date.now()}.${Math.random().toString(36).substr(2, 9)}@example.com`,
         phone: '555-101-2001',
         professional_title: 'Former Navy Admiral',
         military_branch: 'navy',
@@ -77,8 +77,8 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
       },
       {
         name: 'Sarah Rodriguez',
-        email: `sarah.rodriguez.test.${Date.now()}.2@example.com`,
-        phone: '555-101-2002',
+        email: `sarah.rodriguez.${Date.now()}.${Math.random().toString(36).substr(2, 9)}@example.com`,
+        phone: '555-201-3002',
         professional_title: 'Cybersecurity Expert',
         military_branch: 'air_force',
         years_of_service: '18',
@@ -92,8 +92,8 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
       },
       {
         name: 'Michael Chen',
-        email: `michael.chen.test.${Date.now()}.3@example.com`,
-        phone: '555-101-2003',
+        email: `michael.chen.${Date.now()}.${Math.random().toString(36).substr(2, 9)}@example.com`,
+        phone: '555-301-4003',
         professional_title: 'Defense Technology Consultant',
         military_branch: 'army',
         years_of_service: '20',
@@ -107,8 +107,8 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
       },
       {
         name: 'Lisa Thompson',
-        email: `lisa.thompson.test.${Date.now()}.4@example.com`,
-        phone: '555-101-2004',
+        email: `lisa.thompson.${Date.now()}.${Math.random().toString(36).substr(2, 9)}@example.com`,
+        phone: '555-401-5004',
         professional_title: 'Intelligence Analyst',
         military_branch: 'marines',
         years_of_service: '15',
@@ -122,8 +122,8 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
       },
       {
         name: 'David Park',
-        email: `david.park.test.${Date.now()}.5@example.com`,
-        phone: '555-101-2005',
+        email: `david.park.${Date.now()}.${Math.random().toString(36).substr(2, 9)}@example.com`,
+        phone: '555-501-6005',
         professional_title: 'Space Force Advisor',
         military_branch: 'space_force',
         years_of_service: '12',
@@ -141,10 +141,16 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
       // Insert advisors one by one to avoid constraint conflicts
       for (let i = 0; i < advisors.length; i++) {
         const advisor = advisors[i];
+        // Add a small delay between insertions to ensure uniqueness
+        if (i > 0) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+        
         try {
           const { error } = await supabase.from('advisor_applications').insert([advisor]);
           if (error) {
             console.error(`Error inserting advisor ${i + 1}:`, error);
+            // Continue with other advisors even if one fails
             // Continue with other advisors even if one fails
           } else {
             console.log(`Successfully inserted advisor ${i + 1}: ${advisor.name}`);
