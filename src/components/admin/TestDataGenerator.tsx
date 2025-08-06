@@ -157,7 +157,6 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
           if (error) {
             console.error(`Error inserting advisor ${i + 1}:`, error);
             // Continue with other advisors even if one fails
-            // Continue with other advisors even if one fails
           } else {
             console.log(`Successfully inserted advisor ${i + 1}: ${advisor.name}`);
           }
@@ -345,7 +344,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         description: 'Research and development of advanced materials for defense and aerospace applications.',
         contact_name: 'Emily Johnson',
         contact_email: `emily.johnson.${Date.now()}.5.${Math.random().toString(36).substr(2, 5)}@example.com`,
-        contact_email: `kevin.zhang.${Date.now()}.2.${Math.random().toString(36).substr(2, 5)}@example.com`,
+        contact_phone: '555-201-3005',
         employee_count: '51-200',
         founded_year: '2015',
         linkedin: 'https://linkedin.com/company/advanced-materials',
@@ -357,27 +356,32 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
       }
     ];
 
-    console.log(`Attempting to insert ${companies.length} companies...`);
-    for (let i = 0; i < companies.length; i++) {
-      const company = companies[i];
-      if (i > 0) {
-        contact_email: `michelle.taylor.${Date.now()}.3.${Math.random().toString(36).substr(2, 5)}@example.com`,
-      }
-      
-      try {
-        console.log(`Inserting company ${i + 1}:`, company.name, company.contact_email);
-        const { error } = await supabase.from('company_submissions').insert([company]);
-        if (error) {
-          console.error(`Error inserting company ${i + 1}:`, error);
-        } else {
-          console.log(`Successfully inserted company ${i + 1}: ${company.name}`);
+    try {
+      console.log(`Attempting to insert ${companies.length} companies...`);
+      for (let i = 0; i < companies.length; i++) {
+        const company = companies[i];
+        if (i > 0) {
+          await new Promise(resolve => setTimeout(resolve, 100));
         }
-      } catch (companyError) {
-        console.error(`Exception inserting company ${i + 1}:`, companyError);
+        
+        try {
+          console.log(`Inserting company ${i + 1}:`, company.name, company.contact_email);
+          const { error } = await supabase.from('company_submissions').insert([company]);
+          if (error) {
+            console.error(`Error inserting company ${i + 1}:`, error);
+          } else {
+            console.log(`Successfully inserted company ${i + 1}: ${company.name}`);
+          }
+        } catch (companyError) {
+          console.error(`Exception inserting company ${i + 1}:`, companyError);
+        }
       }
+      console.log('Completed company test data generation');
+    } catch (err) {
+      console.error('Error in generateTestCompanies:', err);
+      throw err;
     }
-    console.log('Completed company test data generation');
-        contact_email: `carlos.rodriguez.${Date.now()}.4.${Math.random().toString(36).substr(2, 5)}@example.com`,
+  };
 
   const generateTestConsortiums = async () => {
     const consortiums = [
@@ -393,7 +397,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         contact_email: `patricia.williams.${Date.now()}.1.${Math.random().toString(36).substr(2, 5)}@example.com`,
         contact_phone: '555-301-4001',
         membership_fee: '$10,000/year',
-        contact_email: `linda.chang.${Date.now()}.5.${Math.random().toString(36).substr(2, 5)}@example.com`,
+        headquarters: 'Arlington, VA',
         logo_url: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=200&h=200&fit=crop',
         status: 'pending'
       },
@@ -403,15 +407,10 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         focus_area: 'Cybersecurity',
         government_partner: 'US Army Cyber Command',
         established_year: '2020',
-      console.log(`Attempting to insert ${innovations.length} innovations...`);
+        eligibility_criteria: 'Cybersecurity companies and organizations with government clearance.',
         description: 'Alliance of cybersecurity companies working to enhance defense against cyber threats.',
         contact_name: 'Mark Davis',
-        if (i > 0) {
-          await new Promise(resolve => setTimeout(resolve, 100));
-        }
-        
         contact_email: `mark.davis.${Date.now()}.2.${Math.random().toString(36).substr(2, 5)}@example.com`,
-          console.log(`Inserting innovation ${i + 1}:`, innovation.name, innovation.contact_email);
         contact_phone: '555-301-4002',
         membership_fee: '$15,000/year',
         headquarters: 'Colorado Springs, CO',
@@ -422,7 +421,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         name: 'Space Technology Consortium',
         website: 'https://example.com/stc',
         focus_area: 'Space Technology',
-      console.log('Completed innovation test data generation');
+        government_partner: 'US Space Force',
         established_year: '2021',
         eligibility_criteria: 'Companies and organizations involved in space technology development.',
         description: 'Consortium focused on advancing space technologies for national security applications.',
@@ -434,71 +433,71 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         logo_url: 'https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=200&h=200&fit=crop',
         status: 'pending'
       },
-        email: `john.smith.${Date.now()}.1.${Math.random().toString(36).substr(2, 5)}@example.com`,
+      {
         name: 'Maritime Defense Network',
         website: 'https://example.com/mdn',
         focus_area: 'Maritime Defense',
         government_partner: 'US Navy',
         established_year: '2018',
         eligibility_criteria: 'Naval contractors and maritime technology developers.',
-        email: `jane.doe.${Date.now()}.2.${Math.random().toString(36).substr(2, 5)}@example.com`,
+        description: 'Network of companies specializing in maritime defense technologies and solutions.',
         contact_name: 'James Wilson',
         contact_email: `james.wilson.${Date.now()}.4.${Math.random().toString(36).substr(2, 5)}@example.com`,
         contact_phone: '555-301-4004',
         membership_fee: '$8,000/year',
         headquarters: 'San Diego, CA',
         logo_url: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=200&h=200&fit=crop',
-        email: `michael.johnson.${Date.now()}.3.${Math.random().toString(36).substr(2, 5)}@example.com`,
+        status: 'pending'
       },
       {
         name: 'Advanced Manufacturing Coalition',
         website: 'https://example.com/amc',
         focus_area: 'Advanced Manufacturing',
         government_partner: 'Defense Logistics Agency',
-        email: `sarah.williams.${Date.now()}.4.${Math.random().toString(36).substr(2, 5)}@example.com`,
+        established_year: '2017',
         eligibility_criteria: 'Manufacturing companies serving defense and government markets.',
         description: 'Coalition of advanced manufacturing companies supporting defense supply chain innovation.',
         contact_name: 'Susan Brown',
         contact_email: `susan.brown.${Date.now()}.5.${Math.random().toString(36).substr(2, 5)}@example.com`,
         contact_phone: '555-301-4005',
         membership_fee: '$5,000/year',
-        email: `robert.brown.${Date.now()}.5.${Math.random().toString(36).substr(2, 5)}@example.com`,
+        headquarters: 'Detroit, MI',
         logo_url: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=200&h=200&fit=crop',
         status: 'pending'
       }
     ];
 
-    console.log(`Attempting to insert ${subscribers.length} newsletter subscribers...`);
-    for (let i = 0; i < consortiums.length; i++) {
-      const consortium = consortiums[i];
-      if (i > 0) {
-        await new Promise(resolve => setTimeout(resolve, 100));
-      }
-      
-      try {
-        console.log(`Inserting subscriber ${i + 1}:`, subscriber.first_name, subscriber.last_name, subscriber.email);
-        const { error } = await supabase.from('consortium_submissions').insert([consortium]);
-        if (error) {
-          console.error(`Error inserting consortium ${i + 1}:`, error);
-        } else {
-          console.log(`Successfully inserted consortium ${i + 1}: ${consortium.name}`);
+    try {
+      console.log(`Attempting to insert ${consortiums.length} consortiums...`);
+      for (let i = 0; i < consortiums.length; i++) {
+        const consortium = consortiums[i];
+        if (i > 0) {
+          await new Promise(resolve => setTimeout(resolve, 100));
         }
-      } catch (consortiumError) {
-        console.error(`Exception inserting consortium ${i + 1}:`, consortiumError);
+        
+        try {
+          console.log(`Inserting consortium ${i + 1}:`, consortium.name, consortium.contact_email);
+          const { error } = await supabase.from('consortium_submissions').insert([consortium]);
+          if (error) {
+            console.error(`Error inserting consortium ${i + 1}:`, error);
+          } else {
+            console.log(`Successfully inserted consortium ${i + 1}: ${consortium.name}`);
+          }
+        } catch (consortiumError) {
+          console.error(`Exception inserting consortium ${i + 1}:`, consortiumError);
+        }
       }
+      console.log('Completed consortium test data generation');
+    } catch (err) {
+      console.error('Error in generateTestConsortiums:', err);
+      throw err;
     }
-    console.log('Completed newsletter subscriber test data generation');
   };
 
   const generateTestInnovations = async () => {
     const innovations = [
       {
-      if (i > 0) {
-        await new Promise(resolve => setTimeout(resolve, 100));
-      }
-      
         name: 'Quantum Research Lab',
-        console.log(`Inserting company ${i + 1}:`, company.name, company.contact_email);
         website: 'https://example.com/quantumlab',
         type: 'research_lab',
         focus_areas: 'Quantum computing, Cryptography, Quantum sensors',
@@ -506,10 +505,9 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         funding_source: 'government',
         description: 'Leading research laboratory specializing in quantum technologies for defense applications.',
         contact_name: 'Dr. Alice Cooper',
-        contact_email: `alice.cooper.test.${Date.now()}.1@example.com`,
+        contact_email: `alice.cooper.${Date.now()}.1.${Math.random().toString(36).substr(2, 5)}@example.com`,
         contact_phone: '555-401-5001',
         primary_sponsor: 'DARPA',
-    console.log('Completed company test data generation');
         headquarters: 'Cambridge, MA',
         logo_url: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=200&h=200&fit=crop',
         status: 'pending'
@@ -523,7 +521,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         funding_source: 'mixed',
         description: 'Innovation center focused on developing AI solutions for defense and national security.',
         contact_name: 'Dr. Kevin Zhang',
-        contact_email: `kevin.zhang.test.${Date.now()}.2@example.com`,
+        contact_email: `kevin.zhang.${Date.now()}.2.${Math.random().toString(36).substr(2, 5)}@example.com`,
         contact_phone: '555-401-5002',
         primary_sponsor: 'Defense Innovation Unit',
         headquarters: 'Palo Alto, CA',
@@ -539,7 +537,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         funding_source: 'government',
         description: 'Government research institute developing biodefense technologies and medical countermeasures.',
         contact_name: 'Dr. Michelle Taylor',
-        contact_email: `patricia.williams.${Date.now()}.1.${Math.random().toString(36).substr(2, 5)}@example.com`,
+        contact_email: `michelle.taylor.${Date.now()}.3.${Math.random().toString(36).substr(2, 5)}@example.com`,
         contact_phone: '555-401-5003',
         primary_sponsor: 'Department of Health and Human Services',
         headquarters: 'Atlanta, GA',
@@ -555,7 +553,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         funding_source: 'academic',
         description: 'University laboratory researching hypersonic technologies for defense applications.',
         contact_name: 'Dr. Carlos Rodriguez',
-        contact_email: `mark.davis.${Date.now()}.2.${Math.random().toString(36).substr(2, 5)}@example.com`,
+        contact_email: `carlos.rodriguez.${Date.now()}.4.${Math.random().toString(36).substr(2, 5)}@example.com`,
         contact_phone: '555-401-5004',
         primary_sponsor: 'Air Force Research Laboratory',
         headquarters: 'Wright-Patterson AFB, OH',
@@ -571,7 +569,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         funding_source: 'nonprofit',
         description: 'Nonprofit institute advancing autonomous systems research for defense and civilian applications.',
         contact_name: 'Dr. Linda Chang',
-        contact_email: `linda.chang.test.${Date.now()}.5@example.com`,
+        contact_email: `linda.chang.${Date.now()}.5.${Math.random().toString(36).substr(2, 5)}@example.com`,
         contact_phone: '555-401-5005',
         primary_sponsor: 'National Science Foundation',
         headquarters: 'Seattle, WA',
@@ -582,9 +580,15 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
 
     try {
       // Insert innovations one by one to avoid constraint conflicts
+      console.log(`Attempting to insert ${innovations.length} innovations...`);
       for (let i = 0; i < innovations.length; i++) {
         const innovation = innovations[i];
+        if (i > 0) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+        
         try {
+          console.log(`Inserting innovation ${i + 1}:`, innovation.name, innovation.contact_email);
           const { error } = await supabase.from('innovation_submissions').insert([innovation]);
           if (error) {
             console.error(`Error inserting innovation ${i + 1}:`, error);
@@ -595,72 +599,77 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
           console.error(`Exception inserting innovation ${i + 1}:`, innovationError);
         }
       }
-      console.log('Successfully created innovation test data');
+      console.log('Completed innovation test data generation');
     } catch (err) {
       console.error('Error in generateTestInnovations:', err);
       throw err;
     }
-        contact_email: `rachel.lee.${Date.now()}.3.${Math.random().toString(36).substr(2, 5)}@example.com`,
+  };
 
   const generateTestNewsletterSubscribers = async () => {
     const subscribers = [
       {
         first_name: 'John',
         last_name: 'Smith',
-        email: `john.smith.newsletter.${Date.now()}.1@example.com`,
+        email: `john.smith.${Date.now()}.1.${Math.random().toString(36).substr(2, 5)}@example.com`,
         notify_ceo: true,
         status: 'pending'
       },
       {
         first_name: 'Jane',
         last_name: 'Doe',
-        email: `jane.doe.newsletter.${Date.now()}.2@example.com`,
+        email: `jane.doe.${Date.now()}.2.${Math.random().toString(36).substr(2, 5)}@example.com`,
         notify_ceo: true,
-        contact_email: `james.wilson.${Date.now()}.4.${Math.random().toString(36).substr(2, 5)}@example.com`,
+        status: 'pending'
       },
       {
         first_name: 'Michael',
         last_name: 'Johnson',
-        email: `michael.johnson.newsletter.${Date.now()}.3@example.com`,
+        email: `michael.johnson.${Date.now()}.3.${Math.random().toString(36).substr(2, 5)}@example.com`,
         notify_ceo: false,
         status: 'pending'
       },
       {
         first_name: 'Sarah',
         last_name: 'Williams',
-        email: `sarah.williams.newsletter.${Date.now()}.4@example.com`,
+        email: `sarah.williams.${Date.now()}.4.${Math.random().toString(36).substr(2, 5)}@example.com`,
         notify_ceo: true,
         status: 'approved'
       },
-        contact_email: `susan.brown.${Date.now()}.5.${Math.random().toString(36).substr(2, 5)}@example.com`,
+      {
         first_name: 'Robert',
         last_name: 'Brown',
-        email: `robert.brown.newsletter.${Date.now()}.5@example.com`,
+        email: `robert.brown.${Date.now()}.5.${Math.random().toString(36).substr(2, 5)}@example.com`,
         notify_ceo: true,
         status: 'pending'
       }
     ];
 
-    console.log(`Attempting to insert ${consortiums.length} consortiums...`);
-    for (let i = 0; i < subscribers.length; i++) {
-      const subscriber = subscribers[i];
-      if (i > 0) {
-        await new Promise(resolve => setTimeout(resolve, 100));
-      }
-      
-      try {
-        console.log(`Inserting consortium ${i + 1}:`, consortium.name, consortium.contact_email);
-        const { error } = await supabase.from('newsletter_subscribers').insert([subscriber]);
-        if (error) {
-          console.error(`Error inserting subscriber ${i + 1}:`, error);
-        } else {
-          console.log(`Successfully inserted subscriber ${i + 1}: ${subscriber.first_name} ${subscriber.last_name}`);
+    try {
+      console.log(`Attempting to insert ${subscribers.length} newsletter subscribers...`);
+      for (let i = 0; i < subscribers.length; i++) {
+        const subscriber = subscribers[i];
+        if (i > 0) {
+          await new Promise(resolve => setTimeout(resolve, 100));
         }
-      } catch (subscriberError) {
-        console.error(`Exception inserting subscriber ${i + 1}:`, subscriberError);
+        
+        try {
+          console.log(`Inserting subscriber ${i + 1}:`, subscriber.first_name, subscriber.last_name, subscriber.email);
+          const { error } = await supabase.from('newsletter_subscribers').insert([subscriber]);
+          if (error) {
+            console.error(`Error inserting subscriber ${i + 1}:`, error);
+          } else {
+            console.log(`Successfully inserted subscriber ${i + 1}: ${subscriber.first_name} ${subscriber.last_name}`);
+          }
+        } catch (subscriberError) {
+          console.error(`Exception inserting subscriber ${i + 1}:`, subscriberError);
+        }
       }
+      console.log('Completed newsletter subscriber test data generation');
+    } catch (err) {
+      console.error('Error in generateTestNewsletterSubscribers:', err);
+      throw err;
     }
-    console.log('Completed consortium test data generation');
   };
 
   return (
@@ -674,7 +683,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
       
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded flex items-start">
-        contact_email: `alice.cooper.${Date.now()}.1.${Math.random().toString(36).substr(2, 5)}@example.com`,
+          <AlertCircle className="h-5 w-5 text-red-500 mr-2 mt-0.5" />
           <div>{error}</div>
         </div>
       )}
