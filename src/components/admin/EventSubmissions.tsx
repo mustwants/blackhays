@@ -27,6 +27,7 @@ const EventSubmissions: React.FC<EventSubmissionsProps> = ({ initialData = [] })
   const fetchSubmissions = async () => {
     setLoading(true);
     setError(null);
+    setSubmissions([]); // Clear existing data first
     try {
       // Get both events and event_submissions
       const [eventsResult, submissionsResult] = await Promise.all([
@@ -58,9 +59,11 @@ const EventSubmissions: React.FC<EventSubmissionsProps> = ({ initialData = [] })
       }
 
       // Sort by date
-      allEvents.sort((a, b) => 
-        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-      );
+      allEvents.sort((a, b) => {
+        const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
+        const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
+        return dateB - dateA;
+      });
 
       setSubmissions(allEvents);
       console.log(`Total events loaded: ${allEvents.length} (${submissionsResult.data?.length || 0} submissions + ${eventsResult.data?.length || 0} events)`);
