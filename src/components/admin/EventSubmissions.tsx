@@ -63,16 +63,15 @@ const EventSubmissions: React.FC<EventSubmissionsProps> = ({ initialData = [] })
 
       // Sort by date
       allEvents.sort((a, b) => {
-        const dateA = new Date(a.created_at || new Date()).getTime();
-        const dateB = new Date(b.created_at || new Date()).getTime();
+        const dateA = new Date(a.created_at || new Date().toISOString()).getTime();
+        const dateB = new Date(b.created_at || new Date().toISOString()).getTime();
         return dateB - dateA;
       });
 
       setSubmissions(allEvents);
-      console.log(`Total events loaded: ${allEvents.length} (${submissionsResult.data?.length || 0} submissions + ${eventsResult.data?.length || 0} events)`);
     } catch (err) {
       console.error("Error fetching events:", err);
-      setError(`Failed to load events: ${err?.message || 'Unknown error'}`);
+      setError('Failed to load events');
     } finally {
       setLoading(false);
     }
