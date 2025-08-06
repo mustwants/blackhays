@@ -56,12 +56,12 @@ const TestDataGenerator = () => {
         phone: '555-101-2001',
         professional_title: 'Former Navy Admiral',
         military_branch: 'navy',
-        years_of_service: '25', // This should be years_of_service (text field)
+        years_of_service: '25', 
+        service_status: ['veteran'],
         // Remove service_status as it doesn't exist in schema
         about: 'Former Navy Admiral with 25 years of experience in naval operations and defense acquisition.',
         address: '123 Defense Way',
         zip_code: '22201',
-        location: [-77.0864, 38.8799],
         headshot_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face',
         business_logo_url: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=200&h=200&fit=crop',
         status: 'pending'
@@ -73,10 +73,10 @@ const TestDataGenerator = () => {
         professional_title: 'Cybersecurity Expert',
         military_branch: 'air_force',
         years_of_service: '18',
+        service_status: ['veteran'],
         about: 'Cybersecurity specialist with expertise in defense systems and threat intelligence.',
         address: '456 Tech Street',
         zip_code: '94107',
-        location: [-122.4194, 37.7749],
         headshot_url: 'https://images.unsplash.com/photo-1494790108755-2616b332e234?w=400&h=400&fit=crop&crop=face',
         business_logo_url: 'https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=200&h=200&fit=crop',
         status: 'pending'
@@ -88,10 +88,10 @@ const TestDataGenerator = () => {
         professional_title: 'Defense Technology Consultant',
         military_branch: 'army',
         years_of_service: '20',
+        service_status: ['veteran'],
         about: 'Army veteran specializing in emerging technologies and defense innovation programs.',
         address: '789 Innovation Blvd',
         zip_code: '80301',
-        location: [-104.9903, 39.7392],
         headshot_url: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face',
         business_logo_url: 'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=200&h=200&fit=crop',
         status: 'pending'
@@ -103,10 +103,10 @@ const TestDataGenerator = () => {
         professional_title: 'Intelligence Analyst',
         military_branch: 'marines',
         years_of_service: '15',
+        service_status: ['veteran'],
         about: 'Former Marine intelligence analyst with expertise in strategic planning and operations.',
         address: '321 Strategy Lane',
         zip_code: '35801',
-        location: [-86.5861, 34.7304],
         headshot_url: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=face',
         business_logo_url: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=200&h=200&fit=crop',
         status: 'pending'
@@ -118,10 +118,10 @@ const TestDataGenerator = () => {
         professional_title: 'Space Force Advisor',
         military_branch: 'space_force',
         years_of_service: '12',
+        service_status: ['active'],
         about: 'Space Force officer with expertise in satellite systems and space-based defense technologies.',
         address: '654 Satellite Drive',
         zip_code: '80914',
-        location: [-104.8214, 38.8339],
         headshot_url: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face',
         business_logo_url: 'https://images.unsplash.com/photo-1614064641938-3bbee52942c7?w=200&h=200&fit=crop',
         status: 'pending'
@@ -217,8 +217,6 @@ const TestDataGenerator = () => {
     const companies = [
       {
         name: 'Apex Defense Technologies',
-        first_name: 'Jennifer',
-        last_name: 'Walsh',
         website: 'https://example.com/apex',
         industry: 'cybersecurity',
         focus_areas: 'AI-powered threat detection, Network security, Incident response',
@@ -238,8 +236,6 @@ const TestDataGenerator = () => {
       },
       {
         name: 'Quantum Aerospace Solutions',
-        first_name: 'Robert',
-        last_name: 'Kim',
         website: 'https://example.com/quantum',
         industry: 'aerospace',
         focus_areas: 'Quantum computing, Satellite communications, Space systems',
@@ -259,8 +255,6 @@ const TestDataGenerator = () => {
       },
       {
         name: 'Tactical Robotics Inc',
-        first_name: 'Maria',
-        last_name: 'Santos',
         website: 'https://example.com/tactical',
         industry: 'robotics',
         focus_areas: 'Autonomous systems, Military robotics, Drone technology',
@@ -280,8 +274,6 @@ const TestDataGenerator = () => {
       },
       {
         name: 'SecureNet Defense',
-        first_name: 'Thomas',
-        last_name: 'Anderson',
         website: 'https://example.com/securenet',
         industry: 'cybersecurity',
         focus_areas: 'Network defense, Threat intelligence, Zero-trust architecture',
@@ -301,8 +293,6 @@ const TestDataGenerator = () => {
       },
       {
         name: 'Advanced Materials Corp',
-        first_name: 'Emily',
-        last_name: 'Johnson',
         website: 'https://example.com/advmat',
         industry: 'defense',
         focus_areas: 'Advanced composites, Armor materials, Lightweight structures',
@@ -331,8 +321,6 @@ const TestDataGenerator = () => {
     const consortiums = [
       {
         name: 'Defense Innovation Consortium',
-        first_name: 'Patricia',
-        last_name: 'Williams',
         website: 'https://example.com/dic',
         focus_area: 'Defense Innovation',
         government_partner: 'Department of Defense',
@@ -349,8 +337,6 @@ const TestDataGenerator = () => {
       },
       {
         name: 'Cyber Defense Alliance',
-        first_name: 'Mark',
-        last_name: 'Davis',
         website: 'https://example.com/cda',
         focus_area: 'Cybersecurity',
         government_partner: 'US Army Cyber Command',
@@ -367,8 +353,6 @@ const TestDataGenerator = () => {
       },
       {
         name: 'Space Technology Consortium',
-        first_name: 'Rachel',
-        last_name: 'Lee',
         website: 'https://example.com/stc',
         focus_area: 'Space Technology',
         government_partner: 'Space Force',
@@ -385,8 +369,6 @@ const TestDataGenerator = () => {
       },
       {
         name: 'Maritime Defense Network',
-        first_name: 'James',
-        last_name: 'Wilson',
         website: 'https://example.com/mdn',
         focus_area: 'Maritime Defense',
         government_partner: 'US Navy',
@@ -403,8 +385,6 @@ const TestDataGenerator = () => {
       },
       {
         name: 'Advanced Manufacturing Coalition',
-        first_name: 'Susan',
-        last_name: 'Brown',
         website: 'https://example.com/amc',
         focus_area: 'Advanced Manufacturing',
         government_partner: 'Defense Logistics Agency',
@@ -441,7 +421,6 @@ const TestDataGenerator = () => {
         contact_phone: '555-401-5001',
         primary_sponsor: 'DARPA',
         headquarters: 'Cambridge, MA',
-        location: [-71.0942, 42.3601],
         logo_url: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=200&h=200&fit=crop',
         status: 'pending'
       },
@@ -458,7 +437,6 @@ const TestDataGenerator = () => {
         contact_phone: '555-401-5002',
         primary_sponsor: 'Defense Innovation Unit',
         headquarters: 'Palo Alto, CA',
-        location: [-122.1430, 37.4419],
         logo_url: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=200&h=200&fit=crop',
         status: 'pending'
       },
@@ -475,7 +453,6 @@ const TestDataGenerator = () => {
         contact_phone: '555-401-5003',
         primary_sponsor: 'Department of Health and Human Services',
         headquarters: 'Atlanta, GA',
-        location: [-84.3880, 33.7490],
         logo_url: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=200&h=200&fit=crop',
         status: 'pending'
       },
@@ -492,7 +469,6 @@ const TestDataGenerator = () => {
         contact_phone: '555-401-5004',
         primary_sponsor: 'Air Force Research Laboratory',
         headquarters: 'Wright-Patterson AFB, OH',
-        location: [-84.0467, 39.8283],
         logo_url: 'https://images.unsplash.com/photo-1614064641938-3bbee52942c7?w=200&h=200&fit=crop',
         status: 'pending'
       },
@@ -509,7 +485,6 @@ const TestDataGenerator = () => {
         contact_phone: '555-401-5005',
         primary_sponsor: 'National Science Foundation',
         headquarters: 'Seattle, WA',
-        location: [-122.3321, 47.6062],
         logo_url: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=200&h=200&fit=crop',
         status: 'pending'
       }
