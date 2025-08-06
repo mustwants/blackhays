@@ -40,9 +40,11 @@ export default function InnovationSubmissions() {
     try {
       setLoading(true);
       
-      // Check authentication
+      // Check authentication - support both Supabase and localStorage admin sessions
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
+      const localSession = localStorage.getItem('auth_session');
+      
+      if (!session && !localSession) {
         throw new Error('Not authenticated');
       }
       

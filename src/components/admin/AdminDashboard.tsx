@@ -95,9 +95,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCategoryClick }) => {
 
   const fetchCategoryStats = async (table: string, startDate: Date): Promise<CategoryStats> => {
     try {
-      // Check authentication first
+      // Check authentication - support both Supabase and localStorage admin sessions
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
+      const localSession = localStorage.getItem('auth_session');
+      
+      if (!session && !localSession) {
         console.warn('Not authenticated for stats fetch');
         return { total: 0, approved: 0, pending: 0, paused: 0, rejected: 0 };
       }
