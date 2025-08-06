@@ -95,12 +95,24 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCategoryClick }) => {
 
   const fetchCategoryStats = async (table: string, startDate: Date): Promise<CategoryStats> => {
     try {
+      // Check authentication first
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        console.warn('Not authenticated for stats fetch');
+        return { total: 0, approved: 0, pending: 0, paused: 0, rejected: 0 };
+      }
+      
       const { data, error } = await supabase
         .from(table)
         .select('status, created_at')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error(`Error fetching ${table} stats:`, error);
+        throw error;
+      }
+      
+      console.log(`${table} stats - found ${data?.length || 0} records`);
 
       const stats = {
         total: data ? data.length : 0,

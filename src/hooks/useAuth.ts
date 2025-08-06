@@ -62,6 +62,11 @@ export function useAuth() {
       setUser(data.user);
       setIsAuthenticated(true);
       
+      // Ensure Supabase session is set for authenticated requests
+      if (data.session) {
+        await supabase.auth.setSession(data.session);
+      }
+      
       return { data, error: null };
     } catch (error) {
       console.error("useAuth: Login error:", error);

@@ -38,12 +38,20 @@ export default function ConsortiumSubmissions() {
   const fetchSubmissions = async () => {
     try {
       setLoading(true);
+      
+      // Check authentication
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error('Not authenticated');
+      }
+      
       const { data, error } = await supabase
         .from('consortium_submissions')
         .select('*')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
+      console.log('Fetched consortium submissions:', data?.length || 0);
       setSubmissions(data || []);
     } catch (err) {
       console.error('Error fetching consortium submissions:', err);

@@ -6,14 +6,48 @@ const AdvisorApplications = () => {
   const { advisors, isLoading, error, approveAdvisor, rejectAdvisor, deleteAdvisor, refreshAdvisors } = useAdvisors();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [directFetchData, setDirectFetchData] = useState([]);
+  const [directLoading, setDirectLoading] = useState(true);
+
+  useEffect(() => {
+    fetchDirectly();
+  }, []);
+
+  const fetchDirectly = async () => {
+    try {
+      setDirectLoading(true);
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (session) {
+        const { data, error } = await supabase
+          .from('advisor_applications')
+          .select('*')
+          .order('created_at', { ascending: false });
+        
+        if (error) {
+          console.error('Direct fetch error:', error);
+        } else {
+          console.log('Direct fetch success:', data?.length || 0, 'advisors');
+          setDirectFetchData(data || []);
+        }
+      }
+    } catch (err) {
+      console.error('Error in direct fetch:', err);
+    } finally {
+      setDirectLoading(false);
+    }
+  };
 
   useEffect(() => {
     refreshAdvisors();
   }, []);
 
-  const filteredAdvisors = advisors.filter(advisor => {
+  // Use direct fetch data if available, otherwise use hook data
+  const dataSource = directFetchData.length > 0 ? directFetchData : advisors;
+  
+  const filteredAdvisors = dataSource.filter(advisor => {
     const matchesSearch = searchTerm === '' || 
-      `${advisor.first_name} ${advisor.last_name}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      advisor.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       advisor.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       advisor.about?.toLowerCase().includes(searchTerm.toLowerCase());
     
@@ -21,6 +55,50 @@ const AdvisorApplications = () => {
     
     return matchesSearch && matchesStatus;
   });
+
+  const handleDirectApprove = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('advisor_applications')
+        .update({ status: 'approved' })
+        .eq('id', id);
+      
+      if (error) throw error;
+      await fetchDirectly();
+    } catch (err) {
+      console.error('Error approving advisor:', err);
+    }
+  };
+
+  const handleDirectReject = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('advisor_applications')
+        .update({ status: 'rejected' })
+        .eq('id', id);
+      
+      if (error) throw error;
+      await fetchDirectly();
+    } catch (err) {
+      console.error('Error rejecting advisor:', err);
+    }
+  };
+
+  const handleDirectDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this advisor?')) return;
+    
+    try {
+      const { error } = await supabase
+        .from('advisor_applications')
+        .delete()
+        .eq('id', id);
+      
+      if (error) throw error;
+      await fetchDirectly();
+    } catch (err) {
+      console.error('Error deleting advisor:', err);
+    }
+  };
 
   const getStatusBadge = (status: string) => {
     const statusColors = {
@@ -37,7 +115,7 @@ const AdvisorApplications = () => {
     );
   };
 
-  if (isLoading) {
+  if (isLoading || directLoading) {
     return (
       <div className="flex items-center justify-center py-8">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-bhred"></div>
@@ -155,7 +233,7 @@ const AdvisorApplications = () => {
                       <div className="flex space-x-2">
                         {advisor.status !== 'approved' && (
                           <button
-                            onClick={() => approveAdvisor(advisor.id)}
+                            onClick={() => handleDirectApprove(advisor.id)}
                             className="text-green-600 hover:text-green-900"
                             title="Approve"
                           >
@@ -164,7 +242,7 @@ const AdvisorApplications = () => {
                         )}
                         {advisor.status !== 'rejected' && (
                           <button
-                            onClick={() => rejectAdvisor(advisor.id)}
+                            onClick={() => handleDirectReject(advisor.id)}
                             className="text-red-600 hover:text-red-900"
                             title="Reject"
                           >
@@ -172,7 +250,7 @@ const AdvisorApplications = () => {
                           </button>
                         )}
                         <button
-                          onClick={() => deleteAdvisor(advisor.id)}
+                          onClick={() => handleDirectDelete(advisor.id)}
                           className="text-red-600 hover:text-red-900"
                           title="Delete"
                         >

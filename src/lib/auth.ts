@@ -53,6 +53,17 @@ export const login = async (email: string, password: string) => {
       try {
         localStorage.setItem('auth_session', JSON.stringify(sessionData));
         localStorage.setItem('auth_token', sessionData.session.access_token);
+        
+        // Set the session in Supabase for authenticated requests
+        await supabase.auth.setSession({
+          access_token: sessionData.session.access_token,
+          refresh_token: sessionData.session.refresh_token
+        });
+        
+        
+        // Set the Supabase session for authenticated requests
+        await supabase.auth.setSession(sessionData.session);
+        
         console.log('Admin session stored successfully');
       } catch (storageError) {
         console.warn('Failed to store admin session:', storageError);

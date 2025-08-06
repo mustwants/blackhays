@@ -25,6 +25,12 @@ const NewsletterSubscribers: React.FC<NewsletterSubscribersProps> = ({ initialDa
     try {
       setLoading(true);
       setError(null);
+      
+      // Check authentication
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error('Not authenticated');
+      }
 
       // Fetch all subscribers ordered by creation date
       const { data, error: fetchError } = await supabase
@@ -33,9 +39,11 @@ const NewsletterSubscribers: React.FC<NewsletterSubscribersProps> = ({ initialDa
         .order('created_at', { ascending: false });
 
       if (fetchError) {
+        console.error('Newsletter fetch error:', fetchError);
         throw fetchError;
       }
 
+      console.log('Fetched newsletter subscribers:', data?.length || 0);
       // Update state with fetched data
       setSubscribers(data || []);
       

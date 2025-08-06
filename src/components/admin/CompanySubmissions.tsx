@@ -41,12 +41,20 @@ export default function CompanySubmissions() {
   const fetchSubmissions = async () => {
     try {
       setLoading(true);
+      
+      // Check authentication
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error('Not authenticated');
+      }
+      
       const { data, error } = await supabase
         .from('company_submissions')
         .select('*')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
+      console.log('Fetched company submissions:', data?.length || 0);
       setSubmissions(data || []);
     } catch (err) {
       console.error('Error fetching company submissions:', err);

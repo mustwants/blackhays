@@ -29,6 +29,12 @@ const EventSubmissions: React.FC<EventSubmissionsProps> = ({ initialData = [] })
     setLoading(true);
     
     try {
+      // Check authentication first
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error('Not authenticated');
+      }
+      
       const [eventsResult, submissionsResult] = await Promise.all([
         supabase
           .from('events')
