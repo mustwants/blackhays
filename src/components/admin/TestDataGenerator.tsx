@@ -14,14 +14,25 @@ const TestDataGenerator = () => {
 
     try {
       // Generate test data for each category
-      await Promise.all([
-        generateTestAdvisors(),
-        generateTestEvents(),
-        generateTestCompanies(),
-        generateTestConsortiums(),
-        generateTestInnovations(),
-        generateTestNewsletterSubscribers()
-      ]);
+      console.log('Starting test data generation...');
+      
+      console.log('Generating advisors...');
+      await generateTestAdvisors();
+      
+      console.log('Generating events...');
+      await generateTestEvents();
+      
+      console.log('Generating companies...');
+      await generateTestCompanies();
+      
+      console.log('Generating consortiums...');
+      await generateTestConsortiums();
+      
+      console.log('Generating innovations...');
+      await generateTestInnovations();
+      
+      console.log('Generating newsletter subscribers...');
+      await generateTestNewsletterSubscribers();
 
       setSuccess('Successfully generated 5 test items for each category!');
       
@@ -31,7 +42,7 @@ const TestDataGenerator = () => {
       }, 3000);
     } catch (err) {
       console.error('Error generating test data:', err);
-      setError('Failed to generate test data. Please try again.');
+      setError(`Failed to generate test data: ${err.message}`);
     } finally {
       setLoading(false);
     }
@@ -40,17 +51,17 @@ const TestDataGenerator = () => {
   const generateTestAdvisors = async () => {
     const advisors = [
       {
-        name: 'John Mitchell',
+        name: 'John Mitchell', // This stays as 'name' - it's correct
         email: `john.mitchell.test.${Date.now()}@example.com`,
         phone: '555-101-2001',
         professional_title: 'Former Navy Admiral',
         military_branch: 'navy',
-        years_of_service: '25',
-        service_status: ['veteran'],
+        years_of_service: '25', // This should be years_of_service (text field)
+        // Remove service_status as it doesn't exist in schema
         about: 'Former Navy Admiral with 25 years of experience in naval operations and defense acquisition.',
         address: '123 Defense Way',
         zip_code: '22201',
-        location: [-77.0864, 38.8799],
+        location: `POINT(-77.0864 38.8799)`, // Convert back to POINT format for database
         headshot_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face',
         business_logo_url: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=200&h=200&fit=crop',
         status: 'pending'
@@ -62,11 +73,10 @@ const TestDataGenerator = () => {
         professional_title: 'Cybersecurity Expert',
         military_branch: 'air_force',
         years_of_service: '18',
-        service_status: ['veteran'],
         about: 'Cybersecurity specialist with expertise in defense systems and threat intelligence.',
         address: '456 Tech Street',
         zip_code: '94107',
-        location: [-122.4194, 37.7749],
+        location: `POINT(-122.4194 37.7749)`,
         headshot_url: 'https://images.unsplash.com/photo-1494790108755-2616b332e234?w=400&h=400&fit=crop&crop=face',
         business_logo_url: 'https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=200&h=200&fit=crop',
         status: 'pending'
@@ -78,11 +88,10 @@ const TestDataGenerator = () => {
         professional_title: 'Defense Technology Consultant',
         military_branch: 'army',
         years_of_service: '20',
-        service_status: ['veteran'],
         about: 'Army veteran specializing in emerging technologies and defense innovation programs.',
         address: '789 Innovation Blvd',
         zip_code: '80301',
-        location: [-104.9903, 39.7392],
+        location: `POINT(-104.9903 39.7392)`,
         headshot_url: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face',
         business_logo_url: 'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=200&h=200&fit=crop',
         status: 'pending'
@@ -94,11 +103,10 @@ const TestDataGenerator = () => {
         professional_title: 'Intelligence Analyst',
         military_branch: 'marines',
         years_of_service: '15',
-        service_status: ['veteran'],
         about: 'Former Marine intelligence analyst with expertise in strategic planning and operations.',
         address: '321 Strategy Lane',
         zip_code: '35801',
-        location: [-86.5861, 34.7304],
+        location: `POINT(-86.5861 34.7304)`,
         headshot_url: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=face',
         business_logo_url: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=200&h=200&fit=crop',
         status: 'pending'
@@ -110,19 +118,26 @@ const TestDataGenerator = () => {
         professional_title: 'Space Force Advisor',
         military_branch: 'space_force',
         years_of_service: '12',
-        service_status: ['active'],
         about: 'Space Force officer with expertise in satellite systems and space-based defense technologies.',
         address: '654 Satellite Drive',
         zip_code: '80914',
-        location: [-104.8214, 38.8339],
+        location: `POINT(-104.8214 38.8339)`,
         headshot_url: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face',
         business_logo_url: 'https://images.unsplash.com/photo-1614064641938-3bbee52942c7?w=200&h=200&fit=crop',
         status: 'pending'
       }
     ];
 
-    for (const advisor of advisors) {
-      await supabase.from('advisor_applications').insert([advisor]);
+    try {
+      const { error } = await supabase.from('advisor_applications').insert(advisors);
+      if (error) {
+        console.error('Error inserting advisors:', error);
+        throw new Error(`Failed to create advisor test data: ${error.message}`);
+      }
+      console.log('Successfully created advisor test data');
+    } catch (err) {
+      console.error('Error in generateTestAdvisors:', err);
+      throw err;
     }
   };
 
@@ -185,8 +200,16 @@ const TestDataGenerator = () => {
       }
     ];
 
-    for (const event of events) {
-      await supabase.from('event_submissions').insert([event]);
+    try {
+      const { error } = await supabase.from('event_submissions').insert(events);
+      if (error) {
+        console.error('Error inserting events:', error);
+        throw new Error(`Failed to create event test data: ${error.message}`);
+      }
+      console.log('Successfully created event test data');
+    } catch (err) {
+      console.error('Error in generateTestEvents:', err);
+      throw err;
     }
   };
 
@@ -407,8 +430,6 @@ const TestDataGenerator = () => {
     const innovations = [
       {
         name: 'Quantum Research Lab',
-        first_name: 'Dr. Alice',
-        last_name: 'Cooper',
         website: 'https://example.com/quantumlab',
         type: 'research_lab',
         focus_areas: 'Quantum computing, Cryptography, Quantum sensors',
@@ -420,14 +441,12 @@ const TestDataGenerator = () => {
         contact_phone: '555-401-5001',
         primary_sponsor: 'DARPA',
         headquarters: 'Cambridge, MA',
-        location: [-71.0942, 42.3601],
+        location: `POINT(-71.0942 42.3601)`,
         logo_url: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=200&h=200&fit=crop',
         status: 'pending'
       },
       {
         name: 'AI Defense Innovation Center',
-        first_name: 'Dr. Kevin',
-        last_name: 'Zhang',
         website: 'https://example.com/aidefense',
         type: 'innovation_center',
         focus_areas: 'Artificial Intelligence, Machine Learning, Computer Vision',
@@ -439,14 +458,12 @@ const TestDataGenerator = () => {
         contact_phone: '555-401-5002',
         primary_sponsor: 'Defense Innovation Unit',
         headquarters: 'Palo Alto, CA',
-        location: [-122.1430, 37.4419],
+        location: `POINT(-122.1430 37.4419)`,
         logo_url: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=200&h=200&fit=crop',
         status: 'pending'
       },
       {
         name: 'Biodefense Research Institute',
-        first_name: 'Dr. Michelle',
-        last_name: 'Taylor',
         website: 'https://example.com/biodefense',
         type: 'government_lab',
         focus_areas: 'Biodefense, Medical countermeasures, Threat detection',
@@ -458,14 +475,12 @@ const TestDataGenerator = () => {
         contact_phone: '555-401-5003',
         primary_sponsor: 'Department of Health and Human Services',
         headquarters: 'Atlanta, GA',
-        location: [-84.3880, 33.7490],
+        location: `POINT(-84.3880 33.7490)`,
         logo_url: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=200&h=200&fit=crop',
         status: 'pending'
       },
       {
         name: 'Hypersonics Technology Lab',
-        first_name: 'Dr. Carlos',
-        last_name: 'Rodriguez',
         website: 'https://example.com/hypersonics',
         type: 'university_lab',
         focus_areas: 'Hypersonic vehicles, Propulsion systems, Aerodynamics',
@@ -477,14 +492,12 @@ const TestDataGenerator = () => {
         contact_phone: '555-401-5004',
         primary_sponsor: 'Air Force Research Laboratory',
         headquarters: 'Wright-Patterson AFB, OH',
-        location: [-84.0467, 39.8283],
+        location: `POINT(-84.0467 39.8283)`,
         logo_url: 'https://images.unsplash.com/photo-1614064641938-3bbee52942c7?w=200&h=200&fit=crop',
         status: 'pending'
       },
       {
         name: 'Autonomous Systems Institute',
-        first_name: 'Dr. Linda',
-        last_name: 'Chang',
         website: 'https://example.com/autonomous',
         type: 'nonprofit',
         focus_areas: 'Autonomous vehicles, Swarm robotics, Decision algorithms',
@@ -496,14 +509,22 @@ const TestDataGenerator = () => {
         contact_phone: '555-401-5005',
         primary_sponsor: 'National Science Foundation',
         headquarters: 'Seattle, WA',
-        location: [-122.3321, 47.6062],
+        location: `POINT(-122.3321 47.6062)`,
         logo_url: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=200&h=200&fit=crop',
         status: 'pending'
       }
     ];
 
-    for (const innovation of innovations) {
-      await supabase.from('innovation_submissions').insert([innovation]);
+    try {
+      const { error } = await supabase.from('innovation_submissions').insert(innovations);
+      if (error) {
+        console.error('Error inserting innovations:', error);
+        throw new Error(`Failed to create innovation test data: ${error.message}`);
+      }
+      console.log('Successfully created innovation test data');
+    } catch (err) {
+      console.error('Error in generateTestInnovations:', err);
+      throw err;
     }
   };
 
