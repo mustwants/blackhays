@@ -38,14 +38,8 @@ const EventSubmissions: React.FC<EventSubmissionsProps> = ({ initialData = [] })
       }
       
       const [eventsResult, submissionsResult] = await Promise.all([
-        supabase
-          .from('events')
-          .select('*')
-          .order('created_at', { ascending: false }),
-        supabase
-          .from('event_submissions')
-          .select('*')
-          .order('created_at', { ascending: false })
+        supabase.from('events').select('*').order('created_at', { ascending: false }),
+        supabase.from('event_submissions').select('*').order('created_at', { ascending: false })
       ]);
 
       let allEvents = [];

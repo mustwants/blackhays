@@ -17,20 +17,16 @@ const AdvisorApplications = () => {
   const fetchDirectly = async () => {
     try {
       setDirectLoading(true);
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data, error } = await supabase
+        .from('advisor_applications')
+        .select('*')
+        .order('created_at', { ascending: false });
       
-      if (session) {
-        const { data, error } = await supabase
-          .from('advisor_applications')
-          .select('*')
-          .order('created_at', { ascending: false });
-        
-        if (error) {
-          console.error('Direct fetch error:', error);
-        } else {
-          console.log('Direct fetch success:', data?.length || 0, 'advisors');
-          setDirectFetchData(data || []);
-        }
+      if (error) {
+        console.error('Direct fetch error:', error);
+      } else {
+        console.log('Direct fetch success:', data?.length || 0, 'advisors');
+        setDirectFetchData(data || []);
       }
     } catch (err) {
       console.error('Error in direct fetch:', err);

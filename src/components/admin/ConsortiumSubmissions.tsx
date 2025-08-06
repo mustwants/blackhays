@@ -38,15 +38,6 @@ export default function ConsortiumSubmissions() {
   const fetchSubmissions = async () => {
     try {
       setLoading(true);
-      
-      // Check authentication - support both Supabase and localStorage admin sessions
-      const { data: { session } } = await supabase.auth.getSession();
-      const localSession = localStorage.getItem('auth_session');
-      
-      if (!session && !localSession) {
-        throw new Error('Not authenticated');
-      }
-      
       const { data, error } = await supabase
         .from('consortium_submissions')
         .select('*')
