@@ -26,13 +26,12 @@ export interface EventSubmission extends Omit<Event, 'id'> {
 
 // Advisor types
 export interface Advisor extends BaseSubmission {
-  first_name: string;
-  last_name: string;
+  name: string;
   email: string;
   state: string;
   zip_code: string;
   phone?: string;
-  street_address?: string;
+  address?: string;
   city?: string;
   webpage?: string;
   facebook?: string;
@@ -42,8 +41,10 @@ export interface Advisor extends BaseSubmission {
   instagram?: string;
   professional_title?: string;
   military_branch?: string;
-  years_of_mil_service?: string;
-  years_of_us_civil_service?: string;
+  other_branch?: string;
+  years_of_service?: string;
+  service_status?: string[];
+  other_status?: string;
   about?: string;
   resume_url?: string;
   headshot_url?: string;

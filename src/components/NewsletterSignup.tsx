@@ -41,20 +41,20 @@ const NewsletterSignup: React.FC<NewsletterSignupProps> = ({ onClose }) => {
       
       const { data, error: dbError } = await supabase
         .from('newsletter_subscribers')
-        .insert([{ 
+        .insert({ 
           first_name: formData.first_name.trim(),
           last_name: formData.last_name.trim(),
           email: formData.email.trim().toLowerCase(),
-          status: 'approved',
+          status: 'pending',
           notify_ceo: true
-        }]);
+        });
 
       if (dbError) {
         console.error('Database error:', dbError);
         if (dbError.code === '23505') {
           setError('This email address is already subscribed.');
         } else {
-          setError('Failed to subscribe. Please try again.');
+          setError(`Database error: ${dbError.message}`);
         }
         setStatus('error');
         return;

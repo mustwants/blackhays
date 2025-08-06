@@ -110,7 +110,7 @@ const AdvisorApplications = () => {
                         )}
                         <div>
                           <div className="text-sm font-medium text-gray-900">
-                            {advisor.first_name} {advisor.last_name}
+                            {advisor.name}
                           </div>
                           {advisor.professional_title && (
                             <div className="text-sm text-gray-500">{advisor.professional_title}</div>
@@ -123,8 +123,8 @@ const AdvisorApplications = () => {
                         {advisor.military_branch && (
                           <div className="text-sm text-gray-900 capitalize">{advisor.military_branch}</div>
                         )}
-                        {advisor.years_of_mil_service && (
-                          <div className="text-sm text-gray-500">{advisor.years_of_mil_service} years service</div>
+                        {advisor.years_of_service && (
+                          <div className="text-sm text-gray-500">{advisor.years_of_service} years service</div>
                         )}
                       </div>
                     </td>

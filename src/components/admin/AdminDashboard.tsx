@@ -97,17 +97,17 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCategoryClick }) => {
     try {
       const { data, error } = await supabase
         .from(table)
-        .select('status, created_at')
+        .select('status')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
 
       const stats = {
-        total: data?.length || 0,
-        approved: data?.filter(item => item.status === 'approved').length || 0,
-        pending: data?.filter(item => item.status === 'pending').length || 0,
-        paused: data?.filter(item => item.status === 'paused').length || 0,
-        rejected: data?.filter(item => item.status === 'rejected').length || 0
+        total: data ? data.length : 0,
+        approved: data ? data.filter(item => item.status === 'approved').length : 0,
+        pending: data ? data.filter(item => item.status === 'pending').length : 0,
+        paused: data ? data.filter(item => item.status === 'paused').length : 0,
+        rejected: data ? data.filter(item => item.status === 'rejected').length : 0
       };
 
       return stats;
@@ -121,11 +121,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCategoryClick }) => {
     try {
       const { data, error } = await supabase
         .from('newsletter_subscribers')
-        .select('id, created_at')
+        .select('id')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data?.length || 0;
+      return data ? data.length : 0;
     } catch (err) {
       console.error('Error fetching newsletter stats:', err);
       return 0;

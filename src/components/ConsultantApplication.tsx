@@ -33,13 +33,12 @@ const ConsultantApplication = () => {
   const navigate = useNavigate();
   const { submitApplication } = useAdvisors();
   const [formData, setFormData] = useState<AdvisorApplicationForm>({
-    first_name: '',
-    last_name: '',
+    name: '',
     email: '',
     state: '',
     zip_code: '',
         phone: '',
-    street_address: '',
+    address: '',
     city: '',
     webpage: '',
     facebook: '',
@@ -49,8 +48,10 @@ const ConsultantApplication = () => {
     instagram: '',
     professional_title: '',
     military_branch: '',
-    years_of_mil_service: '',
-    years_of_us_civil_service: '',
+    years_of_service: '',
+    service_status: [],
+    other_branch: '',
+    other_status: '',
     about: ''
   });
   const [submitting, setSubmitting] = useState(false);
@@ -87,13 +88,12 @@ const ConsultantApplication = () => {
   };
   const fillTestData = () => {
     setFormData({
-      first_name: 'Jane',
-      last_name: 'Doe',
+      name: 'Jane Doe',
       email: 'jane.doe@example.com',
       state: 'VA',
       zip_code: '22202',
             phone: '555-123-4567',
-      street_address: '123 Defense St',
+      address: '123 Defense St',
       city: 'Arlington',
       webpage: 'https://example.com',
       facebook: 'https://facebook.com/janedoe',
@@ -102,9 +102,11 @@ const ConsultantApplication = () => {
       bluesky: '',
       instagram: '',
       professional_title: 'Defense Consultant',
-      military_branch: 'army',
-      years_of_mil_service: '10',
-      years_of_us_civil_service: '5',
+      military_branch: 'Army',
+      years_of_service: '10',
+      service_status: ['Veteran'],
+      other_branch: '',
+      other_status: '',
       about: 'Experienced military advisor with a decade of service.'
     });
   };
@@ -183,28 +185,15 @@ const ConsultantApplication = () => {
               <div className="grid grid-cols-1 gap-6">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-bhgray-700">First Name</label>
+                    <label className="block text-sm font-medium text-bhgray-700">Full Name</label>
                     <input
                       type="text"
-                      value={formData.first_name}
-                      onChange={e => setFormData({ ...formData, first_name: e.target.value })}
+                      value={formData.name}
+                      onChange={e => setFormData({ ...formData, name: e.target.value })}
                       className="mt-1 block w-full rounded-md border-bhgray-300 shadow-sm focus:border-bhred focus:ring-bhred"
                       required
                     />
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-bhgray-700">Last Name</label>
-                    <input
-                      type="text"
-                      value={formData.last_name}
-                      onChange={e => setFormData({ ...formData, last_name: e.target.value })}
-                      className="mt-1 block w-full rounded-md border-bhgray-300 shadow-sm focus:border-bhred focus:ring-bhred"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-bhgray-700">Email</label>
                     <input
@@ -215,6 +204,9 @@ const ConsultantApplication = () => {
                       required
                     />
                   </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-bhgray-700">Phone</label>
                     <input
@@ -224,19 +216,19 @@ const ConsultantApplication = () => {
                       className="mt-1 block w-full rounded-md border-bhgray-300 shadow-sm focus:border-bhred focus:ring-bhred"
                      />
                   </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-bhgray-700">Street Address</label>
+                    <label className="block text-sm font-medium text-bhgray-700">Address</label>
                     <input
                       type="text"
-                       value={formData.street_address}
-                      onChange={e => setFormData({ ...formData, street_address: e.target.value })}
+                       value={formData.address}
+                      onChange={e => setFormData({ ...formData, address: e.target.value })}
                       className="mt-1 block w-full rounded-md border-bhgray-300 shadow-sm focus:border-bhred focus:ring-bhred"
-                      placeholder="Street address"
+                      placeholder="Full address"
                     />
                   </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                     <div>
                     <label className="block text-sm font-medium text-bhgray-700">City</label>
                     <input
@@ -247,9 +239,6 @@ const ConsultantApplication = () => {
                       placeholder="City"
                     />
                   </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-bhgray-700">State</label>
                     <input
@@ -353,34 +342,74 @@ const ConsultantApplication = () => {
                     className="mt-1 block w-full rounded-md border-bhgray-300 shadow-sm focus:border-bhred focus:ring-bhred"
                   >
                     <option value="">Select Branch</option>
-                    <option value="army">Army</option>
-                    <option value="navy">Navy</option>
-                    <option value="air_force">Air Force</option>
-                    <option value="marines">Marines</option>
-                    <option value="coast_guard">Coast Guard</option>
-                    <option value="space_force">Space Force</option>
+                    <option value="Army">Army</option>
+                    <option value="Navy">Navy</option>
+                    <option value="Air Force">Air Force</option>
+                    <option value="Marines">Marines</option>
+                    <option value="Coast Guard">Coast Guard</option>
+                    <option value="Space Force">Space Force</option>
                   </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-bhgray-700">Service Status</label>
+                  <div className="mt-1 space-y-2">
+                    {['Active Duty', 'Veteran', 'Reserve', 'National Guard', 'Retired'].map((status) => (
+                      <label key={status} className="flex items-center">
+                        <input
+                          type="checkbox"
+                          checked={formData.service_status.includes(status)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setFormData({ 
+                                ...formData, 
+                                service_status: [...formData.service_status, status] 
+                              });
+                            } else {
+                              setFormData({ 
+                                ...formData, 
+                                service_status: formData.service_status.filter(s => s !== status) 
+                              });
+                            }
+                          }}
+                          className="rounded border-gray-300 text-bhred focus:ring-bhred"
+                        />
+                        <span className="ml-2 text-sm text-gray-700">{status}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-bhgray-700">Years of Service</label>
+                  <input
+                    type="text"
+                    value={formData.years_of_service}
+                    onChange={e => setFormData({ ...formData, years_of_service: e.target.value })}
+                    className="mt-1 block w-full rounded-md border-bhgray-300 shadow-sm focus:border-bhred focus:ring-bhred"
+                    placeholder="e.g., 10"
+                  />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-bhgray-700">Years of Military Service</label>
+                    <label className="block text-sm font-medium text-bhgray-700">Other Branch (if applicable)</label>
                     <input
                       type="text"
-                      value={formData.years_of_mil_service}
-                      onChange={e => setFormData({ ...formData, years_of_mil_service: e.target.value })}
+                      value={formData.other_branch}
+                      onChange={e => setFormData({ ...formData, other_branch: e.target.value })}
                       className="mt-1 block w-full rounded-md border-bhgray-300 shadow-sm focus:border-bhred focus:ring-bhred"
-                                            placeholder="e.g., 10"
+                      placeholder="e.g., CIA, FBI, NSA"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-bhgray-700">Years of US Civil Service</label>
+                    <label className="block text-sm font-medium text-bhgray-700">Other Status (if applicable)</label>
                     <input
                       type="text"
-                      value={formData.years_of_us_civil_service}
-                      onChange={e => setFormData({ ...formData, years_of_us_civil_service: e.target.value })}
+                      value={formData.other_status}
+                      onChange={e => setFormData({ ...formData, other_status: e.target.value })}
                       className="mt-1 block w-full rounded-md border-bhgray-300 shadow-sm focus:border-bhred focus:ring-bhred"
-                      placeholder="e.g., 5"
+                      placeholder="e.g., Former Employee, Contractor"
                     />
                   </div>
                  </div>

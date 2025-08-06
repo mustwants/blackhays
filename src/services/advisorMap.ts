@@ -2,8 +2,7 @@ import { supabase, isConnected } from '../lib/supabaseClient';
 
 export interface MapAdvisor {
   id: string;
-  first_name: string;
-  last_name: string;
+  name: string;
   location: [number, number]; // [longitude, latitude]
   about: string;
   professional_title?: string;
@@ -45,9 +44,6 @@ class AdvisorMapService {
         if (!data) return [];
 
         return data.map(advisor => {
-          const [first_name, ...rest] = (advisor.name || '').split(' ');
-          const last_name = rest.join(' ');
-          
           // Ensure location is a valid [number, number] array
           let location: [number, number];
           if (Array.isArray(advisor.location) && advisor.location.length === 2) {
@@ -61,8 +57,7 @@ class AdvisorMapService {
           
           return {
             id: advisor.id,
-            first_name,
-            last_name,
+            name: advisor.name,
             location,
             about: advisor.about,
             professional_title: advisor.professional_title,
