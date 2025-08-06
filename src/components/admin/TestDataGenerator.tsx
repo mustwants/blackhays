@@ -68,6 +68,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
     const advisors = [
       {
         name: 'John Mitchell',
+        email: `john.mitchell.${Date.now()}.1.${Math.random().toString(36).substr(2, 9)}@example.com`,
         phone: '555-101-2001',
         professional_title: 'Former Navy Admiral',
         military_branch: 'navy',
@@ -84,6 +85,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         business_logo_url: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=200&h=200&fit=crop',
         status: 'pending'
       },
+      {
         name: 'Sarah Rodriguez',
         email: `sarah.rodriguez.${Date.now()}.2.${Math.random().toString(36).substr(2, 9)}@example.com`,
         phone: '555-201-3002',
@@ -102,6 +104,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         business_logo_url: 'https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=200&h=200&fit=crop',
         status: 'pending'
       },
+      {
         name: 'Michael Chen',
         email: `michael.chen.${Date.now()}.3.${Math.random().toString(36).substr(2, 9)}@example.com`,
         phone: '555-301-4003',
@@ -120,6 +123,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         business_logo_url: 'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=200&h=200&fit=crop',
         status: 'pending'
       },
+      {
         name: 'Lisa Thompson',
         email: `lisa.thompson.${Date.now()}.4.${Math.random().toString(36).substr(2, 9)}@example.com`,
         phone: '555-401-5004',
@@ -138,6 +142,7 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         business_logo_url: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=200&h=200&fit=crop',
         status: 'pending'
       },
+      {
         name: 'David Park',
         email: `david.park.${Date.now()}.5.${Math.random().toString(36).substr(2, 9)}@example.com`,
         phone: '555-501-6005',
@@ -169,13 +174,13 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         }
         
         try {
-          console.log(`✅ Inserting advisor ${i + 1}:`, advisor.first_name + ' ' + advisor.last_name, advisor.email);
+          console.log(`✅ Inserting advisor ${i + 1}:`, advisor.name, advisor.email);
           const { error } = await supabase.from('advisor_applications').insert([advisor]);
           if (error) {
             console.error(`Error inserting advisor ${i + 1}:`, error);
             // Continue with other advisors even if one fails
           } else {
-            console.log(`✅ Successfully inserted advisor ${i + 1}: ${advisor.first_name} ${advisor.last_name}`);
+            console.log(`✅ Successfully inserted advisor ${i + 1}: ${advisor.name}`);
           }
         } catch (advisorError) {
           console.error(`Exception inserting advisor ${i + 1}:`, advisorError);
