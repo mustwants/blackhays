@@ -18,13 +18,6 @@ const AdvisorApplications = () => {
     try {
       setDirectLoading(true);
       
-      // Create a mock admin session for database access
-      const mockAdminToken = `sb-mock-admin-${Date.now()}`;
-      await supabase.auth.setSession({
-        access_token: mockAdminToken,
-        refresh_token: mockAdminToken
-      });
-      
       const { data, error } = await supabase
         .from('advisor_applications')
         .select('*')
@@ -63,12 +56,6 @@ const AdvisorApplications = () => {
 
   const handleDirectApprove = async (id: string) => {
     try {
-      // Create a mock admin session for database access
-      const mockAdminToken = `sb-mock-admin-${Date.now()}`;
-      await supabase.auth.setSession({
-        access_token: mockAdminToken,
-        refresh_token: mockAdminToken
-      });
       
       const { error } = await supabase
         .from('advisor_applications')
@@ -84,13 +71,7 @@ const AdvisorApplications = () => {
 
   const handleDirectReject = async (id: string) => {
     try {
-      // Create a mock admin session for database access
-      const mockAdminToken = `sb-mock-admin-${Date.now()}`;
-      await supabase.auth.setSession({
-        access_token: mockAdminToken,
-        refresh_token: mockAdminToken
-      });
-      
+     
       const { error } = await supabase
         .from('advisor_applications')
         .update({ status: 'rejected' })
@@ -107,12 +88,6 @@ const AdvisorApplications = () => {
     if (!confirm('Are you sure you want to delete this advisor?')) return;
     
     try {
-      // Create a mock admin session for database access
-      const mockAdminToken = `sb-mock-admin-${Date.now()}`;
-      await supabase.auth.setSession({
-        access_token: mockAdminToken,
-        refresh_token: mockAdminToken
-      });
       
       const { error } = await supabase
         .from('advisor_applications')
