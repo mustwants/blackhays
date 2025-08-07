@@ -4,10 +4,10 @@ import { RefreshCw, Download, Trash2, Upload, Edit2, Check, PauseCircle, X } fro
 
 interface Subscriber {
   id: string;
-  first_name: string;
-  last_name: string;
+  first_name: string | null;
+  last_name: string | null;
   email: string;
-  status?: string;
+  status: 'pending' | 'approved' | 'paused' | 'denied' | null;
   created_at?: string;
 }
 
@@ -26,10 +26,10 @@ const NewsletterSubscribers: React.FC<NewsletterSubscribersProps> = ({ initialDa
       setLoading(true);
       setError(null);
   
-      // Fetch all subscribers ordered by creation date
+      // Fetch relevant fields for all subscribers ordered by creation date
       const { data, error: fetchError } = await client
         .from('newsletter_subscribers')
-        .select('*')
+        .select('id, first_name, last_name, email, status, created_at')
         .order('created_at', { ascending: false });
 
       if (fetchError) {
@@ -120,20 +120,20 @@ const NewsletterSubscribers: React.FC<NewsletterSubscribersProps> = ({ initialDa
   };
 
   const editSubscriber = async (subscriber: Subscriber) => {
-    const first_name =
-      prompt('First Name', subscriber.first_name) ?? subscriber.first_name;
-    const last_name =
-      prompt('Last Name', subscriber.last_name) ?? subscriber.last_name;
+    const first_name = prompt('First Name', subscriber.first_name || '') ?? subscriber.first_name;
+    const last_name = prompt('Last Name', subscriber.last_name || '') ?? subscriber.last_name;
     const email = prompt('Email', subscriber.email) ?? subscriber.email;
-
+    // Ensure we have strings before trimming
+    const updatedFirst = first_name ? first_name.trim() : null;
+    const updatedLast = last_name ? last_name.trim() : null;
+    const updatedEmail = email.trim().toLowerCase();
     try {
-     
-      const { error: updateError } = await client
+    const { error: updateError } = await client
         .from('newsletter_subscribers')
         .update({
-          first_name: first_name.trim(),
-          last_name: last_name.trim(),
-          email: email.trim().toLowerCase()
+         first_name: updatedFirst,
+          last_name: updatedLast,
+          email: updatedEmail
         })
         .eq('id', subscriber.id);
 
@@ -144,7 +144,12 @@ const NewsletterSubscribers: React.FC<NewsletterSubscribersProps> = ({ initialDa
       setSubscribers(prev =>
         prev.map(sub =>
           sub.id === subscriber.id
-            ? { ...sub, first_name, last_name, email }
+            ? {
+                ...sub,
+                first_name: updatedFirst,
+                last_name: updatedLast,
+                email: updatedEmail
+              }
             : sub
         )
       );
@@ -322,12 +327,12 @@ const NewsletterSubscribers: React.FC<NewsletterSubscribersProps> = ({ initialDa
                 <tr key={subscriber.id}>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-bhgray-900">
-                      {subscriber.first_name}
+                      {subscriber.first_name || ''}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-bhgray-900">
-                      {subscriber.last_name}
+                      {subscriber.last_name || ''}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
