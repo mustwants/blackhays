@@ -40,13 +40,7 @@ export default function InnovationSubmissions() {
     try {
       setLoading(true);
       
-      // Create a mock admin session for database access
-      const mockAdminToken = `sb-mock-admin-${Date.now()}`;
-      await supabase.auth.setSession({
-        access_token: mockAdminToken,
-        refresh_token: mockAdminToken
-      });
-      
+    
       const { data, error } = await supabase
         .from('innovation_submissions')
         .select('*')
@@ -75,12 +69,6 @@ export default function InnovationSubmissions() {
 
   const updateStatus = async (id: string, status: string) => {
     try {
-      // Create a mock admin session for database access
-      const mockAdminToken = `sb-mock-admin-${Date.now()}`;
-      await supabase.auth.setSession({
-        access_token: mockAdminToken,
-        refresh_token: mockAdminToken
-      });
       
       const { error } = await supabase
         .from('innovation_submissions')
@@ -102,12 +90,6 @@ export default function InnovationSubmissions() {
     if (!confirm('Are you sure you want to delete this submission?')) return;
 
     try {
-      // Create a mock admin session for database access
-      const mockAdminToken = `sb-mock-admin-${Date.now()}`;
-      await supabase.auth.setSession({
-        access_token: mockAdminToken,
-        refresh_token: mockAdminToken
-      });
       
       const { error } = await supabase
         .from('innovation_submissions')
@@ -137,12 +119,6 @@ export default function InnovationSubmissions() {
     if (!editingId) return;
 
     try {
-      // Create a mock admin session for database access
-      const mockAdminToken = `sb-mock-admin-${Date.now()}`;
-      await supabase.auth.setSession({
-        access_token: mockAdminToken,
-        refresh_token: mockAdminToken
-      });
       
       const { error } = await supabase
         .from('innovation_submissions')
