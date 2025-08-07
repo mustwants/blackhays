@@ -44,6 +44,16 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCategoryClick }) => {
     try {
       setLoading(true);
       setError(null);
+      
+      // Check authentication
+      const { data: { session } } = await supabase.auth.getSession();
+      const localSession = localStorage.getItem('auth_session');
+      
+      if (!session && !localSession) {
+        console.log('No authentication found, skipping stats fetch');
+        setLoading(false);
+        return;
+      }
 
       // Get date range
       const now = new Date();

@@ -38,6 +38,18 @@ export default function ConsortiumSubmissions() {
   const fetchSubmissions = async () => {
     try {
       setLoading(true);
+      
+      // Check authentication
+      const { data: { session } } = await supabase.auth.getSession();
+      const localSession = localStorage.getItem('auth_session');
+      
+      if (!session && !localSession) {
+        console.log('No authentication found, skipping fetch');
+        setSubmissions([]);
+        setLoading(false);
+        return;
+      }
+      
       const { data, error } = await supabase
         .from('consortium_submissions')
         .select('*')

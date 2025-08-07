@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabaseClient';
-import { useAuth } from '../../hooks/useAuth';
 import { Search, Filter, Edit2, Trash2, Check, X, Pause, Eye, ExternalLink } from 'lucide-react';
 
 interface CompanySubmission {
@@ -27,7 +26,6 @@ interface CompanySubmission {
 }
 
 export default function CompanySubmissions() {
-  const { isAuthenticated, isLoading } = useAuth();
   const [submissions, setSubmissions] = useState<CompanySubmission[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -37,14 +35,24 @@ export default function CompanySubmissions() {
   const [editData, setEditData] = useState<Partial<CompanySubmission>>({});
 
   useEffect(() => {
-    if (isAuthenticated && !isLoading) {
-      fetchSubmissions();
-    }
-  }, [isAuthenticated, isLoading]);
+    fetchSubmissions();
+  }, []);
 
   const fetchSubmissions = async () => {
     try {
       setLoading(true);
+      
+      // Check authentication
+      const { data: { session } } = await supabase.auth.getSession();
+      const localSession = localStorage.getItem('auth_session');
+      
+      if (!session && !localSession) {
+        console.log('No authentication found, skipping fetch');
+        setSubmissions([]);
+        setLoading(false);
+        return;
+      }
+      
       const { data, error } = await supabase
         .from('company_submissions')
         .select('*')
