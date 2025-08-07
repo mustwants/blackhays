@@ -1,5 +1,7 @@
 // Database helper functions
-import { supabase, isConnected as supabaseIsConnected } from './supabaseClient';
+import { supabase, supabaseAdmin, isConnected as supabaseIsConnected } from './supabaseClient';
+
+const client = supabaseAdmin ?? supabase;
 
 // Generic type for all submission types
 export interface Submission {
@@ -32,7 +34,7 @@ class DatabaseHelpers {
     } = {}
   ): Promise<{ data: T[] | null; error: string | null }> {
     try {
-      let query = supabase.from(table).select(options.columns || '*');
+      let query = client.from(table).select(options.columns || '*');
       
       if (options.filters) {
         options.filters.forEach(filter => {
@@ -74,7 +76,7 @@ class DatabaseHelpers {
     
     while (attempt < maxRetries) {
       try {
-        let query = supabase.from(table).insert(data);
+        let query = client.from(table).insert(data);
         
         if (options.returnData) {
           query = query.select().single();
@@ -119,7 +121,7 @@ class DatabaseHelpers {
     try {
       console.log(`Updating ${table} where ${query.column} = ${query.value} with data:`, data);
       
-      let updateQuery = supabase
+      let updateQuery = client
         .from(table)
         .update(data)
         .eq(query.column, query.value);
@@ -155,7 +157,7 @@ class DatabaseHelpers {
     try {
       console.log(`Deleting from ${table} where ${query.column} = ${query.value}`);
       
-      const { error } = await supabase
+      const { error } = await client
         .from(table)
         .delete()
         .eq(query.column, query.value);
