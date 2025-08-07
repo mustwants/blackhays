@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { supabase } from '../lib/supabaseClient';
+import { supabase, supabaseAdmin } from '../lib/supabaseClient';
 import { RefreshCw, Download, Trash2, Upload, Edit2, Check, PauseCircle, X } from 'lucide-react';
 
 interface Subscriber {
@@ -20,14 +20,14 @@ const NewsletterSubscribers: React.FC<NewsletterSubscribersProps> = ({ initialDa
   const [loading, setLoading] = useState(initialData.length === 0);
   const [error, setError] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
-
+  const client = supabaseAdmin ?? supabase;
   const fetchSubscribers = async () => {
     try {
       setLoading(true);
       setError(null);
   
       // Fetch all subscribers ordered by creation date
-      const { data, error: fetchError } = await supabase
+      const { data, error: fetchError } = await client
         .from('newsletter_subscribers')
         .select('*')
         .order('created_at', { ascending: false });
@@ -75,7 +75,7 @@ const NewsletterSubscribers: React.FC<NewsletterSubscribersProps> = ({ initialDa
     try {
       setError(null);
       
-      const { error: deleteError } = await supabase
+      const { error: deleteError } = await client
         .from('newsletter_subscribers')
         .delete()
         .eq('id', id);
@@ -101,7 +101,7 @@ const NewsletterSubscribers: React.FC<NewsletterSubscribersProps> = ({ initialDa
     try {
       setError(null);
       
-      const { error: updateError } = await supabase
+      const { error: updateError } = await client
         .from('newsletter_subscribers')
         .update({ status })
         .eq('id', id);
@@ -128,7 +128,7 @@ const NewsletterSubscribers: React.FC<NewsletterSubscribersProps> = ({ initialDa
 
     try {
      
-      const { error: updateError } = await supabase
+      const { error: updateError } = await client
         .from('newsletter_subscribers')
         .update({
           first_name: first_name.trim(),
@@ -204,7 +204,7 @@ const NewsletterSubscribers: React.FC<NewsletterSubscribersProps> = ({ initialDa
         }));
 
       if (toInsert.length > 0) {
-        const { error: uploadError } = await supabase
+        const { error: uploadError } = await client
           .from('newsletter_subscribers')
           .upsert(toInsert, { onConflict: 'email' });
 
