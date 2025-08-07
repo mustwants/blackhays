@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAdvisors } from '../../hooks/useAdvisors';
-import { supabase } from '../../lib/supabaseClient';
+import { supabase, supabaseAdmin } from '../../lib/supabaseClient';
 import { Search, Filter, Edit2, Trash2, Check, X, Pause, Eye, ExternalLink, MapPin, Phone, Mail } from 'lucide-react';
 
 const AdvisorApplications = () => {
@@ -13,12 +13,12 @@ const AdvisorApplications = () => {
   useEffect(() => {
     fetchDirectly();
   }, []);
-
+  const client = supabaseAdmin ?? supabase;
   const fetchDirectly = async () => {
     try {
       setDirectLoading(true);
       
-      const { data, error } = await supabase
+      const { data, error } = await client
         .from('advisor_applications')
         .select('*')
         .order('created_at', { ascending: false });
@@ -57,7 +57,7 @@ const AdvisorApplications = () => {
   const handleDirectApprove = async (id: string) => {
     try {
       
-      const { error } = await supabase
+      const { error } = await client
         .from('advisor_applications')
         .update({ status: 'approved' })
         .eq('id', id);
@@ -72,7 +72,7 @@ const AdvisorApplications = () => {
   const handleDirectReject = async (id: string) => {
     try {
      
-      const { error } = await supabase
+      const { error } = await client
         .from('advisor_applications')
         .update({ status: 'rejected' })
         .eq('id', id);
@@ -89,7 +89,7 @@ const AdvisorApplications = () => {
     
     try {
       
-      const { error } = await supabase
+      const { error } = await client
         .from('advisor_applications')
         .delete()
         .eq('id', id);
