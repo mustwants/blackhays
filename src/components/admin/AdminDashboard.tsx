@@ -102,16 +102,22 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCategoryClick }) => {
 
   const fetchCategoryStats = async (table: string, startDate: Date): Promise<CategoryStats> => {
     try {
-      // Create a mock admin session for database access
-      const mockAdminToken = `sb-mock-admin-${Date.now()}`;
-      await supabase.auth.setSession({
-        access_token: mockAdminToken,
-        refresh_token: mockAdminToken
-      });
+      // Set up admin session for database access
+      const authSession = localStorage.getItem('auth_session');
+      if (authSession) {
+        try {
+          const sessionData = JSON.parse(authSession);
+          if (sessionData?.session) {
+            await supabase.auth.setSession(sessionData.session);
+          }
+        } catch (e) {
+          console.warn('Failed to parse auth session:', e);
+        }
+      }
       
       const { data, error } = await supabase
         .from(table)
-        .select('status, created_at')
+        .select('status')
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -138,12 +144,18 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCategoryClick }) => {
 
   const fetchNewsletterStats = async (startDate: Date): Promise<number> => {
     try {
-      // Create a mock admin session for database access
-      const mockAdminToken = `sb-mock-admin-${Date.now()}`;
-      await supabase.auth.setSession({
-        access_token: mockAdminToken,
-        refresh_token: mockAdminToken
-      });
+      // Set up admin session for database access
+      const authSession = localStorage.getItem('auth_session');
+      if (authSession) {
+        try {
+          const sessionData = JSON.parse(authSession);
+          if (sessionData?.session) {
+            await supabase.auth.setSession(sessionData.session);
+          }
+        } catch (e) {
+          console.warn('Failed to parse auth session:', e);
+        }
+      }
       
       const { data, error } = await supabase
         .from('newsletter_subscribers')
