@@ -9,6 +9,14 @@ interface TestDataGeneratorProps {
 const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+
+  const generateTestData = async () => {
+    setLoading(true);
+    setError(null);
+    setSuccess(null);
+
+    try {
       // Generate test data for each category
       console.log('Starting test data generation...');
       
@@ -189,7 +197,6 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         location: 'Washington, DC',
         website: 'https://example.com/dis2025',
         about: 'Annual summit bringing together defense innovators, contractors, and government officials.',
-        submitter_email: `test.event1.${Date.now()}.1.${Math.random().toString(36).substr(2, 5)}@example.com`,
         submitter_email: `test.event${Date.now()}${Math.floor(Math.random() * 1000)}@example.com`,
         logo_url: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=300&h=150&fit=crop',
         status: 'pending'
@@ -356,6 +363,12 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         contact_phone: '555-201-3004',
         employee_count: '1-10',
         founded_year: '2022',
+        street_address: '400 Security Blvd',
+        city: 'Reston',
+        state: 'VA',
+        zip_code: '20191',
+        first_name: 'Thomas',
+        last_name: 'Anderson',
         linkedin: 'https://linkedin.com/company/securenet-defense',
         twitter: 'https://twitter.com/securenetdef',
         facebook: 'https://facebook.com/securenetdefense',
@@ -375,6 +388,12 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         contact_phone: '555-201-3005',
         employee_count: '51-200',
         founded_year: '2015',
+        street_address: '500 Materials Way',
+        city: 'Huntsville',
+        state: 'AL',
+        zip_code: '35801',
+        first_name: 'Emily',
+        last_name: 'Johnson',
         linkedin: 'https://linkedin.com/company/advanced-materials',
         twitter: 'https://twitter.com/advancedmat',
         facebook: 'https://facebook.com/advancedmaterials',
@@ -448,6 +467,12 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         contact_phone: '555-301-4002',
         membership_fee: '$15,000/year',
         headquarters: 'Colorado Springs, CO',
+        street_address: '700 Cyber Lane',
+        city: 'Colorado Springs',
+        state: 'CO',
+        zip_code: '80914',
+        first_name: 'Mark',
+        last_name: 'Davis',
         logo_url: 'https://images.unsplash.com/photo-1563986768494-4dee2763ff3f?w=200&h=200&fit=crop',
         status: 'pending'
       },
@@ -464,6 +489,12 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         contact_phone: '555-301-4003',
         membership_fee: '$12,000/year',
         headquarters: 'Houston, TX',
+        street_address: '800 Space Center Blvd',
+        city: 'Houston',
+        state: 'TX',
+        zip_code: '77058',
+        first_name: 'Rachel',
+        last_name: 'Lee',
         logo_url: 'https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=200&h=200&fit=crop',
         status: 'pending'
       },
@@ -480,6 +511,12 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         contact_phone: '555-301-4004',
         membership_fee: '$8,000/year',
         headquarters: 'San Diego, CA',
+        street_address: '900 Harbor Drive',
+        city: 'San Diego',
+        state: 'CA',
+        zip_code: '92101',
+        first_name: 'James',
+        last_name: 'Wilson',
         logo_url: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=200&h=200&fit=crop',
         status: 'pending'
       },
@@ -496,6 +533,12 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         contact_phone: '555-301-4005',
         membership_fee: '$5,000/year',
         headquarters: 'Detroit, MI',
+        street_address: '1000 Manufacturing Ave',
+        city: 'Detroit',
+        state: 'MI',
+        zip_code: '48201',
+        first_name: 'Susan',
+        last_name: 'Brown',
         logo_url: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=200&h=200&fit=crop',
         status: 'pending'
       }
@@ -543,6 +586,12 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         contact_phone: '555-401-5001',
         primary_sponsor: 'DARPA',
         headquarters: 'Cambridge, MA',
+        street_address: '1100 Research Blvd',
+        city: 'Cambridge',
+        state: 'MA',
+        zip_code: '02139',
+        first_name: 'Alice',
+        last_name: 'Cooper',
         logo_url: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=200&h=200&fit=crop',
         status: 'pending'
       },
@@ -559,6 +608,12 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         contact_phone: '555-401-5002',
         primary_sponsor: 'Defense Innovation Unit',
         headquarters: 'Palo Alto, CA',
+        street_address: '1200 AI Way',
+        city: 'Palo Alto',
+        state: 'CA',
+        zip_code: '94301',
+        first_name: 'Kevin',
+        last_name: 'Zhang',
         logo_url: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=200&h=200&fit=crop',
         status: 'pending'
       },
@@ -575,6 +630,12 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         contact_phone: '555-401-5003',
         primary_sponsor: 'Department of Health and Human Services',
         headquarters: 'Atlanta, GA',
+        street_address: '1300 Bio Drive',
+        city: 'Atlanta',
+        state: 'GA',
+        zip_code: '30309',
+        first_name: 'Michelle',
+        last_name: 'Taylor',
         logo_url: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=200&h=200&fit=crop',
         status: 'pending'
       },
@@ -591,6 +652,12 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         contact_phone: '555-401-5004',
         primary_sponsor: 'Air Force Research Laboratory',
         headquarters: 'Wright-Patterson AFB, OH',
+        street_address: '1400 Hypersonic Ave',
+        city: 'Dayton',
+        state: 'OH',
+        zip_code: '45433',
+        first_name: 'Carlos',
+        last_name: 'Rodriguez',
         logo_url: 'https://images.unsplash.com/photo-1614064641938-3bbee52942c7?w=200&h=200&fit=crop',
         status: 'pending'
       },
@@ -607,6 +674,12 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         contact_phone: '555-401-5005',
         primary_sponsor: 'National Science Foundation',
         headquarters: 'Seattle, WA',
+        street_address: '1500 Autonomous Blvd',
+        city: 'Seattle',
+        state: 'WA',
+        zip_code: '98101',
+        first_name: 'Linda',
+        last_name: 'Chang',
         logo_url: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=200&h=200&fit=crop',
         status: 'pending'
       }
