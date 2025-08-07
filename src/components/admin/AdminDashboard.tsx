@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../../lib/supabaseClient';
+import { supabase, supabaseAdmin } from '../../lib/supabaseClient';
 import { Users, Calendar, Building, Rocket, Brain, Mail } from 'lucide-react';
 
 interface CategoryStats {
@@ -45,17 +45,19 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCategoryClick }) => {
       setError(null);
       console.log('🔄 Starting dashboard stats fetch...');
 
-      // Set up admin session for authenticated access
-      const authSession = localStorage.getItem('auth_session');
-      if (authSession) {
-        try {
-          const sessionData = JSON.parse(authSession);
-          if (sessionData?.session?.access_token) {
-            await supabase.auth.setSession({
-              access_token: sessionData.session.access_token,
-              refresh_token: sessionData.session.refresh_token || sessionData.session.access_token
-            });
-            console.log('✅ Admin session set from localStorage');
+      // Set up admin session for authenticated access when not using service key
+      if (!supabaseAdmin) {
+        const authSession = localStorage.getItem('auth_session');
+        if (authSession) {
+          try {
+            const sessionData = JSON.parse(authSession);
+            if (sessionData?.session?.access_token) {
+              await supabase.auth.setSession({
+                access_token: sessionData.session.access_token,
+                refresh_token: sessionData.session.refresh_token || sessionData.session.access_token
+              });
+              console.log('✅ Admin session set from localStorage');
+            }
           }
         } catch (e) {
           console.warn('Failed to parse auth session:', e);
@@ -63,6 +65,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCategoryClick }) => {
       }
 
       // Fetch all stats in parallel
+          const client = supabaseAdmin ?? supabase;
       const [
         advisorStats,
         eventStats,
@@ -71,12 +74,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCategoryClick }) => {
         innovationStats,
         newsletterStats
       ] = await Promise.all([
-        fetchCategoryStats('advisor_applications'),
-        fetchCategoryStats('event_submissions'),
-        fetchCategoryStats('company_submissions'),
-        fetchCategoryStats('consortium_submissions'),
-        fetchCategoryStats('innovation_submissions'),
-        fetchNewsletterStats()
+        fetchCategoryStats(client, 'advisor_applications'),
+        fetchCategoryStats(client, 'event_submissions'),
+        fetchCategoryStats(client, 'company_submissions'),
+        fetchCategoryStats(client, 'consortium_submissions'),
+        fetchCategoryStats(client, 'innovation_submissions'),
+        fetchNewsletterStats(client)
       ]);
 
       console.log('📊 All stats fetched:', {
@@ -104,11 +107,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCategoryClick }) => {
     }
   };
 
-  const fetchCategoryStats = async (table: string): Promise<CategoryStats> => {
+  const fetchCategoryStats = async (client: typeof supabase, table: string): Promise<CategoryStats> => {
     try {
       console.log(`📋 Fetching stats for ${table}...`);
       
-      const { data, error } = await supabase
+      const { data, error } = await client
         .from(table)
         .select('status, created_at')
         .order('created_at', { ascending: false });
@@ -141,11 +144,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCategoryClick }) => {
     }
   };
 
-  const fetchNewsletterStats = async (): Promise<number> => {
+  const fetchNewsletterStats = async (client: typeof supabase): Promise<number> => {
     try {
       console.log('📧 Fetching newsletter stats...');
       
-      const { data, error } = await supabase
+      const { data, error } = await client
         .from('newsletter_subscribers')
         .select('id, created_at')
         .order('created_at', { ascending: false });
