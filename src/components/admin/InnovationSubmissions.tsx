@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../../lib/supabaseClient';
+import { supabase, supabaseAdmin } from '../../lib/supabaseClient';
 import { Search, Filter, Edit2, Trash2, Check, X, Pause, Eye, ExternalLink } from 'lucide-react';
 
 interface InnovationSubmission {
@@ -36,12 +36,13 @@ export default function InnovationSubmissions() {
     fetchSubmissions();
   }, []);
 
+   const client = supabaseAdmin ?? supabase;
   const fetchSubmissions = async () => {
     try {
       setLoading(true);
       
     
-      const { data, error } = await supabase
+      const { data, error } = await client
         .from('innovation_submissions')
         .select('*')
         .order('created_at', { ascending: false });
@@ -70,7 +71,7 @@ export default function InnovationSubmissions() {
   const updateStatus = async (id: string, status: string) => {
     try {
       
-      const { error } = await supabase
+      const { error } = await client
         .from('innovation_submissions')
         .update({ status, updated_at: new Date().toISOString() })
         .eq('id', id);
@@ -91,7 +92,7 @@ export default function InnovationSubmissions() {
 
     try {
       
-      const { error } = await supabase
+      const { error } = await client
         .from('innovation_submissions')
         .delete()
         .eq('id', id);
@@ -120,11 +121,11 @@ export default function InnovationSubmissions() {
 
     try {
       
-      const { error } = await supabase
+       const { error } = await client
         .from('innovation_submissions')
-        .update({ 
-          ...editData, 
-          updated_at: new Date().toISOString() 
+        .update({
+          ...editData,
+          updated_at: new Date().toISOString()
         })
         .eq('id', editingId);
 
