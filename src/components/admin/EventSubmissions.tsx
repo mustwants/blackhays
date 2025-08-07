@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../../lib/supabaseClient';
+import { supabase, supabaseAdmin } from '../../lib/supabaseClient';
 import { RefreshCw, Trash2, Edit2, Check, X, PauseCircle, Search } from 'lucide-react';
 
 interface EventSubmissionsProps {
@@ -23,7 +23,7 @@ const EventSubmissions: React.FC<EventSubmissionsProps> = ({ initialData = [] })
       fetchSubmissions();
     }
   }, [initialData]);
-
+  const client = supabaseAdmin ?? supabase;
   const fetchSubmissions = async () => {
     setError(null);
     setLoading(true);
@@ -31,8 +31,8 @@ const EventSubmissions: React.FC<EventSubmissionsProps> = ({ initialData = [] })
     try {
       
       const [eventsResult, submissionsResult] = await Promise.all([
-        supabase.from('events').select('*').order('created_at', { ascending: false }),
-        supabase.from('event_submissions').select('*').order('created_at', { ascending: false })
+        client.from('events').select('*').order('created_at', { ascending: false }),
+        client.from('event_submissions').select('*').order('created_at', { ascending: false })
       ]);
 
       let allEvents = [];
@@ -94,7 +94,7 @@ const EventSubmissions: React.FC<EventSubmissionsProps> = ({ initialData = [] })
     try {
       
       if (action === 'delete') {
-        const { error } = await supabase
+        const { error } = await client
           .from('event_submissions')
           .delete()
           .eq('id', id);
@@ -107,7 +107,7 @@ const EventSubmissions: React.FC<EventSubmissionsProps> = ({ initialData = [] })
         const status = action === 'approve' ? 'approved' : 
                       action === 'pause' ? 'paused' : 'rejected';
         
-        const { error } = await supabase
+        const { error } = await client
           .from('event_submissions')
           .update({ status })
           .eq('id', id);
