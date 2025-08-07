@@ -9,14 +9,6 @@ interface TestDataGeneratorProps {
 const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
-
-  const generateTestData = async () => {
-    setLoading(true);
-    setError(null);
-    setSuccess(null);
-
-    try {
       // Generate test data for each category
       console.log('Starting test data generation...');
       

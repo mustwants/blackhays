@@ -25,17 +25,6 @@ const NewsletterSubscribers: React.FC<NewsletterSubscribersProps> = ({ initialDa
     try {
       setLoading(true);
       setError(null);
-      
-      // Check authentication
-      const { data: { session } } = await supabase.auth.getSession();
-      const localSession = localStorage.getItem('auth_session');
-      
-      if (!session && !localSession) {
-        console.log('No authentication found, skipping fetch');
-        setSubscribers([]);
-        setLoading(false);
-        return;
-      }
 
       // Fetch all subscribers ordered by creation date
       const { data, error: fetchError } = await supabase
@@ -45,7 +34,13 @@ const NewsletterSubscribers: React.FC<NewsletterSubscribersProps> = ({ initialDa
 
       if (fetchError) {
         console.error('Newsletter fetch error:', fetchError);
-        throw fetchError;
+        if (fetchError.message.includes('Not authenticated')) {
+          setError('Authentication required to view subscribers');
+        } else {
+          setError('Failed to load subscribers. Please try again.');
+        }
+        setSubscribers([]);
+        return;
       }
 
       console.log('Fetched newsletter subscribers:', data?.length || 0);

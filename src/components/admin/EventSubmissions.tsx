@@ -29,17 +29,6 @@ const EventSubmissions: React.FC<EventSubmissionsProps> = ({ initialData = [] })
     setLoading(true);
     
     try {
-      // Check authentication
-      const { data: { session } } = await supabase.auth.getSession();
-      const localSession = localStorage.getItem('auth_session');
-      
-      if (!session && !localSession) {
-        console.log('No authentication found, skipping fetch');
-        setSubmissions([]);
-        setLoading(false);
-        return;
-      }
-      
       const [eventsResult, submissionsResult] = await Promise.all([
         supabase.from('events').select('*').order('created_at', { ascending: false }),
         supabase.from('event_submissions').select('*').order('created_at', { ascending: false })
@@ -48,7 +37,9 @@ const EventSubmissions: React.FC<EventSubmissionsProps> = ({ initialData = [] })
       let allEvents = [];
 
       // Process events
-      if (!eventsResult.error && eventsResult.data) {
+      if (eventsResult.error) {
+        console.error('Error fetching events:', eventsResult.error);
+      } else if (eventsResult.data) {
         console.log(`Found ${eventsResult.data.length} events in events table`);
         allEvents = [...eventsResult.data.map(event => ({
           ...event,
@@ -58,7 +49,9 @@ const EventSubmissions: React.FC<EventSubmissionsProps> = ({ initialData = [] })
       }
 
       // Process submissions
-      if (!submissionsResult.error && submissionsResult.data) {
+      if (submissionsResult.error) {
+        console.error('Error fetching event submissions:', submissionsResult.error);
+      } else if (submissionsResult.data) {
         console.log(`Found ${submissionsResult.data.length} events in event_submissions table`);
         allEvents = [...allEvents, ...submissionsResult.data.map(submission => ({
           ...submission,
@@ -66,6 +59,15 @@ const EventSubmissions: React.FC<EventSubmissionsProps> = ({ initialData = [] })
           start_date: submission.start_date || new Date().toISOString(),
           end_date: submission.end_date || new Date().toISOString()
         }))];
+      }
+
+      // If both queries failed with auth errors, show appropriate message
+      if (eventsResult.error && submissionsResult.error && 
+          (eventsResult.error.message.includes('Not authenticated') || 
+           submissionsResult.error.message.includes('Not authenticated'))) {
+        setError('Authentication required to view submissions');
+        setSubmissions([]);
+        return;
       }
 
       // Sort by date

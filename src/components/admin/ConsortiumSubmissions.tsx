@@ -39,23 +39,22 @@ export default function ConsortiumSubmissions() {
     try {
       setLoading(true);
       
-      // Check authentication
-      const { data: { session } } = await supabase.auth.getSession();
-      const localSession = localStorage.getItem('auth_session');
-      
-      if (!session && !localSession) {
-        console.log('No authentication found, skipping fetch');
-        setSubmissions([]);
-        setLoading(false);
-        return;
-      }
-      
       const { data, error } = await supabase
         .from('consortium_submissions')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching consortium submissions:', error);
+        if (error.message.includes('Not authenticated')) {
+          setError('Authentication required to view submissions');
+        } else {
+          setError('Failed to load consortium submissions');
+        }
+        setSubmissions([]);
+        return;
+      }
+      
       console.log('Fetched consortium submissions:', data?.length || 0);
       setSubmissions(data || []);
     } catch (err) {
