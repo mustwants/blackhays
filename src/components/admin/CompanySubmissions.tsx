@@ -52,12 +52,9 @@ export default function CompanySubmissions() {
       const { data, error } = await supabase
         .from('company_submissions')
         .select('*')
-      // Create a mock admin session for database access
-      const mockAdminToken = `sb-mock-admin-${Date.now()}`;
-      await supabase.auth.setSession({
-        access_token: mockAdminToken,
-        refresh_token: mockAdminToken
-      });
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
       
       console.log('Fetched company submissions:', data?.length || 0);
       setSubmissions(data || []);
@@ -77,6 +74,12 @@ export default function CompanySubmissions() {
         access_token: mockAdminToken,
         refresh_token: mockAdminToken
       });
+      
+      const { error } = await supabase
+        .from('company_submissions')
+        .update({ status })
+        .eq('id', id);
+      
       if (error) throw error;
       
       setSubmissions(prev => prev.map(sub => 
@@ -98,6 +101,12 @@ export default function CompanySubmissions() {
         access_token: mockAdminToken,
         refresh_token: mockAdminToken
       });
+      
+      const { error } = await supabase
+        .from('company_submissions')
+        .delete()
+        .eq('id', id);
+      
       if (error) throw error;
       
       setSubmissions(prev => prev.filter(sub => sub.id !== id));
@@ -127,7 +136,10 @@ export default function CompanySubmissions() {
         access_token: mockAdminToken,
         refresh_token: mockAdminToken
       });
-        })
+      
+      const { error } = await supabase
+        .from('company_submissions')
+        .update(editData)
         .eq('id', editingId);
 
       if (error) throw error;
