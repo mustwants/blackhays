@@ -25,14 +25,7 @@ const NewsletterSubscribers: React.FC<NewsletterSubscribersProps> = ({ initialDa
     try {
       setLoading(true);
       setError(null);
-
-      // Create a mock admin session for database access
-      const mockAdminToken = `sb-mock-admin-${Date.now()}`;
-      await supabase.auth.setSession({
-        access_token: mockAdminToken,
-        refresh_token: mockAdminToken
-      });
-      
+  
       // Fetch all subscribers ordered by creation date
       const { data, error: fetchError } = await supabase
         .from('newsletter_subscribers')
@@ -82,13 +75,6 @@ const NewsletterSubscribers: React.FC<NewsletterSubscribersProps> = ({ initialDa
     try {
       setError(null);
       
-      // Create a mock admin session for database access
-      const mockAdminToken = `sb-mock-admin-${Date.now()}`;
-      await supabase.auth.setSession({
-        access_token: mockAdminToken,
-        refresh_token: mockAdminToken
-      });
-      
       const { error: deleteError } = await supabase
         .from('newsletter_subscribers')
         .delete()
@@ -114,13 +100,6 @@ const NewsletterSubscribers: React.FC<NewsletterSubscribersProps> = ({ initialDa
     const updateStatus = async (id: string, status: 'approved' | 'paused' | 'denied') => {
     try {
       setError(null);
-      
-      // Create a mock admin session for database access
-      const mockAdminToken = `sb-mock-admin-${Date.now()}`;
-      await supabase.auth.setSession({
-        access_token: mockAdminToken,
-        refresh_token: mockAdminToken
-      });
       
       const { error: updateError } = await supabase
         .from('newsletter_subscribers')
@@ -148,13 +127,7 @@ const NewsletterSubscribers: React.FC<NewsletterSubscribersProps> = ({ initialDa
     const email = prompt('Email', subscriber.email) ?? subscriber.email;
 
     try {
-      // Create a mock admin session for database access
-      const mockAdminToken = `sb-mock-admin-${Date.now()}`;
-      await supabase.auth.setSession({
-        access_token: mockAdminToken,
-        refresh_token: mockAdminToken
-      });
-      
+     
       const { error: updateError } = await supabase
         .from('newsletter_subscribers')
         .update({
@@ -217,13 +190,6 @@ const NewsletterSubscribers: React.FC<NewsletterSubscribersProps> = ({ initialDa
     try {
       // Handle ISO date strings
       setLoading(true);
-      
-      // Create a mock admin session for database access
-      const mockAdminToken = `sb-mock-admin-${Date.now()}`;
-      await supabase.auth.setSession({
-        access_token: mockAdminToken,
-        refresh_token: mockAdminToken
-      });
       
       const text = await file.text();
       const lines = text.trim().split(/\r?\n/).slice(1); // remove header
