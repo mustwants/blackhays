@@ -4,6 +4,7 @@ import { ConnectionManager } from './connectionManager';
 // Get environment variables
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabaseServiceRoleKey = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY;
 
 // Validate environment variables
 if (!supabaseUrl || !supabaseAnonKey) {
@@ -34,6 +35,19 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     schema: 'public'
   }
 });
+
+// Create Supabase admin client when service role key is available
+export const supabaseAdmin = supabaseServiceRoleKey
+  ? createClient(supabaseUrl, supabaseServiceRoleKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      },
+      db: {
+        schema: 'public'
+      }
+    })
+  : null;
 
 // Get connection manager instance
 const connectionManager = ConnectionManager.getInstance();
