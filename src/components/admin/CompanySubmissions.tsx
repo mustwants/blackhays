@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../../lib/supabaseClient';
+import { supabase, supabaseAdmin } from '../../lib/supabaseClient';
 import { Search, Filter, Edit2, Trash2, Check, X, Pause, Eye, ExternalLink } from 'lucide-react';
 
 interface CompanySubmission {
@@ -37,12 +37,12 @@ export default function CompanySubmissions() {
   useEffect(() => {
     fetchSubmissions();
   }, []);
-
+  const client = supabaseAdmin ?? supabase;
   const fetchSubmissions = async () => {
     try {
       setLoading(true);
       
-      const { data, error } = await supabase
+      const { data, error } = await client
         .from('company_submissions')
         .select('*')
         .order('created_at', { ascending: false });
@@ -61,7 +61,7 @@ export default function CompanySubmissions() {
 
   const updateStatus = async (id: string, status: string) => {
     try {
-      const { error } = await supabase
+      const { error } = await client
         .from('company_submissions')
         .update({ status })
         .eq('id', id);
@@ -81,7 +81,7 @@ export default function CompanySubmissions() {
     if (!confirm('Are you sure you want to delete this submission?')) return;
 
     try {
-      const { error } = await supabase
+      const { error } = await client
         .from('company_submissions')
         .delete()
         .eq('id', id);
@@ -109,7 +109,7 @@ export default function CompanySubmissions() {
     if (!editingId) return;
 
     try {
-      const { error } = await supabase
+      const { error } = await client
         .from('company_submissions')
         .update(editData)
         .eq('id', editingId);
