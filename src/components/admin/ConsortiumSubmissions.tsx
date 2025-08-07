@@ -39,14 +39,7 @@ export default function ConsortiumSubmissions() {
     try {
       setLoading(true);
       
-      // Create a mock admin session for database access
-      const mockAdminToken = `sb-mock-admin-${Date.now()}`;
-      await supabase.auth.setSession({
-        access_token: mockAdminToken,
-        refresh_token: mockAdminToken
-      });
-      
-      const { data, error } = await supabase
+     const { data, error } = await supabase
         .from('consortium_submissions')
         .select('*')
         .order('created_at', { ascending: false });
@@ -74,13 +67,7 @@ export default function ConsortiumSubmissions() {
 
   const updateStatus = async (id: string, status: string) => {
     try {
-      // Create a mock admin session for database access
-      const mockAdminToken = `sb-mock-admin-${Date.now()}`;
-      await supabase.auth.setSession({
-        access_token: mockAdminToken,
-        refresh_token: mockAdminToken
-      });
-      
+    
       const { error } = await supabase
         .from('consortium_submissions')
         .update({ status, updated_at: new Date().toISOString() })
@@ -101,13 +88,7 @@ export default function ConsortiumSubmissions() {
     if (!confirm('Are you sure you want to delete this submission?')) return;
 
     try {
-      // Create a mock admin session for database access
-      const mockAdminToken = `sb-mock-admin-${Date.now()}`;
-      await supabase.auth.setSession({
-        access_token: mockAdminToken,
-        refresh_token: mockAdminToken
-      });
-      
+     
       const { error } = await supabase
         .from('consortium_submissions')
         .delete()
@@ -136,13 +117,7 @@ export default function ConsortiumSubmissions() {
     if (!editingId) return;
 
     try {
-      // Create a mock admin session for database access
-      const mockAdminToken = `sb-mock-admin-${Date.now()}`;
-      await supabase.auth.setSession({
-        access_token: mockAdminToken,
-        refresh_token: mockAdminToken
-      });
-      
+    
       const { error } = await supabase
         .from('consortium_submissions')
         .update({ 
