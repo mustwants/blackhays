@@ -162,12 +162,6 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
     ];
 
     try {
-      // Check authentication before inserting
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        throw new Error('Not authenticated for test data generation');
-      }
-      
       console.log(`Attempting to insert ${advisors.length} advisors...`);
       for (let i = 0; i < advisors.length; i++) {
         const advisor = advisors[i];
