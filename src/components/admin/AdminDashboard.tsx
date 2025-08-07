@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabaseClient';
-import { Users, Calendar, Building, Rocket, Brain, Mail, ArrowUp, ArrowDown } from 'lucide-react';
+import { Users, Calendar, Building, Rocket, Brain, Mail } from 'lucide-react';
 
 interface CategoryStats {
   total: number;
@@ -34,37 +34,32 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCategoryClick }) => {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [timeRange, setTimeRange] = useState<'week' | 'month' | 'year'>('month');
 
   useEffect(() => {
     fetchStats();
-  }, [timeRange]);
+  }, []);
 
   const fetchStats = async () => {
     try {
       setLoading(true);
       setError(null);
+      console.log('🔄 Starting dashboard stats fetch...');
 
-      // Create a mock admin session for database access
-      const mockAdminToken = `sb-mock-admin-${Date.now()}`;
-      await supabase.auth.setSession({
-        access_token: mockAdminToken,
-        refresh_token: mockAdminToken
-      });
-      
-      // Get date range
-      const now = new Date();
-      const startDate = new Date();
-      switch (timeRange) {
-        case 'week':
-          startDate.setDate(now.getDate() - 7);
-          break;
-        case 'month':
-          startDate.setMonth(now.getMonth() - 1);
-          break;
-        case 'year':
-          startDate.setFullYear(now.getFullYear() - 1);
-          break;
+      // Set up admin session for authenticated access
+      const authSession = localStorage.getItem('auth_session');
+      if (authSession) {
+        try {
+          const sessionData = JSON.parse(authSession);
+          if (sessionData?.session?.access_token) {
+            await supabase.auth.setSession({
+              access_token: sessionData.session.access_token,
+              refresh_token: sessionData.session.refresh_token || sessionData.session.access_token
+            });
+            console.log('✅ Admin session set from localStorage');
+          }
+        } catch (e) {
+          console.warn('Failed to parse auth session:', e);
+        }
       }
 
       // Fetch all stats in parallel
@@ -76,13 +71,22 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCategoryClick }) => {
         innovationStats,
         newsletterStats
       ] = await Promise.all([
-        fetchCategoryStats('advisor_applications', startDate),
-        fetchCategoryStats('event_submissions', startDate),
-        fetchCategoryStats('company_submissions', startDate),
-        fetchCategoryStats('consortium_submissions', startDate),
-        fetchCategoryStats('innovation_submissions', startDate),
-        fetchNewsletterStats(startDate)
+        fetchCategoryStats('advisor_applications'),
+        fetchCategoryStats('event_submissions'),
+        fetchCategoryStats('company_submissions'),
+        fetchCategoryStats('consortium_submissions'),
+        fetchCategoryStats('innovation_submissions'),
+        fetchNewsletterStats()
       ]);
+
+      console.log('📊 All stats fetched:', {
+        advisors: advisorStats,
+        events: eventStats,
+        companies: companyStats,
+        consortiums: consortiumStats,
+        innovations: innovationStats,
+        newsletter: newsletterStats
+      });
 
       setStats({
         advisors: advisorStats,
@@ -93,38 +97,16 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCategoryClick }) => {
         newsletterCount: newsletterStats
       });
     } catch (err) {
-      console.error('Error fetching dashboard stats:', err);
+      console.error('❌ Error fetching dashboard stats:', err);
       setError('Failed to load dashboard statistics');
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchCategoryStats = async (table: string, startDate: Date): Promise<CategoryStats> => {
+  const fetchCategoryStats = async (table: string): Promise<CategoryStats> => {
     try {
-      // Use service role or proper admin session for database access
-      const authSession = localStorage.getItem('auth_session');
-      if (authSession) {
-        try {
-          const sessionData = JSON.parse(authSession);
-          if (sessionData?.session?.access_token) {
-            // Set the session with the stored admin token
-            await supabase.auth.setSession({
-              access_token: sessionData.session.access_token,
-              refresh_token: sessionData.session.refresh_token || sessionData.session.access_token
-            });
-          }
-        } catch (e) {
-          console.warn('Failed to parse auth session:', e);
-        }
-      } else {
-        // Create a temporary admin session for data access
-        const mockAdminToken = `sb-admin-${Date.now()}`;
-        await supabase.auth.setSession({
-          access_token: mockAdminToken,
-          refresh_token: mockAdminToken
-        });
-      }
+      console.log(`📋 Fetching stats for ${table}...`);
       
       const { data, error } = await supabase
         .from(table)
@@ -132,54 +114,36 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCategoryClick }) => {
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error(`Error fetching ${table} stats:`, error);
-        // Don't throw error, just log and return empty stats
-        console.warn(`Unable to fetch ${table} stats, returning empty stats`);
+        console.error(`❌ Error fetching ${table} stats:`, error);
         return { total: 0, approved: 0, pending: 0, paused: 0, rejected: 0 };
       }
       
-      console.log(`${table} stats - found ${data?.length || 0} records`);
+      console.log(`✅ ${table} - found ${data?.length || 0} records`);
+      
+      if (!data || data.length === 0) {
+        console.log(`⚠️ No data found for ${table}`);
+        return { total: 0, approved: 0, pending: 0, paused: 0, rejected: 0 };
+      }
 
       const stats = {
-        total: data ? data.length : 0,
-        approved: data ? data.filter(item => item.status === 'approved').length : 0,
-        pending: data ? data.filter(item => item.status === 'pending').length : 0,
-        paused: data ? data.filter(item => item.status === 'paused').length : 0,
-        rejected: data ? data.filter(item => item.status === 'rejected').length : 0
+        total: data.length,
+        approved: data.filter(item => item.status === 'approved').length,
+        pending: data.filter(item => item.status === 'pending').length,
+        paused: data.filter(item => item.status === 'paused').length,
+        rejected: data.filter(item => item.status === 'rejected').length
       };
 
-      console.log(`${table} stats breakdown:`, stats);
+      console.log(`📈 ${table} breakdown:`, stats);
       return stats;
     } catch (err) {
-      console.error(`Error fetching ${table} stats:`, err);
+      console.error(`❌ Exception fetching ${table} stats:`, err);
       return { total: 0, approved: 0, pending: 0, paused: 0, rejected: 0 };
     }
   };
 
-  const fetchNewsletterStats = async (startDate: Date): Promise<number> => {
+  const fetchNewsletterStats = async (): Promise<number> => {
     try {
-      // Use service role or proper admin session for database access
-      const authSession = localStorage.getItem('auth_session');
-      if (authSession) {
-        try {
-          const sessionData = JSON.parse(authSession);
-          if (sessionData?.session?.access_token) {
-            await supabase.auth.setSession({
-              access_token: sessionData.session.access_token,
-              refresh_token: sessionData.session.refresh_token || sessionData.session.access_token
-            });
-          }
-        } catch (e) {
-          console.warn('Failed to parse auth session:', e);
-        }
-      } else {
-        // Create a temporary admin session for data access
-        const mockAdminToken = `sb-admin-${Date.now()}`;
-        await supabase.auth.setSession({
-          access_token: mockAdminToken,
-          refresh_token: mockAdminToken
-        });
-      }
+      console.log('📧 Fetching newsletter stats...');
       
       const { data, error } = await supabase
         .from('newsletter_subscribers')
@@ -187,14 +151,14 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCategoryClick }) => {
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('Error fetching newsletter stats:', error);
+        console.error('❌ Error fetching newsletter stats:', error);
         return 0;
       }
       
-      console.log(`Newsletter stats - found ${data?.length || 0} subscribers`);
+      console.log(`✅ Newsletter - found ${data?.length || 0} subscribers`);
       return data ? data.length : 0;
     } catch (err) {
-      console.error('Error fetching newsletter stats:', err);
+      console.error('❌ Exception fetching newsletter stats:', err);
       return 0;
     }
   };
@@ -217,31 +181,31 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCategoryClick }) => {
     }`;
     
     return (
-    <div className={cardClasses} onClick={onClick}>
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
-        <Icon className="w-6 h-6 text-gray-500" />
+      <div className={cardClasses} onClick={onClick}>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
+          <Icon className="w-6 h-6 text-gray-500" />
+        </div>
+        
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <p className="text-sm text-gray-600">Total</p>
+            <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-600">Approved</p>
+            <p className="text-2xl font-bold text-green-600">{stats.approved}</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-600">Pending</p>
+            <p className="text-2xl font-bold text-yellow-600">{stats.pending}</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-600">Rejected</p>
+            <p className="text-2xl font-bold text-red-600">{stats.rejected}</p>
+          </div>
+        </div>
       </div>
-      
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <p className="text-sm text-gray-600">Total</p>
-          <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
-        </div>
-        <div>
-          <p className="text-sm text-gray-600">Approved</p>
-          <p className="text-2xl font-bold text-green-600">{stats.approved}</p>
-        </div>
-        <div>
-          <p className="text-sm text-gray-600">Pending</p>
-          <p className="text-2xl font-bold text-yellow-600">{stats.pending}</p>
-        </div>
-        <div>
-          <p className="text-sm text-gray-600">Paused</p>
-          <p className="text-2xl font-bold text-blue-600">{stats.paused}</p>
-        </div>
-      </div>
-    </div>
     );
   };
 
@@ -257,6 +221,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCategoryClick }) => {
     return (
       <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
         {error}
+        <button 
+          onClick={fetchStats}
+          className="ml-4 px-3 py-1 bg-red-100 hover:bg-red-200 rounded text-sm"
+        >
+          Retry
+        </button>
       </div>
     );
   }
@@ -265,17 +235,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCategoryClick }) => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-900">Dashboard Overview</h2>
-        <div className="flex space-x-2">
-          <select
-            value={timeRange}
-            onChange={(e) => setTimeRange(e.target.value as 'week' | 'month' | 'year')}
-            className="bg-white border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-bhred focus:border-bhred"
-          >
-            <option value="week">Last 7 Days</option>
-            <option value="month">Last 30 Days</option>
-            <option value="year">Last Year</option>
-          </select>
-        </div>
+        <button
+          onClick={fetchStats}
+          className="px-4 py-2 bg-bhred text-white rounded-lg hover:bg-red-700"
+        >
+          Refresh
+        </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
