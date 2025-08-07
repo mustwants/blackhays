@@ -26,6 +26,19 @@ const NewsletterSubscribers: React.FC<NewsletterSubscribersProps> = ({ initialDa
       setLoading(true);
       setError(null);
 
+      // Set up admin session for authenticated requests
+      const authSession = localStorage.getItem('auth_session');
+      if (authSession) {
+        try {
+          const session = JSON.parse(authSession);
+          if (session?.session) {
+            await supabase.auth.setSession(session.session);
+          }
+        } catch (e) {
+          console.warn('Failed to set admin session:', e);
+        }
+      }
+      
       // Fetch all subscribers ordered by creation date
       const { data, error: fetchError } = await supabase
         .from('newsletter_subscribers')
@@ -75,6 +88,19 @@ const NewsletterSubscribers: React.FC<NewsletterSubscribersProps> = ({ initialDa
     try {
       setError(null);
       
+      // Set up admin session for authenticated requests
+      const authSession = localStorage.getItem('auth_session');
+      if (authSession) {
+        try {
+          const session = JSON.parse(authSession);
+          if (session?.session) {
+            await supabase.auth.setSession(session.session);
+          }
+        } catch (e) {
+          console.warn('Failed to set admin session:', e);
+        }
+      }
+      
       const { error: deleteError } = await supabase
         .from('newsletter_subscribers')
         .delete()
@@ -100,6 +126,20 @@ const NewsletterSubscribers: React.FC<NewsletterSubscribersProps> = ({ initialDa
     const updateStatus = async (id: string, status: 'approved' | 'paused' | 'denied') => {
     try {
       setError(null);
+      
+      // Set up admin session for authenticated requests
+      const authSession = localStorage.getItem('auth_session');
+      if (authSession) {
+        try {
+          const session = JSON.parse(authSession);
+          if (session?.session) {
+            await supabase.auth.setSession(session.session);
+          }
+        } catch (e) {
+          console.warn('Failed to set admin session:', e);
+        }
+      }
+      
       const { error: updateError } = await supabase
         .from('newsletter_subscribers')
         .update({ status })
@@ -126,6 +166,19 @@ const NewsletterSubscribers: React.FC<NewsletterSubscribersProps> = ({ initialDa
     const email = prompt('Email', subscriber.email) ?? subscriber.email;
 
     try {
+      // Set up admin session for authenticated requests
+      const authSession = localStorage.getItem('auth_session');
+      if (authSession) {
+        try {
+          const session = JSON.parse(authSession);
+          if (session?.session) {
+            await supabase.auth.setSession(session.session);
+          }
+        } catch (e) {
+          console.warn('Failed to set admin session:', e);
+        }
+      }
+      
       const { error: updateError } = await supabase
         .from('newsletter_subscribers')
         .update({
@@ -188,6 +241,20 @@ const NewsletterSubscribers: React.FC<NewsletterSubscribersProps> = ({ initialDa
     try {
       // Handle ISO date strings
       setLoading(true);
+      
+      // Set up admin session for authenticated requests
+      const authSession = localStorage.getItem('auth_session');
+      if (authSession) {
+        try {
+          const session = JSON.parse(authSession);
+          if (session?.session) {
+            await supabase.auth.setSession(session.session);
+          }
+        } catch (e) {
+          console.warn('Failed to set admin session:', e);
+        }
+      }
+      
       const text = await file.text();
       const lines = text.trim().split(/\r?\n/).slice(1); // remove header
       const toInsert = lines

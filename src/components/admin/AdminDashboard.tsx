@@ -45,6 +45,19 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCategoryClick }) => {
       setLoading(true);
       setError(null);
 
+      // Set up admin session for authenticated requests
+      const authSession = localStorage.getItem('auth_session');
+      if (authSession) {
+        try {
+          const session = JSON.parse(authSession);
+          if (session?.session) {
+            await supabase.auth.setSession(session.session);
+          }
+        } catch (e) {
+          console.warn('Failed to set admin session:', e);
+        }
+      }
+      
       // Get date range
       const now = new Date();
       const startDate = new Date();
@@ -95,6 +108,19 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCategoryClick }) => {
 
   const fetchCategoryStats = async (table: string, startDate: Date): Promise<CategoryStats> => {
     try {
+      // Set up admin session for authenticated requests
+      const authSession = localStorage.getItem('auth_session');
+      if (authSession) {
+        try {
+          const session = JSON.parse(authSession);
+          if (session?.session) {
+            await supabase.auth.setSession(session.session);
+          }
+        } catch (e) {
+          console.warn('Failed to set admin session:', e);
+        }
+      }
+      
       const { data, error } = await supabase
         .from(table)
         .select('status, created_at')
@@ -124,6 +150,19 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCategoryClick }) => {
 
   const fetchNewsletterStats = async (startDate: Date): Promise<number> => {
     try {
+      // Set up admin session for authenticated requests
+      const authSession = localStorage.getItem('auth_session');
+      if (authSession) {
+        try {
+          const session = JSON.parse(authSession);
+          if (session?.session) {
+            await supabase.auth.setSession(session.session);
+          }
+        } catch (e) {
+          console.warn('Failed to set admin session:', e);
+        }
+      }
+      
       const { data, error } = await supabase
         .from('newsletter_subscribers')
         .select('id')

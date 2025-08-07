@@ -29,6 +29,19 @@ const EventSubmissions: React.FC<EventSubmissionsProps> = ({ initialData = [] })
     setLoading(true);
     
     try {
+      // Set up admin session for authenticated requests
+      const authSession = localStorage.getItem('auth_session');
+      if (authSession) {
+        try {
+          const session = JSON.parse(authSession);
+          if (session?.session) {
+            await supabase.auth.setSession(session.session);
+          }
+        } catch (e) {
+          console.warn('Failed to set admin session:', e);
+        }
+      }
+      
       const [eventsResult, submissionsResult] = await Promise.all([
         supabase.from('events').select('*').order('created_at', { ascending: false }),
         supabase.from('event_submissions').select('*').order('created_at', { ascending: false })
@@ -91,6 +104,19 @@ const EventSubmissions: React.FC<EventSubmissionsProps> = ({ initialData = [] })
     setError(null);
     
     try {
+      // Set up admin session for authenticated requests
+      const authSession = localStorage.getItem('auth_session');
+      if (authSession) {
+        try {
+          const session = JSON.parse(authSession);
+          if (session?.session) {
+            await supabase.auth.setSession(session.session);
+          }
+        } catch (e) {
+          console.warn('Failed to set admin session:', e);
+        }
+      }
+      
       if (action === 'delete') {
         const { error } = await supabase
           .from('event_submissions')

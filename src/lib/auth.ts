@@ -60,10 +60,6 @@ export const login = async (email: string, password: string) => {
           refresh_token: sessionData.session.refresh_token
         });
         
-        
-        // Set the Supabase session for authenticated requests
-        await supabase.auth.setSession(sessionData.session);
-        
         console.log('Admin session stored successfully');
       } catch (storageError) {
         console.warn('Failed to store admin session:', storageError);

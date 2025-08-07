@@ -39,6 +39,19 @@ export default function ConsortiumSubmissions() {
     try {
       setLoading(true);
       
+      // Set up admin session for authenticated requests
+      const authSession = localStorage.getItem('auth_session');
+      if (authSession) {
+        try {
+          const session = JSON.parse(authSession);
+          if (session?.session) {
+            await supabase.auth.setSession(session.session);
+          }
+        } catch (e) {
+          console.warn('Failed to set admin session:', e);
+        }
+      }
+      
       const { data, error } = await supabase
         .from('consortium_submissions')
         .select('*')
@@ -67,6 +80,19 @@ export default function ConsortiumSubmissions() {
 
   const updateStatus = async (id: string, status: string) => {
     try {
+      // Set up admin session for authenticated requests
+      const authSession = localStorage.getItem('auth_session');
+      if (authSession) {
+        try {
+          const session = JSON.parse(authSession);
+          if (session?.session) {
+            await supabase.auth.setSession(session.session);
+          }
+        } catch (e) {
+          console.warn('Failed to set admin session:', e);
+        }
+      }
+      
       const { error } = await supabase
         .from('consortium_submissions')
         .update({ status, updated_at: new Date().toISOString() })
@@ -87,6 +113,19 @@ export default function ConsortiumSubmissions() {
     if (!confirm('Are you sure you want to delete this submission?')) return;
 
     try {
+      // Set up admin session for authenticated requests
+      const authSession = localStorage.getItem('auth_session');
+      if (authSession) {
+        try {
+          const session = JSON.parse(authSession);
+          if (session?.session) {
+            await supabase.auth.setSession(session.session);
+          }
+        } catch (e) {
+          console.warn('Failed to set admin session:', e);
+        }
+      }
+      
       const { error } = await supabase
         .from('consortium_submissions')
         .delete()
@@ -115,6 +154,19 @@ export default function ConsortiumSubmissions() {
     if (!editingId) return;
 
     try {
+      // Set up admin session for authenticated requests
+      const authSession = localStorage.getItem('auth_session');
+      if (authSession) {
+        try {
+          const session = JSON.parse(authSession);
+          if (session?.session) {
+            await supabase.auth.setSession(session.session);
+          }
+        } catch (e) {
+          console.warn('Failed to set admin session:', e);
+        }
+      }
+      
       const { error } = await supabase
         .from('consortium_submissions')
         .update({ 

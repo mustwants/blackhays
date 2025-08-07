@@ -17,6 +17,20 @@ const AdvisorApplications = () => {
   const fetchDirectly = async () => {
     try {
       setDirectLoading(true);
+      
+      // Set up admin session for authenticated requests
+      const authSession = localStorage.getItem('auth_session');
+      if (authSession) {
+        try {
+          const session = JSON.parse(authSession);
+          if (session?.session) {
+            await supabase.auth.setSession(session.session);
+          }
+        } catch (e) {
+          console.warn('Failed to set admin session:', e);
+        }
+      }
+      
       const { data, error } = await supabase
         .from('advisor_applications')
         .select('*')
@@ -55,6 +69,19 @@ const AdvisorApplications = () => {
 
   const handleDirectApprove = async (id: string) => {
     try {
+      // Set up admin session for authenticated requests  
+      const authSession = localStorage.getItem('auth_session');
+      if (authSession) {
+        try {
+          const session = JSON.parse(authSession);
+          if (session?.session) {
+            await supabase.auth.setSession(session.session);
+          }
+        } catch (e) {
+          console.warn('Failed to set admin session:', e);
+        }
+      }
+      
       const { error } = await supabase
         .from('advisor_applications')
         .update({ status: 'approved' })
@@ -69,6 +96,19 @@ const AdvisorApplications = () => {
 
   const handleDirectReject = async (id: string) => {
     try {
+      // Set up admin session for authenticated requests
+      const authSession = localStorage.getItem('auth_session');
+      if (authSession) {
+        try {
+          const session = JSON.parse(authSession);
+          if (session?.session) {
+            await supabase.auth.setSession(session.session);
+          }
+        } catch (e) {
+          console.warn('Failed to set admin session:', e);
+        }
+      }
+      
       const { error } = await supabase
         .from('advisor_applications')
         .update({ status: 'rejected' })
@@ -85,6 +125,19 @@ const AdvisorApplications = () => {
     if (!confirm('Are you sure you want to delete this advisor?')) return;
     
     try {
+      // Set up admin session for authenticated requests
+      const authSession = localStorage.getItem('auth_session');
+      if (authSession) {
+        try {
+          const session = JSON.parse(authSession);
+          if (session?.session) {
+            await supabase.auth.setSession(session.session);
+          }
+        } catch (e) {
+          console.warn('Failed to set admin session:', e);
+        }
+      }
+      
       const { error } = await supabase
         .from('advisor_applications')
         .delete()
