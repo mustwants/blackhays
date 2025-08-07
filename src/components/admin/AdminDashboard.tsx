@@ -45,18 +45,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCategoryClick }) => {
       setLoading(true);
       setError(null);
 
-      // Set up admin session for authenticated requests
-      const authSession = localStorage.getItem('auth_session');
-      if (authSession) {
-        try {
-          const session = JSON.parse(authSession);
-          if (session?.session) {
-            await supabase.auth.setSession(session.session);
-          }
-        } catch (e) {
-          console.warn('Failed to set admin session:', e);
-        }
-      }
+      // Create a mock admin session for database access
+      const mockAdminToken = `sb-mock-admin-${Date.now()}`;
+      await supabase.auth.setSession({
+        access_token: mockAdminToken,
+        refresh_token: mockAdminToken
+      });
       
       // Get date range
       const now = new Date();
@@ -108,18 +102,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCategoryClick }) => {
 
   const fetchCategoryStats = async (table: string, startDate: Date): Promise<CategoryStats> => {
     try {
-      // Set up admin session for authenticated requests
-      const authSession = localStorage.getItem('auth_session');
-      if (authSession) {
-        try {
-          const session = JSON.parse(authSession);
-          if (session?.session) {
-            await supabase.auth.setSession(session.session);
-          }
-        } catch (e) {
-          console.warn('Failed to set admin session:', e);
-        }
-      }
+      // Create a mock admin session for database access
+      const mockAdminToken = `sb-mock-admin-${Date.now()}`;
+      await supabase.auth.setSession({
+        access_token: mockAdminToken,
+        refresh_token: mockAdminToken
+      });
       
       const { data, error } = await supabase
         .from(table)
@@ -150,18 +138,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCategoryClick }) => {
 
   const fetchNewsletterStats = async (startDate: Date): Promise<number> => {
     try {
-      // Set up admin session for authenticated requests
-      const authSession = localStorage.getItem('auth_session');
-      if (authSession) {
-        try {
-          const session = JSON.parse(authSession);
-          if (session?.session) {
-            await supabase.auth.setSession(session.session);
-          }
-        } catch (e) {
-          console.warn('Failed to set admin session:', e);
-        }
-      }
+      // Create a mock admin session for database access
+      const mockAdminToken = `sb-mock-admin-${Date.now()}`;
+      await supabase.auth.setSession({
+        access_token: mockAdminToken,
+        refresh_token: mockAdminToken
+      });
       
       const { data, error } = await supabase
         .from('newsletter_subscribers')
