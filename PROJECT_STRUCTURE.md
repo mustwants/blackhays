@@ -48,7 +48,6 @@ Modern React application built with Vite, TypeScript, and Tailwind CSS for a def
 │   │   └── useEvents.ts    # Events data management
 │   │
 │   ├── lib/               # Core utilities
-│   │   ├── auth.ts        # Authentication utilities
 │   │   └── supabaseClient.ts # Supabase client configuration
 │   │
 │   ├── pages/             # Route components
