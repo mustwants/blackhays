@@ -16,68 +16,19 @@ export interface AuthService {
 
 class SupabaseAuthService implements AuthService {
   async login(email: string, password: string) {
-    // Normalize email for comparison
     const normalizedEmail = email.toLowerCase();
-    
-    // Check admin credentials first
-    const isAdminUser = Object.entries(ADMIN_CREDENTIALS).some(
-      ([adminEmail, adminPassword]) => 
-        adminEmail.toLowerCase() === normalizedEmail && 
-        password === adminPassword
-    );
-    
-    if (isAdminUser) {
-      console.log('Auth service: Admin login successful:', normalizedEmail);
-      
-      // Create admin user data
-      const adminUser = {
-        id: 'admin-user-id',
-        email: normalizedEmail,
-        role: 'admin',
-        app_metadata: { role: 'admin' }
-      };
-      
-      // Session data
-      const sessionData = {
-        user: adminUser,
-        session: {
-          access_token: `admin-token-${Date.now()}`,
-          refresh_token: `admin-refresh-${Date.now()}`,
-          expires_at: Date.now() + 3600000 // 1 hour
-        }
-      };
-      
-      // Store auth data in localStorage
-      try {
-        localStorage.setItem('auth_session', JSON.stringify(sessionData));
-        localStorage.setItem('auth_token', sessionData.session.access_token);
-      } catch (storageError) {
-        console.warn('Failed to store admin session in localStorage:', storageError);
-      }
-      
-      return { 
-        data: {
-          user: adminUser,
-          session: sessionData.session
-        },
-        error: null
-      };
-    }
-
-    // If not admin, try Supabase auth
-    // Check connection status before attempting Supabase auth
-    if (!isConnected()) {
+   if (!isConnected()) {
       console.error('Database connection unavailable');
-      return { 
-        data: null, 
-        error: { 
-          message: 'Database connection is currently unavailable. Please try again later.',
+           return {
+        data: null,
+        error: {
+         message: 'Database connection is currently unavailable. Please try again later.',
           code: 'connection_unavailable'
         }
       };
     }
 
-    console.log("Attempting Supabase login");
+    console.log('Attempting Supabase login');
     const { data, error } = await supabase.auth.signInWithPassword({
       email: normalizedEmail,
       password
@@ -87,7 +38,15 @@ class SupabaseAuthService implements AuthService {
       console.error('Supabase auth error:', error);
       return { data: null, error };
     }
-
+    // Persist session for subsequent requests
+    try {
+      if (data.session) {
+        localStorage.setItem('auth_session', JSON.stringify(data));
+        localStorage.setItem('auth_token', data.session.access_token);
+      }
+    } catch (storageError) {
+      console.warn('Failed to store session in localStorage:', storageError);
+    }
     return { data, error: null };
   }
 
@@ -111,7 +70,7 @@ class SupabaseAuthService implements AuthService {
   }
 
   async getCurrentUser() {
-    // Check for admin session in localStorage
+  // Check for stored session in localStorage
     try {
       const sessionData = localStorage.getItem('auth_session');
       if (sessionData) {
@@ -121,10 +80,10 @@ class SupabaseAuthService implements AuthService {
         }
       }
     } catch (storageError) {
-      console.warn('Failed to get admin session from localStorage:', storageError);
+      console.warn('Failed to get session from localStorage:', storageError);
     }
 
-    // If no admin session, check Supabase
+    // Fallback to Supabase
     try {
       const { data: { user } } = await supabase.auth.getUser();
       return user;
@@ -135,10 +94,11 @@ class SupabaseAuthService implements AuthService {
   }
 
   async isAuthenticated() {
-    // First check for admin session in localStorage
+    // First check for stored session in localStorage
     try {
-      const hasLocalAuth = localStorage.getItem('auth_session') !== null || 
-                          localStorage.getItem('auth_token') !== null;
+      const hasLocalAuth =
+        localStorage.getItem('auth_session') !== null ||
+        localStorage.getItem('auth_token') !== null;
       if (hasLocalAuth) {
         return true;
       }
@@ -146,7 +106,7 @@ class SupabaseAuthService implements AuthService {
       console.warn('Failed to check local auth status:', storageError);
     }
 
-    // If no admin session, check Supabase
+    // Fallback to Supabase session
     try {
       const { data: { session } } = await supabase.auth.getSession();
       return !!session;
