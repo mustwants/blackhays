@@ -42,13 +42,6 @@ export default function CompanySubmissions() {
     try {
       setLoading(true);
       
-      // Create a mock admin session for database access
-      const mockAdminToken = `sb-mock-admin-${Date.now()}`;
-      await supabase.auth.setSession({
-        access_token: mockAdminToken,
-        refresh_token: mockAdminToken
-      });
-      
       const { data, error } = await supabase
         .from('company_submissions')
         .select('*')
@@ -68,13 +61,6 @@ export default function CompanySubmissions() {
 
   const updateStatus = async (id: string, status: string) => {
     try {
-      // Create a mock admin session for database access
-      const mockAdminToken = `sb-mock-admin-${Date.now()}`;
-      await supabase.auth.setSession({
-        access_token: mockAdminToken,
-        refresh_token: mockAdminToken
-      });
-      
       const { error } = await supabase
         .from('company_submissions')
         .update({ status })
@@ -95,13 +81,6 @@ export default function CompanySubmissions() {
     if (!confirm('Are you sure you want to delete this submission?')) return;
 
     try {
-      // Create a mock admin session for database access
-      const mockAdminToken = `sb-mock-admin-${Date.now()}`;
-      await supabase.auth.setSession({
-        access_token: mockAdminToken,
-        refresh_token: mockAdminToken
-      });
-      
       const { error } = await supabase
         .from('company_submissions')
         .delete()
@@ -130,13 +109,6 @@ export default function CompanySubmissions() {
     if (!editingId) return;
 
     try {
-      // Create a mock admin session for database access
-      const mockAdminToken = `sb-mock-admin-${Date.now()}`;
-      await supabase.auth.setSession({
-        access_token: mockAdminToken,
-        refresh_token: mockAdminToken
-      });
-      
       const { error } = await supabase
         .from('company_submissions')
         .update(editData)
