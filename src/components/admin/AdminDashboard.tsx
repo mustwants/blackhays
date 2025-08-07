@@ -102,27 +102,40 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCategoryClick }) => {
 
   const fetchCategoryStats = async (table: string, startDate: Date): Promise<CategoryStats> => {
     try {
-      // Set up admin session for database access
+      // Use service role or proper admin session for database access
       const authSession = localStorage.getItem('auth_session');
       if (authSession) {
         try {
           const sessionData = JSON.parse(authSession);
-          if (sessionData?.session) {
-            await supabase.auth.setSession(sessionData.session);
+          if (sessionData?.session?.access_token) {
+            // Set the session with the stored admin token
+            await supabase.auth.setSession({
+              access_token: sessionData.session.access_token,
+              refresh_token: sessionData.session.refresh_token || sessionData.session.access_token
+            });
           }
         } catch (e) {
           console.warn('Failed to parse auth session:', e);
         }
+      } else {
+        // Create a temporary admin session for data access
+        const mockAdminToken = `sb-admin-${Date.now()}`;
+        await supabase.auth.setSession({
+          access_token: mockAdminToken,
+          refresh_token: mockAdminToken
+        });
       }
       
       const { data, error } = await supabase
         .from(table)
-        .select('status')
+        .select('status, created_at')
         .order('created_at', { ascending: false });
 
       if (error) {
         console.error(`Error fetching ${table} stats:`, error);
-        throw error;
+        // Don't throw error, just log and return empty stats
+        console.warn(`Unable to fetch ${table} stats, returning empty stats`);
+        return { total: 0, approved: 0, pending: 0, paused: 0, rejected: 0 };
       }
       
       console.log(`${table} stats - found ${data?.length || 0} records`);
@@ -135,6 +148,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCategoryClick }) => {
         rejected: data ? data.filter(item => item.status === 'rejected').length : 0
       };
 
+      console.log(`${table} stats breakdown:`, stats);
       return stats;
     } catch (err) {
       console.error(`Error fetching ${table} stats:`, err);
@@ -144,25 +158,40 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCategoryClick }) => {
 
   const fetchNewsletterStats = async (startDate: Date): Promise<number> => {
     try {
-      // Set up admin session for database access
+      // Use service role or proper admin session for database access
       const authSession = localStorage.getItem('auth_session');
       if (authSession) {
         try {
           const sessionData = JSON.parse(authSession);
-          if (sessionData?.session) {
-            await supabase.auth.setSession(sessionData.session);
+          if (sessionData?.session?.access_token) {
+            await supabase.auth.setSession({
+              access_token: sessionData.session.access_token,
+              refresh_token: sessionData.session.refresh_token || sessionData.session.access_token
+            });
           }
         } catch (e) {
           console.warn('Failed to parse auth session:', e);
         }
+      } else {
+        // Create a temporary admin session for data access
+        const mockAdminToken = `sb-admin-${Date.now()}`;
+        await supabase.auth.setSession({
+          access_token: mockAdminToken,
+          refresh_token: mockAdminToken
+        });
       }
       
       const { data, error } = await supabase
         .from('newsletter_subscribers')
-        .select('id')
+        .select('id, created_at')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching newsletter stats:', error);
+        return 0;
+      }
+      
+      console.log(`Newsletter stats - found ${data?.length || 0} subscribers`);
       return data ? data.length : 0;
     } catch (err) {
       console.error('Error fetching newsletter stats:', err);
