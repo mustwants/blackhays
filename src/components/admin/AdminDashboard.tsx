@@ -58,9 +58,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCategoryClick }) => {
               });
               console.log('✅ Admin session set from localStorage');
             }
+          } catch (e) {
+            console.warn('Failed to parse auth session:', e);
           }
-        } catch (e) {
-          console.warn('Failed to parse auth session:', e);
         }
       }
 
