@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Clock, MessageCircle, Target, ArrowRight, Shield, Star, CheckCircle } from 'lucide-react';
+import { Clock, MessageCircle, Target, ArrowRight, Shield, Star, CheckCircle, Calendar } from 'lucide-react';
 
 const Mission = () => {
   const [activeCard, setActiveCard] = useState<string | null>(null);
