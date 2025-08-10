@@ -1,40 +1,36 @@
+/* src/index.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@layer utilities {
-  .perspective-1000 {
-    perspective: 1000px;
-  }
-  
-  .preserve-3d {
-    transform-style: preserve-3d;
-  }
-  
-  .backface-hidden {
-    backface-visibility: hidden;
-  }
-  
-  .rotate-y-180 {
-    transform: rotateY(180deg);
-  }
-  
-  .animate-fadeIn {
-    animation: fadeIn 0.3s ease-in-out;
+/* ---- Fixed-header offset (global) ----
+   If your header is fixed/sticky, give the page a top padding so content
+   never hides behind it. Tweak --header-h if your header height differs.
+*/
+:root {
+  --header-h: 64px;  /* 64px (~16 Tailwind units) */
+}
+
+/* If your header is taller on larger screens, adjust here */
+@media (min-width: 1024px) {
+  :root {
+    --header-h: 72px;
   }
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+html, body, #root {
+  height: 100%;
 }
-.card{background:#111114;border:1px solid #222228;border-radius:16px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
-.row{display:flex;gap:12px;flex-wrap:wrap}
-.badge{padding:2px 8px;border-radius:999px;border:1px solid #333;font-size:12px;text-transform:uppercase;letter-spacing:.04em}
-.badge.pending{border-color:#6b6b10}.badge.approved{border-color:#1f6b1f}.badge.denied{border-color:#6b1f1f}.badge.paused{border-color:#6b4b1f}
+
+body {
+  padding-top: var(--header-h);
+  background: #f8fafc; /* optional: subtle app bg */
+}
+
+/* Optional: a tiny helper if you want uniform page shells */
+.container-page {
+  max-width: 56rem; /* ~ Tailwind max-w-3xl */
+  margin-left: auto;
+  margin-right: auto;
+  padding: 1.5rem; /* p-6 */
+}
