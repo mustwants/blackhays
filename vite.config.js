@@ -1,26 +1,19 @@
-// vite.config.js
+﻿// vite.config.js
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
   server: {
-    port: 5173,         // Lock to known safe dev port
-    strictPort: true,   // Fail if port is unavailable
-    host: '0.0.0.0',    // Allow access from Codex/browsers
-    hmr: {
-      protocol: 'ws',   // WebSocket protocol (Codex-safe)
-      host: 'localhost',
-      port: 5173,
-    }
+    port: 5191,        // start here
+    strictPort: false, // if busy, pick next free port automatically
+    host: '0.0.0.0',
   },
   preview: {
-    port: 4173,         // Default Vite preview port
-    host: '0.0.0.0'     // Enable access from outside container
+    port: 4191,
+    host: '0.0.0.0',
   },
   define: {
-    'process.env': {}   // Prevent 'process is not defined' errors
-  }
+    'process.env': {},
+  },
 });
-
-

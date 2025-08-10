@@ -1,8 +1,14 @@
-import React, { useState, useEffect, useRef } from 'react';
-import Map, { Marker, Popup, NavigationControl, ScaleControl, Source, Layer } from 'react-map-gl';
+import React, { useEffect, useRef, useState } from 'react'
+import Map, {
+  Marker,
+  Popup,
+  NavigationControl,
+  ScaleControl,
+  type MapRef,
+} from 'react-map-gl'
 import {
   Search,
-  Filter,
+  Filter as FilterIcon,
   Layers,
   MapPin,
   Users,
@@ -11,148 +17,117 @@ import {
   Calendar,
   Lightbulb,
   Tag,
-  X
-} from 'lucide-react';
-import { mapService, type MapEntity } from '../services/mapService';
-import 'mapbox-gl/dist/mapbox-gl.css';
+  X,
+} from 'lucide-react'
+import { mapService, type MapEntity } from '../services/mapService'
+import 'mapbox-gl/dist/mapbox-gl.css'
 
-interface MapExplorer {
-  id: string;
-  name: string;
-  type: 'advisor' | 'company' | 'consortium' | 'innovation' | 'event';
-  description?: string;
-  location: [number, number];
-  address?: string;
-  website?: string;
-  details?: Record<string, any>;
-}
-
+// Icons keyed by entity type
 const typeIcons = {
   advisor: Users,
   company: Building,
   consortium: Rocket,
   innovation: Lightbulb,
   event: Calendar,
-};
+} as const
+type TypeKey = keyof typeof typeIcons
 
-const typeColors = {
-  advisor: '#3b82f6', // blue
-  company: '#16a34a', // green
-  consortium: '#9333ea', // purple
-  innovation: '#f59e0b', // amber
-  event: '#ef4444', // red
-};
+const typeColors: Record<TypeKey, string> = {
+  advisor: '#3b82f6',
+  company: '#16a34a',
+  consortium: '#9333ea',
+  innovation: '#f59e0b',
+  event: '#ef4444',
+}
 
-const MapExplorer = () => {
-  const [entities, setEntities] = useState<MapEntity[]>([]);
-  const [selectedEntity, setSelectedEntity] = useState<MapEntity | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [viewState, setViewState] = useState({
-    longitude: -95.7129,
-    latitude: 37.0902,
-    zoom: 3.5
-  });
-  const [searchTerm, setSearchTerm] = useState('');
-    const [searchLocation, setSearchLocation] = useState('');
-  const [searchDate, setSearchDate] = useState('');
-  const [searchEventType, setSearchEventType] = useState('');
-  const [filters, setFilters] = useState({
+const typeDescriptions: Record<TypeKey, string> = {
+  advisor: 'Connect with defense advisors and experts.',
+  company: 'Companies driving defense innovation.',
+  consortium: 'Collaborative defense partnerships.',
+  innovation: 'Innovation labs and organizations.',
+  event: 'Upcoming events in the ecosystem.',
+}
+
+export default function MapExplorer() {
+  const [entities, setEntities] = useState<MapEntity[]>([])
+  const [selectedEntity, setSelectedEntity] = useState<MapEntity | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  const [searchTerm, setSearchTerm] = useState('')
+  const [searchLocation, setSearchLocation] = useState('')
+  const [searchDate, setSearchDate] = useState('')
+  const [searchEventType, setSearchEventType] = useState('')
+
+  const [filters, setFilters] = useState<Record<TypeKey, boolean>>({
     advisor: true,
     company: true,
     consortium: true,
     innovation: true,
-    event: true
-  });
-  const [showFilters, setShowFilters] = useState(false);
-    const [controlsCollapsed, setControlsCollapsed] = useState(false);
-  const [legendCollapsed, setLegendCollapsed] = useState(false);
+    event: true,
+  })
 
-  const mapRef = useRef(null);
-  const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN;
+  const [showFilters, setShowFilters] = useState(false)
+  const [controlsCollapsed, setControlsCollapsed] = useState(false)
+  const [legendCollapsed, setLegendCollapsed] = useState(false)
+
+  const mapRef = useRef<MapRef | null>(null)
+  const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN as string | undefined
 
   useEffect(() => {
     const fetchMapData = async () => {
       try {
-        setLoading(true);
-        const data = await mapService.getAllEntities();
-        setEntities(data);
-        if (data.length === 0) {
-          setError('No locations found. Please check back later.');
-        }
+        setLoading(true)
+        const data = await mapService.getAllEntities()
+        setEntities(data)
+        if (data.length === 0) setError('No locations found. Please check back later.')
       } catch (err) {
-        console.error('Error loading map data:', err);
-        setError('Unable to load map data. Please try again later.');
+        console.error('Error loading map data:', err)
+        setError('Unable to load map data. Please try again later.')
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
-
-    fetchMapData();
-  }, []);
-
-  // Filter entities based on search and filters
-  const filteredEntities = entities.filter(entity => {
-    if (!filters[entity.type]) return false;
-    if (searchTerm && !entity.name.toLowerCase().includes(searchTerm.toLowerCase())) {
-      return false;
     }
-        if (
-      searchLocation &&
-      !entity.address?.toLowerCase().includes(searchLocation.toLowerCase())
-    ) {
-      return false;
-    }
+    fetchMapData()
+  }, [])
+
+  const filteredEntities = entities.filter((entity) => {
+    if (!filters[entity.type]) return false
+
+    if (searchTerm && !entity.name.toLowerCase().includes(searchTerm.toLowerCase())) return false
+    if (searchLocation && !entity.address?.toLowerCase().includes(searchLocation.toLowerCase()))
+      return false
+
     if (entity.type === 'event') {
-      const startDate = entity.details?.start_date
-        ? entity.details.start_date.slice(0, 10)
-        : '';
-      const eventType = (
-        (entity.details?.event_type || entity.details?.type || '') as string
-      ).toLowerCase();
-      if (searchDate && startDate !== searchDate) {
-        return false;
-      }
-      if (searchEventType && !eventType.includes(searchEventType.toLowerCase())) {
-        return false;
-      }
+      const startDate = entity.details?.start_date ? String(entity.details.start_date).slice(0, 10) : ''
+      const eventType = String(entity.details?.event_type || entity.details?.type || '').toLowerCase()
+      if (searchDate && startDate !== searchDate) return false
+      if (searchEventType && !eventType.includes(searchEventType.toLowerCase())) return false
     }
-    return true;
-  });
+    return true
+  })
 
-  const toggleFilter = (type: keyof typeof filters) => {
-    setFilters(prev => ({
-      ...prev,
-      [type]: !prev[type]
-    }));
-  };
-    const typeDescriptions: Record<string, string> = {
-    advisor: 'Connect with defense advisors and experts.',
-    company: 'Companies driving defense innovation.',
-    consortium: 'Collaborative defense partnerships.',
-    innovation: 'Innovation labs and organizations.',
-    event: 'Upcoming events in the ecosystem.'
-  };
-
+  const toggleFilter = (type: TypeKey) =>
+    setFilters((prev) => ({ ...prev, [type]: !prev[type] }))
 
   if (!MAPBOX_TOKEN) {
     return (
       <div className="w-full h-full flex items-center justify-center bg-gray-100 rounded-lg">
         <p className="text-red-600">Map configuration error. Please contact support.</p>
       </div>
-    );
+    )
   }
 
   return (
     <div className="relative w-full h-[calc(100vh-13rem)]">
-      {/* Search and Filter Controls */}
+      {/* Search & filter panel */}
       {controlsCollapsed ? (
         <button
           onClick={() => setControlsCollapsed(false)}
           className="absolute top-4 left-4 z-10 bg-white p-2 rounded-lg shadow-lg"
           title="Show search and filters"
         >
-          <Filter className="w-5 h-5" />
+          <FilterIcon className="w-5 h-5" />
         </button>
       ) : (
         <div className="absolute top-4 left-4 z-10 w-80 bg-white rounded-lg shadow-lg overflow-hidden">
@@ -163,8 +138,9 @@ const MapExplorer = () => {
             >
               <X className="w-4 h-4" />
             </button>
+
             <div className="relative mb-3">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
                 placeholder="Search by name..."
@@ -173,8 +149,9 @@ const MapExplorer = () => {
                 className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-bhred focus:border-bhred"
               />
             </div>
+
             <div className="relative mb-3">
-              <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
                 placeholder="Search by location..."
@@ -183,8 +160,9 @@ const MapExplorer = () => {
                 className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-bhred focus:border-bhred"
               />
             </div>
+
             <div className="relative mb-3">
-              <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
                 type="date"
                 value={searchDate}
@@ -192,8 +170,9 @@ const MapExplorer = () => {
                 className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-bhred focus:border-bhred"
               />
             </div>
+
             <div className="relative mb-3">
-              <Tag className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <Tag className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
                 placeholder="Search by event type..."
@@ -208,7 +187,7 @@ const MapExplorer = () => {
                 onClick={() => setShowFilters(!showFilters)}
                 className="flex items-center text-gray-700 hover:text-bhred"
               >
-                <Filter className="w-4 h-4 mr-1" />
+                <FilterIcon className="w-4 h-4 mr-1" />
                 Filters
               </button>
             </div>
@@ -217,58 +196,26 @@ const MapExplorer = () => {
               <div className="bg-gray-50 p-3 rounded-lg mt-2 space-y-2">
                 <div className="text-sm font-medium text-gray-700 mb-2">Show on map:</div>
                 <div className="grid grid-cols-2 gap-2">
-                  {Object.entries(filters).map(([type, enabled]) => {
-                    const Icon = typeIcons[type as keyof typeof typeIcons];
+                  {(Object.keys(filters) as TypeKey[]).map((type) => {
+                    const Icon = typeIcons[type]
+                    const enabled = filters[type]
                     return (
                       <div key={type} className="relative group">
                         <button
-                          onClick={() => toggleFilter(type as keyof typeof filters)}
-                          className={`flex items-center justify-between px-3 py-2 rounded-md transition-colors ${
-                            enabled
-                              ? `bg-${
-                                  type === 'advisor'
-                                    ? 'blue'
-                                    : type === 'company'
-                                      ? 'green'
-                                      : type === 'consortium'
-                                        ? 'purple'
-                                        : type === 'innovation'
-                                          ? 'amber'
-                                          : 'red'
-                                }-100 text-${
-                                  type === 'advisor'
-                                    ? 'blue'
-                                    : type === 'company'
-                                      ? 'green'
-                                      : type === 'consortium'
-                                        ? 'purple'
-                                        : type === 'innovation'
-                                          ? 'amber'
-                                          : 'red'
-                                }-800 border border-${
-                                  type === 'advisor'
-                                    ? 'blue'
-                                    : type === 'company'
-                                      ? 'green'
-                                      : type === 'consortium'
-                                        ? 'purple'
-                                        : type === 'innovation'
-                                          ? 'amber'
-                                          : 'red'
-                                }-200`
-                              : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
-                          }`}
+                          onClick={() => toggleFilter(type)}
+                          className={`flex items-center justify-between px-3 py-2 rounded-md transition-colors border ${enabled ? 'text-white' : 'text-gray-600 bg-gray-100 hover:bg-gray-200 border-gray-300'}`}
+                          style={enabled ? { backgroundColor: typeColors[type], borderColor: typeColors[type] } : undefined}
                         >
                           <div className="flex items-center">
                             <Icon className="w-4 h-4 mr-2" />
                             <span className="capitalize">{type}s</span>
                           </div>
                         </button>
-                        <div className="absolute left-1/2 transform -translate-x-1/2 top-full mt-1 hidden group-hover:block bg-gray-800 text-white text-xs rounded px-2 py-1 z-10 w-max">
+                        <div className="absolute left-1/2 -translate-x-1/2 top-full mt-1 hidden group-hover:block bg-gray-800 text-white text-xs rounded px-2 py-1 z-10 w-max">
                           {typeDescriptions[type]}
                         </div>
                       </div>
-                     );
+                    )
                   })}
                 </div>
               </div>
@@ -293,11 +240,10 @@ const MapExplorer = () => {
       )}
 
       <Map
-        {...viewState}
+        initialViewState={{ longitude: -95.7129, latitude: 37.0902, zoom: 3.5 }}
         ref={mapRef}
-        onMove={evt => setViewState(evt.viewState)}
         mapStyle="mapbox://styles/mapbox/dark-v11"
-        mapboxAccessToken={MAPBOX_TOKEN}
+        mapboxAccessToken={MAPBOX_TOKEN!}
         style={{ width: '100%', height: '100%' }}
         minZoom={2}
         maxZoom={15}
@@ -305,32 +251,33 @@ const MapExplorer = () => {
         <NavigationControl position="top-right" />
         <ScaleControl position="bottom-right" />
 
-        {filteredEntities.map(entity => (
-          <Marker
-            key={entity.id}
-            longitude={entity.location[0]}
-            latitude={entity.location[1]}
-            anchor="bottom"
-            onClick={e => {
-              e.originalEvent.stopPropagation();
-              setSelectedEntity(entity);
-            }}
-          >
-            <div className="relative group cursor-pointer">
-              <div 
-                className="w-8 h-8 rounded-full flex items-center justify-center transform hover:scale-110 transition-transform shadow-lg"
-                style={{ backgroundColor: typeColors[entity.type] }}
-              >
-                {React.createElement(typeIcons[entity.type], { 
-                  className: "w-5 h-5 text-white"
-                })}
+        {filteredEntities.map((entity) => {
+          const Icon = typeIcons[entity.type]
+          return (
+            <Marker
+              key={entity.id}
+              longitude={entity.location[0]}
+              latitude={entity.location[1]}
+              anchor="bottom"
+              onClick={(e) => {
+                e.originalEvent.stopPropagation()
+                setSelectedEntity(entity)
+              }}
+            >
+              <div className="relative group cursor-pointer">
+                <div
+                  className="w-8 h-8 rounded-full flex items-center justify-center transform hover:scale-110 transition-transform shadow-lg"
+                  style={{ backgroundColor: typeColors[entity.type] }}
+                >
+                  <Icon className="w-5 h-5 text-white" />
+                </div>
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 whitespace-nowrap bg-black/80 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                  {entity.name}
+                </div>
               </div>
-              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 whitespace-nowrap bg-black bg-opacity-75 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                {entity.name}
-              </div>
-            </div>
-          </Marker>
-        ))}
+            </Marker>
+          )
+        })}
 
         {selectedEntity && (
           <Popup
@@ -338,7 +285,7 @@ const MapExplorer = () => {
             latitude={selectedEntity.location[1]}
             anchor="bottom"
             onClose={() => setSelectedEntity(null)}
-            closeButton={true}
+            closeButton
             closeOnClick={false}
             className="max-w-sm"
           >
@@ -385,14 +332,14 @@ const MapExplorer = () => {
             </button>
           </div>
           <div className="space-y-2">
-            {Object.entries(typeIcons).map(([type]) => (
+            {(Object.keys(typeIcons) as TypeKey[]).map((type) => (
               <div key={type} className="flex items-center relative group">
                 <div
                   className="w-4 h-4 rounded-full mr-2"
-                  style={{ backgroundColor: typeColors[type as keyof typeof typeColors] }}
-                ></div>
+                  style={{ backgroundColor: typeColors[type] }}
+                />
                 <span className="text-xs text-gray-600 capitalize">{type}s</span>
-                <div className="absolute left-1/2 transform -translate-x-1/2 -top-8 hidden group-hover:block bg-gray-800 text-white text-xs rounded px-2 py-1 z-10 w-max">
+                <div className="absolute left-1/2 -translate-x-1/2 -top-8 hidden group-hover:block bg-gray-800 text-white text-xs rounded px-2 py-1 z-10 w-max">
                   {typeDescriptions[type]}
                 </div>
               </div>
@@ -401,7 +348,5 @@ const MapExplorer = () => {
         </div>
       )}
     </div>
-  );
-};
-
-export default MapExplorer;
+  )
+}

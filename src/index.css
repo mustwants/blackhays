@@ -34,3 +34,7 @@
     transform: translateY(0);
   }
 }
+.card{background:#111114;border:1px solid #222228;border-radius:16px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.row{display:flex;gap:12px;flex-wrap:wrap}
+.badge{padding:2px 8px;border-radius:999px;border:1px solid #333;font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+.badge.pending{border-color:#6b6b10}.badge.approved{border-color:#1f6b1f}.badge.denied{border-color:#6b1f1f}.badge.paused{border-color:#6b4b1f}
