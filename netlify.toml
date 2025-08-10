@@ -1,1 +1,18 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+  external_node_modules = ["@supabase/supabase-js","zod"]
+
+# Helpful CORS defaults for our API routes
+[[headers]]
+  for = "/.netlify/functions/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "${SITE_ORIGIN}"
+    Access-Control-Allow-Methods = "GET, POST, PATCH, OPTIONS"
+    Access-Control-Allow-Headers = "Authorization, Content-Type"
+    Access-Control-Allow-Credentials = "true"
 
