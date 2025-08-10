@@ -1,168 +1,164 @@
 import React, { useState } from 'react';
-import { Clock, MessageCircle, Target, ArrowRight, Shield } from 'lucide-react';
+import { Clock, MessageCircle, Target, ArrowRight, Shield, Star, CheckCircle } from 'lucide-react';
 
 const Mission = () => {
-  const [flippedCard, setFlippedCard] = useState<string | null>(null);
-  const [hoveredTip, setHoveredTip] = useState<string | null>(null);
+  const [activeCard, setActiveCard] = useState<string | null>(null);
 
-  const cards = [
+  const approaches = [
     {
       id: 'time',
       title: 'Right Time',
-      subtitle: 'Strategic timing saves time and money.',
+      subtitle: 'Strategic timing saves time and money',
       icon: Clock,
-      description: 'We understand that saving time and money is critical. Timing your engagement strategically can save you thousands.',
-      tip: 'Did you know federal budget cycles can impact funding availability?',
-      stats: [
-        { label: 'Average Time Saved', value: '6-8 months' },
-        { label: 'Cost Reduction', value: '40-60%' }
+      description: 'Timing your engagement strategically can save thousands. We align with federal budget cycles and procurement windows.',
+      benefits: [
+        'Align with federal budget cycles',
+        'Optimize proposal submissions',
+        'Maximize funding opportunities',
+        'Reduce time-to-market by 6-8 months'
       ],
-      backContent: {
-        title: 'Strategic Timing',
-        points: [
-          'Align with federal budget cycles',
-          'Optimize proposal submissions',
-          'Maximize funding opportunities',
-          'Reduce time-to-market'
-        ]
-      }
+      stat: { value: '40-60%', label: 'Cost Reduction' },
+      gradient: 'from-blue-600 to-blue-700'
     },
     {
       id: 'message',
       title: 'Right Message',
-      subtitle: 'Tailored messaging that aligns with leadership.',
+      subtitle: 'Tailored messaging that resonates',
       icon: MessageCircle,
-      description: 'With over 400 years of combined experience, we ensure your messaging resonates with the Administration, Hill Members, and leadership.',
-      tip: 'Clear alignment with leadership priorities can improve your success rate by 20%.',
-      stats: [
-        { label: 'Combined Experience', value: '400+ years' },
-        { label: 'Success Rate', value: '85%' }
+      description: 'With 400+ years of combined experience, we ensure your messaging aligns with leadership priorities.',
+      benefits: [
+        'Leadership alignment strategies',
+        'Value proposition refinement',
+        'Stakeholder communication',
+        'Impact demonstration'
       ],
-      backContent: {
-        title: 'Message Development',
-        points: [
-          'Leadership alignment strategies',
-          'Value proposition refinement',
-          'Stakeholder communication',
-          'Impact demonstration'
-        ]
-      }
+      stat: { value: '85%', label: 'Success Rate' },
+      gradient: 'from-purple-600 to-purple-700'
     },
     {
       id: 'approach',
       title: 'Right Approach',
-      subtitle: 'Beyond SBIRs: Teaming, partnering, and collaboration.',
+      subtitle: 'Beyond SBIRs: Strategic partnerships',
       icon: Target,
-      description: "It's not just about SBIRs or RFPs. It's about teaming, partnering, and creating pathways to engage effectively with prime vendors.",
-      tip: 'Teaming with prime vendors often requires early engagement in program planning.',
-      stats: [
-        { label: 'Partner Network', value: '500+' },
-        { label: 'Active Projects', value: '50+' }
+      description: "It's about teaming, partnering, and creating pathways to engage effectively with prime vendors.",
+      benefits: [
+        'Prime vendor partnerships',
+        'SBIR/STTR optimization',
+        'Contract vehicle selection',
+        'Technology transition planning'
       ],
-      backContent: {
-        title: 'Strategic Approach',
-        points: [
-          'Prime vendor partnerships',
-          'SBIR/STTR optimization',
-          'Contract vehicle selection',
-          'Technology transition planning'
-        ]
-      }
+      stat: { value: '500+', label: 'Partner Network' },
+      gradient: 'from-green-600 to-green-700'
     }
   ];
 
   return (
-    <div id="what-we-do" className="py-16 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl font-extrabold text-black sm:text-4xl md:text-5xl">
-            Our Mission
+    <div id="what-we-do" className="relative py-24 bg-white overflow-hidden">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-white">
+        <div className="absolute inset-0 bg-grid-gray-100/50 bg-grid-8"></div>
+      </div>
+      
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Section Header */}
+        <div className="text-center mb-20">
+          <div className="inline-flex items-center px-4 py-2 bg-bhred/10 border border-bhred/20 rounded-full text-bhred text-sm font-semibold mb-6">
+            <Star className="w-4 h-4 mr-2" />
+            Our Strategic Methodology
+          </div>
+          
+          <h2 className="text-4xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+            The <span className="bg-gradient-to-r from-bhred to-red-600 bg-clip-text text-transparent">Right Formula</span>
+            <br />for Defense Success
           </h2>
-          <p className="mt-4 text-xl text-bhgray-600 max-w-3xl mx-auto">
-            Identifying Right Time, Right Message, to the customer with proven methodologies and expert guidance
+          
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            Our proven methodology identifies the optimal timing, messaging, and approach to maximize your 
+            success in government markets while minimizing costs and accelerating outcomes.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {cards.map((card) => (
+        {/* Approach Cards */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-20">
+          {approaches.map((approach, index) => (
             <div
-              key={card.id}
-              className="h-[500px] perspective-1000"
-              onClick={() => setFlippedCard(flippedCard === card.id ? null : card.id)}
+              key={approach.id}
+              className={`group relative bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden border border-gray-100 hover:border-gray-200 ${
+                activeCard === approach.id ? 'scale-105 shadow-2xl' : ''
+              }`}
+              onMouseEnter={() => setActiveCard(approach.id)}
+              onMouseLeave={() => setActiveCard(null)}
             >
-              <div
-                className={`relative w-full h-full transition-all duration-700 preserve-3d ${
-                  flippedCard === card.id ? 'rotate-y-180' : ''
-                }`}
-              >
-                {/* Front of card */}
-                <div className="absolute inset-0 bg-gradient-to-br from-black to-bhred rounded-xl p-8 backface-hidden flex flex-col">
-                  <div className="flex items-center mb-4">
-                    <card.icon className="w-10 h-10 text-white" />
-                    <h3 className="text-2xl font-bold text-white ml-4">{card.title}</h3>
-                  </div>
-                  
-                  <p className="text-white/80 text-lg mb-4">{card.subtitle}</p>
-                  
-                  <div className="flex-grow">
-                    <p className="text-white/90 text-base leading-relaxed">{card.description}</p>
-                  </div>
+              {/* Card Header */}
+              <div className={`p-8 bg-gradient-to-br ${approach.gradient} text-white relative overflow-hidden`}>
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
+                <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full -ml-12 -mb-12"></div>
+                
+                <div className="relative z-10">
+                  <approach.icon className="w-12 h-12 text-white mb-4 group-hover:scale-110 transition-transform duration-300" />
+                  <h3 className="text-2xl font-bold mb-2">{approach.title}</h3>
+                  <p className="text-white/90 text-lg font-medium">{approach.subtitle}</p>
+                </div>
+              </div>
 
-                  <div className="mt-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      {card.stats.map((stat, index) => (
-                        <div key={index} className="bg-white/10 backdrop-blur-sm rounded-lg p-3">
-                          <div className="text-white/60 text-xs">{stat.label}</div>
-                          <div className="text-white font-bold text-lg">{stat.value}</div>
-                        </div>
-                      ))}
+              {/* Card Body */}
+              <div className="p-8">
+                <p className="text-gray-700 text-base leading-relaxed mb-6">
+                  {approach.description}
+                </p>
+
+                {/* Benefits List */}
+                <div className="space-y-3 mb-6">
+                  {approach.benefits.map((benefit, idx) => (
+                    <div key={idx} className="flex items-start space-x-3">
+                      <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                      <span className="text-gray-600 text-sm">{benefit}</span>
                     </div>
-                  </div>
-
-                  <div 
-                    className="absolute top-4 right-4"
-                    onMouseEnter={() => setHoveredTip(card.id)}
-                    onMouseLeave={() => setHoveredTip(null)}
-                  >
-                    <Shield className="w-6 h-6 text-white/40 hover:text-white transition-colors" />
-                    
-                    {hoveredTip === card.id && (
-                      <div className="absolute top-full right-0 mt-2 w-64 p-4 bg-white rounded-lg shadow-lg text-sm text-bhgray-700 z-10">
-                        {card.tip}
-                      </div>
-                    )}
-                  </div>
+                  ))}
                 </div>
 
-                {/* Back of card */}
-                <div className="absolute inset-0 bg-white rounded-xl p-8 rotate-y-180 backface-hidden flex flex-col">
-                  <h4 className="text-xl font-bold text-bhgray-900 mb-6">{card.backContent.title}</h4>
-                  
-                  <div className="flex-grow space-y-4">
-                    {card.backContent.points.map((point, index) => (
-                      <div key={index} className="flex items-center">
-                        <div className="w-2 h-2 bg-bhred rounded-full mr-3 flex-shrink-0" />
-                        <p className="text-bhgray-600">{point}</p>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="mt-4">
-                    <a
-                      href="https://calendly.com/blackhaysgroup"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center justify-center w-full px-4 py-2 bg-bhred text-white rounded-lg hover:bg-red-700 transition-colors"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      Schedule Consultation
-                      <ArrowRight className="ml-2 w-4 h-4" />
-                    </a>
-                  </div>
+                {/* Stat */}
+                <div className="bg-gray-50 rounded-2xl p-4 mb-6">
+                  <div className="text-3xl font-bold text-gray-900">{approach.stat.value}</div>
+                  <div className="text-sm text-gray-600">{approach.stat.label}</div>
                 </div>
+
+                {/* CTA */}
+                <a
+                  href="https://calendly.com/blackhaysgroup"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group inline-flex items-center w-full justify-center px-6 py-3 bg-gray-900 text-white rounded-xl hover:bg-bhred transition-all duration-300 font-semibold"
+                >
+                  Learn More
+                  <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </a>
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Bottom CTA Section */}
+        <div className="text-center">
+          <div className="inline-flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6 p-8 bg-gradient-to-r from-bhred/5 to-red-600/5 border border-bhred/20 rounded-3xl">
+            <div className="text-left">
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                Ready to Accelerate Your Defense Strategy?
+              </h3>
+              <p className="text-gray-600">
+                Schedule a consultation and discover how our proven methodology can transform your government engagement.
+              </p>
+            </div>
+            <a
+              href="https://calendly.com/blackhaysgroup"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-shrink-0 inline-flex items-center px-8 py-4 bg-bhred text-white rounded-xl hover:bg-red-700 transition-colors font-semibold whitespace-nowrap"
+            >
+              Schedule Consultation
+              <Calendar className="ml-2 w-5 h-5" />
+            </a>
+          </div>
         </div>
       </div>
     </div>
