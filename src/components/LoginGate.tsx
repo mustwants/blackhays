@@ -1,45 +1,72 @@
-import { ReactNode, useEffect, useState } from 'react'
-import { supabase } from '../supabaseClient'
+// src/components/LoginGate.tsx
+import React, { useState } from 'react';
+import { supabase } from '../supabaseClient';
 
-export default function LoginGate({ children, requireAdmin = false }: { children: ReactNode, requireAdmin?: boolean }) {
-  const [loading, setLoading] = useState(true)
-  const [allowed, setAllowed] = useState(false)
+export default function LoginGate() {
+  const [email, setEmail] = useState('');
+  const [sending, setSending] = useState(false);
+  const [sent, setSent] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const run = async () => {
-      const { data: sessionData } = await supabase.auth.getSession()
-      const user = sessionData.session?.user
-      if (!user) { setAllowed(false); setLoading(false); return }
-      if (!requireAdmin) { setAllowed(true); setLoading(false); return }
-      const { data, error } = await supabase.from('admins').select('email').eq('email', user.email).maybeSingle()
-      if (error) console.error(error)
-      setAllowed(!!data); setLoading(false)
+  const isAllowedDomain = (addr: string) =>
+    addr.toLowerCase().endsWith('@blackhaysgroup.com');
+
+  const sendMagicLink = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+
+    if (!isAllowedDomain(email)) {
+      setError('Use your @blackhaysgroup.com email.');
+      return;
     }
-    run()
-  }, [requireAdmin])
 
-  if (loading) return <div className="card"><p>Loading…</p></div>
-  if (!allowed) return <AuthCard />
-  return <>{children}</>
-}
+    setSending(true);
+    try {
+const { error } = await supabase.auth.signInWithOtp({
+  email,
+  options: {
+    emailRedirectTo: `${window.location.protocol}//localhost:5191/submit`,
+  },
+});
 
-function AuthCard() {
-  const emailLogin = async (e: any) => {
-    e.preventDefault()
-    const email = e.target.email.value
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: { emailRedirectTo: window.location.origin + '/submit' }
-    })
-    if (error) alert(error.message); else alert('Check your inbox for a login link.')
+      if (error) throw error;
+      setSent(true);
+    } catch (err: any) {
+      setError(err?.message || 'Failed to send magic link.');
+    } finally {
+      setSending(false);
+    }
+  };
+
+  if (sent) {
+    return (
+      <div className="max-w-md mx-auto p-4 border rounded-lg bg-white">
+        <h2 className="text-lg font-semibold mb-2">Check your email</h2>
+        <p>We sent a magic link to <b>{email}</b>. Click it, and you’ll come back to this page.</p>
+      </div>
+    );
   }
+
   return (
-    <div className="card">
-      <h3>Sign in</h3>
-      <form onSubmit={emailLogin} className="row" style={{flexDirection:'column', gap:12}}>
-        <input type="email" name="email" placeholder="you@blackhaysgroup.com" required />
-        <button type="submit">Send magic link</button>
-      </form>
-    </div>
-  )
+    <form onSubmit={sendMagicLink} className="max-w-md mx-auto p-4 border rounded-lg bg-white">
+      <h2 className="text-lg font-semibold mb-4">Sign in</h2>
+      <label className="block text-sm mb-1">Company Email</label>
+      <input
+        type="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        className="w-full border rounded px-3 py-2 mb-3"
+        placeholder="you@blackhaysgroup.com"
+        required
+      />
+      {error && <p className="text-red-600 text-sm mb-2">{error}</p>}
+      <button
+        type="submit"
+        disabled={sending}
+        className="bg-bhred text-white px-4 py-2 rounded disabled:opacity-60"
+      >
+        {sending ? 'Sending…' : 'Send magic link'}
+      </button>
+    </form>
+  );
 }
