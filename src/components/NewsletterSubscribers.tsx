@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { supabase, supabaseAdmin } from '../lib/supabaseClient';
+import { supabase, supabaseAdmin } from '../supabaseClient';
 import { RefreshCw, Download, Trash2, Upload, Edit2, Check, PauseCircle, X } from 'lucide-react';
 
 interface Subscriber {
