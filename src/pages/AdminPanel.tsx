@@ -1,7 +1,7 @@
 import React from 'react';
 import AdminPanelComponent from '../components/AdminPanel';
 import { Navigate } from 'react-router-dom';
-import { supabase } from '../lib/supabaseClient';
+import { supabase } from '../supabaseClient';
 
 const AdminPanel = () => {
   // Check if user is authenticated
