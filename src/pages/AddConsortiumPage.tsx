@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Rocket, MapPin, Link2, Mail, Phone, FileText, Check, Briefcase, Clock, Beaker } from 'lucide-react';
 import Footer from '../components/Footer';
 import AdminPanel from '../components/AdminPanel';
-import { supabase } from '../lib/supabaseClient';
+import { supabase } from '../supabaseClient';
 
 const AddConsortiumPage = () => {
   const [showAdminPanel, setShowAdminPanel] = useState(false);
