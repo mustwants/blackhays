@@ -1,5 +1,5 @@
-import { supabase } from '../../lib/supabaseClient';
-import { isConnected } from '../../lib/supabaseClient';
+import { supabase } from '../../supabaseClient';
+import { isConnected } from '../../supabaseClient';
 
 // Hardcoded admin credentials for direct comparison
 const ADMIN_CREDENTIALS = {
