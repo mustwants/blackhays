@@ -3,7 +3,7 @@ import { Calendar, MapPin, Link2, FileText, Check, Beaker } from 'lucide-react';
 import { useEvents } from '../hooks/useEvents';
 import Footer from '../components/Footer';
 import AdminPanel from '../components/AdminPanel';
-import { supabase } from '../lib/supabaseClient';
+import { supabase } from '../supabaseClient';
 
 const SubmitEventPage = () => {
   const { submitEvent } = useEvents();
