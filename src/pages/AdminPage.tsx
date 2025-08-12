@@ -1,3 +1,4 @@
+// src/pages/AdminPage.tsx
 import React from 'react';
 import LoginGate from '../components/LoginGate';
 import AdminPanel from '../components/AdminPanel';
