@@ -1,13 +1,17 @@
-﻿import type { SupabaseClient } from '@supabase/supabase-js';
-import { supabase } from '../supabaseClient';
+import { createClient } from '@supabase/supabase-js';
 
-// Re-export the normal client
-export { supabase };
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL as string;
+const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string;
 
-// TEMP: client-side placeholder so imports compile.
-// DO NOT use this for privileged/admin operations in the browser.
-// We'll move admin actions to serverless functions with a service-role key.
-export const supabaseAdmin: SupabaseClient = supabase;
+// Do not proceed without env vars
+if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+  throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY');
+}
 
-// No-op connection check to satisfy existing imports.
-export const isConnected = async (): Promise<boolean> => true;
+export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true,
+  },
+});
