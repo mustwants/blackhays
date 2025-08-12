@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { supabase, supabaseAdmin } from '../../lib/supabaseClient';
+import { supabase, supabaseAdmin } from '../../supabaseClient';
 import { Users, Calendar, Building, Rocket, Brain, Mail } from 'lucide-react';
 
 interface CategoryStats {
