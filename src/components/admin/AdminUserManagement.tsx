@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../../lib/supabaseClient';
+import { supabase } from '../../supabaseClient';
 import { RefreshCw, Trash2, UserPlus, Lock, AlertTriangle, Edit2, Check, X, Mail, Eye, EyeOff } from 'lucide-react';
 
 const AdminUserManagement = () => {
