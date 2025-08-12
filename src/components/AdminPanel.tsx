@@ -8,18 +8,37 @@ import {
   UserPlus,
   Loader2,
   AlertTriangle,
+  XCircle,
+  PauseCircle,
+  PlayCircle,
+  Pencil,
+  Trash2,
+  Search,
 } from 'lucide-react';
 
-// Local types (kept minimal & resilient)
+// ---------- Types (local, resilient to schema) ----------
 type Profile = {
   id: string;
   email: string | null;
   is_admin: boolean;
-  // status may or may not exist in your schema; we handle it defensively
   status?: string | null;
 };
 
+type SubmissionStatus = 'pending' | 'approved' | 'denied' | 'paused';
+type Submission = {
+  id: string;
+  user_id: string;
+  title: string;
+  description: string;
+  attachment_url?: string | null;
+  status: SubmissionStatus;
+  created_at: string;
+  updated_at?: string;
+};
+
+// ---------- Component ----------
 export default function AdminPanel() {
+  // me/admin/pending profiles state
   const [loading, setLoading] = useState(true);
   const [me, setMe] = useState<Profile | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -29,41 +48,47 @@ export default function AdminPanel() {
   const [err, setErr] = useState<string | null>(null);
   const [filter, setFilter] = useState<'all' | 'pendingOnly'>('pendingOnly');
 
-  // -------- helpers --------
+  // submissions state
+  const [subsLoading, setSubsLoading] = useState(true);
+  const [subs, setSubs] = useState<Submission[]>([]);
+  const [statusFilter, setStatusFilter] = useState<SubmissionStatus | 'all'>('pending');
+  const [search, setSearch] = useState('');
+
+  // ---------- helpers ----------
   function toastOK(text: string) {
     setMsg(text);
     setTimeout(() => setMsg(null), 3500);
   }
   function toastErr(text: string) {
     setErr(text);
-    // keep error visible until next action
   }
 
-  async function assertSession(): Promise<boolean> {
+  async function assertSession(): Promise<string | null> {
     const { data, error } = await supabase.auth.getSession();
     if (error) {
       toastErr(`auth.getSession error: ${error.message}`);
-      return false;
+      return null;
     }
     if (!data.session) {
       toastErr('Not signed in.');
-      return false;
+      return null;
     }
-    return true;
+    return data.session.user.id;
   }
 
-  // -------- data load --------
-  async function refreshAll() {
+  // ---------- admin/identity load ----------
+  async function refreshHeader() {
     setLoading(true);
     setErr(null);
     setMsg(null);
 
-    if (!(await assertSession())) {
+    const uid = await assertSession();
+    if (!uid) {
       setLoading(false);
       return;
     }
 
-    // 1) am I admin?
+    // 1) admin?
     const { data: adminVal, error: adminErr } = await supabase.rpc('me_is_admin');
     if (adminErr) {
       toastErr(`me_is_admin error: ${adminErr.message}`);
@@ -72,7 +97,7 @@ export default function AdminPanel() {
     }
     setIsAdmin(!!adminVal);
 
-    // 2) me profile (RLS-respecting)
+    // 2) my profile
     const { data: meProfile, error: meErr } = await supabase.rpc('me_profile');
     if (meErr) {
       toastErr(`me_profile error: ${meErr.message}`);
@@ -81,11 +106,10 @@ export default function AdminPanel() {
     }
     setMe(meProfile ?? null);
 
-    // 3) pending list (admin only)
+    // 3) pending profiles (admin-only)
     if (adminVal) {
       const { data: pend, error: pendErr } = await supabase.rpc('list_pending_profiles');
       if (pendErr) {
-        // not fatal to admin view; just show warning
         toastErr(`list_pending_profiles error: ${pendErr.message}`);
         setPending([]);
       } else {
@@ -98,52 +122,118 @@ export default function AdminPanel() {
     setLoading(false);
   }
 
-  useEffect(() => {
-    refreshAll();
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, _s) => {
-      // When auth changes (sign-in/out), re-load
-      refreshAll();
-    });
-    return () => sub.subscription.unsubscribe();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // -------- actions --------
-  async function handleAddAdmin() {
+  // ---------- submissions load/actions ----------
+  async function loadSubmissions() {
+    setSubsLoading(true);
     setErr(null);
-    setMsg(null);
-    const email = newAdminEmail.trim();
-    if (!email) {
-      toastErr('Enter an email address.');
+    const uid = await assertSession();
+    if (!uid) {
+      setSubsLoading(false);
       return;
     }
-    const { error } = await supabase.rpc('add_admin_by_email', { target_email: email });
+
+    // Admins can see all; RLS policies created earlier allow this.
+    const { data, error } = await supabase
+      .from('submissions')
+      .select('*')
+      .order('created_at', { ascending: false });
+
     if (error) {
-      toastErr(`add_admin_by_email error: ${error.message}`);
-      return;
+      toastErr(`submissions load error: ${error.message}`);
+      setSubs([]);
+    } else {
+      setSubs((data ?? []) as Submission[]);
     }
-    toastOK(`Admin added/allowlisted: ${email}`);
-    setNewAdminEmail('');
-    await refreshAll();
+    setSubsLoading(false);
   }
 
-  async function handleApprove(email: string | null) {
-    setErr(null);
-    setMsg(null);
-    if (!email) {
-      toastErr('Missing email for approval.');
-      return;
-    }
-    const { error } = await supabase.rpc('approve_user_by_email', { target_email: email });
+  async function logAction(
+    uid: string,
+    submission: Submission,
+    action: 'approve' | 'deny' | 'pause' | 'resume' | 'delete' | 'edit',
+    details: any
+  ) {
+    // Prefer actor_user_id per your existing types; if your table uses a different field,
+    // let me know and I’ll swap it (we added admin override RLS so admins can insert).
+    const { error } = await supabase.from('submission_actions').insert([
+      {
+        submission_id: submission.id,
+        actor_user_id: uid,
+        action,
+        details,
+      } as any,
+    ]);
     if (error) {
-      toastErr(`approve_user_by_email error: ${error.message}`);
-      return;
+      // Not fatal to the UI, but we should surface it
+      toastErr(`submission_actions insert error: ${error.message}`);
     }
-    toastOK(`Approved: ${email}`);
-    await refreshAll();
   }
 
-  // -------- filtered view --------
+  async function act(submission: Submission, action: 'approve' | 'deny' | 'pause' | 'resume' | 'delete') {
+    const uid = await assertSession();
+    if (!uid) return;
+
+    let newStatus: SubmissionStatus | null = null;
+    if (action === 'approve') newStatus = 'approved';
+    if (action === 'deny') newStatus = 'denied';
+    if (action === 'pause') newStatus = 'paused';
+    if (action === 'resume') newStatus = 'pending';
+
+    if (action === 'delete') {
+      const { error } = await supabase.from('submissions').delete().eq('id', submission.id);
+      if (error) {
+        toastErr(error.message);
+        return;
+      }
+      await logAction(uid, submission, 'delete', { prev: submission.status });
+      setSubs((prev) => prev.filter((s) => s.id !== submission.id));
+      toastOK('Submission deleted.');
+      return;
+    }
+
+    if (newStatus) {
+      const { data, error } = await supabase
+        .from('submissions')
+        .update({ status: newStatus })
+        .eq('id', submission.id)
+        .select()
+        .single();
+
+      if (error) {
+        toastErr(error.message);
+        return;
+      }
+
+      await logAction(uid, submission, action, { from: submission.status, to: newStatus });
+      setSubs((prev) => prev.map((s) => (s.id === data.id ? (data as Submission) : s)));
+      toastOK(`Status set to ${newStatus}.`);
+    }
+  }
+
+  async function edit(submission: Submission) {
+    const title = window.prompt('New title', submission.title) ?? submission.title;
+    const description = window.prompt('New description', submission.description) ?? submission.description;
+
+    const uid = await assertSession();
+    if (!uid) return;
+
+    const { data, error } = await supabase
+      .from('submissions')
+      .update({ title, description })
+      .eq('id', submission.id)
+      .select()
+      .single();
+
+    if (error) {
+      toastErr(error.message);
+      return;
+    }
+
+    await logAction(uid, submission, 'edit', { fields: ['title', 'description'] });
+    setSubs((prev) => prev.map((s) => (s.id === (data as Submission).id ? (data as Submission) : s)));
+    toastOK('Submission updated.');
+  }
+
   const filteredPending = useMemo(() => {
     if (filter === 'pendingOnly') {
       return pending.filter((p) => (p as any).status === 'pending' || (p as any).status == null);
@@ -151,7 +241,33 @@ export default function AdminPanel() {
     return pending;
   }, [pending, filter]);
 
-  // -------- renders --------
+  const filteredSubs = useMemo(() => {
+    let arr = subs;
+    if (statusFilter !== 'all') arr = arr.filter((i) => i.status === statusFilter);
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      arr = arr.filter(
+        (i) =>
+          (i.title || '').toLowerCase().includes(q) ||
+          (i.description || '').toLowerCase().includes(q)
+      );
+    }
+    return arr;
+  }, [subs, statusFilter, search]);
+
+  // ---------- effects ----------
+  useEffect(() => {
+    refreshHeader();
+    loadSubmissions();
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, _s) => {
+      refreshHeader();
+      loadSubmissions();
+    });
+    return () => sub.subscription.unsubscribe();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // ---------- renders ----------
   if (loading) {
     return (
       <div className="p-6">
@@ -179,7 +295,7 @@ export default function AdminPanel() {
   }
 
   return (
-    <div className="grid gap-6 max-w-4xl mx-auto p-6">
+    <div className="grid gap-6 max-w-6xl mx-auto p-6">
       {/* Alerts */}
       {err && (
         <div className="border border-red-300 bg-red-50 text-red-800 p-4 rounded-xl">
@@ -211,11 +327,11 @@ export default function AdminPanel() {
           )}
         </div>
 
-        <div className="mt-4">
+        <div className="mt-4 flex gap-2">
           <button
-            onClick={refreshAll}
+            onClick={refreshHeader}
             className="inline-flex items-center gap-2 btn-ghost"
-            title="Refresh"
+            title="Refresh profile"
           >
             <RefreshCw className="h-4 w-4" />
             Refresh
@@ -297,6 +413,114 @@ export default function AdminPanel() {
           </div>
         )}
       </section>
+
+      {/* Submissions Management */}
+      <section className="card p-5">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-xl font-semibold">Submissions</h2>
+          <div className="flex items-center gap-2">
+            <select
+              className="form-select"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value as any)}
+              title="Status filter"
+            >
+              <option value="all">All</option>
+              <option value="pending">Pending</option>
+              <option value="approved">Approved</option>
+              <option value="denied">Denied</option>
+              <option value="paused">Paused</option>
+            </select>
+            <div className="relative">
+              <input
+                className="form-input pr-9"
+                placeholder="Search…"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+              <Search className="h-4 w-4 absolute right-2 top-1/2 -translate-y-1/2 text-gray-500" />
+            </div>
+            <button onClick={loadSubmissions} className="btn-ghost inline-flex items-center gap-2">
+              <RefreshCw className="h-4 w-4" />
+              Refresh
+            </button>
+          </div>
+        </div>
+
+        {subsLoading ? (
+          <div className="flex items-center gap-2 text-gray-700">
+            <Loader2 className="h-5 w-5 animate-spin" />
+            <span>Loading submissions…</span>
+          </div>
+        ) : filteredSubs.length === 0 ? (
+          <div className="text-sm text-gray-600">No submissions match.</div>
+        ) : (
+          <div className="grid gap-4">
+            {filteredSubs.map((s) => (
+              <div key={s.id} className="card p-4">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <div className="font-semibold">{s.title}</div>
+                    <div className="text-xs text-gray-600">
+                      by {s.user_id} • {new Date(s.created_at).toLocaleString()}
+                    </div>
+                  </div>
+                  <span
+                    className={`status-badge ${
+                      s.status === 'pending'
+                        ? 'status-pending'
+                        : s.status === 'approved'
+                        ? 'status-approved'
+                        : s.status === 'paused'
+                        ? 'status-paused'
+                        : 'status-rejected'
+                    }`}
+                  >
+                    {s.status}
+                  </span>
+                </div>
+                <p className="mt-2 whitespace-pre-wrap text-sm">{s.description}</p>
+
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {s.status !== 'approved' && (
+                    <button className="btn-secondary inline-flex items-center gap-2" onClick={() => act(s, 'approve')}>
+                      <CheckCircle2 className="h-4 w-4" />
+                      Approve
+                    </button>
+                  )}
+                  {s.status !== 'denied' && (
+                    <button className="btn-ghost inline-flex items-center gap-2" onClick={() => act(s, 'deny')}>
+                      <XCircle className="h-4 w-4" />
+                      Deny
+                    </button>
+                  )}
+                  {s.status !== 'paused' && (
+                    <button className="btn-ghost inline-flex items-center gap-2" onClick={() => act(s, 'pause')}>
+                      <PauseCircle className="h-4 w-4" />
+                      Pause
+                    </button>
+                  )}
+                  {s.status === 'paused' && (
+                    <button className="btn-ghost inline-flex items-center gap-2" onClick={() => act(s, 'resume')}>
+                      <PlayCircle className="h-4 w-4" />
+                      Resume
+                    </button>
+                  )}
+                  <button className="btn-ghost inline-flex items-center gap-2" onClick={() => edit(s)}>
+                    <Pencil className="h-4 w-4" />
+                    Edit
+                  </button>
+                  <button className="btn-ghost inline-flex items-center gap-2" onClick={() => act(s, 'delete')}>
+                    <Trash2 className="h-4 w-4" />
+                    Delete
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
     </div>
   );
 }
+
