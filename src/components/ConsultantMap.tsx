@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Map, { Marker, NavigationControl, Popup } from 'react-map-gl';
 import { MapPin, RefreshCw } from 'lucide-react';
 import { advisorMapService, MapAdvisor } from '../services/advisorMap';
-import { isConnected } from '../lib/supabaseClient';
+import { isConnected } from '../supabaseClient';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 const ConsultantMap = () => {
