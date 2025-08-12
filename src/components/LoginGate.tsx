@@ -4,9 +4,9 @@ import { supabase } from '../supabaseClient';
 
 type Props = {
   children?: React.ReactNode;
-  requireAdmin?: boolean;          // when true, user must be admin to see children
-  fallback?: React.ReactNode;      // optional UI when blocked (not signed in / not admin)
-  redirectTo?: string;             // where magic-link sends the user after login
+  requireAdmin?: boolean;
+  fallback?: React.ReactNode;
+  redirectTo?: string;
 };
 
 export default function LoginGate({
@@ -19,13 +19,12 @@ export default function LoginGate({
   const [signedIn, setSignedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
 
-  // Existing form state (preserved)
+  // Magic link form state (kept simple)
   const [email, setEmail] = useState('');
   const [sending, setSending] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
 
-  // Load session + (optionally) admin status
   const refresh = async () => {
     setErr(null);
     const { data, error } = await supabase.auth.getSession();
@@ -56,16 +55,14 @@ export default function LoginGate({
     let unsub: (() => void) | undefined;
     (async () => {
       await refresh();
-      const { data: listener } = supabase.auth.onAuthStateChange((_evt, _sess) => {
+      const { data: listener } = supabase.auth.onAuthStateChange(() => {
         refresh();
       });
       unsub = () => listener.subscription.unsubscribe();
     })();
     return () => { if (unsub) unsub(); };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [requireAdmin]);
 
-  // === Existing magic-link flow (unchanged UI & behavior) ===
   const sendMagicLink = async (e: React.FormEvent) => {
     e.preventDefault();
     setErr(null);
@@ -93,10 +90,8 @@ export default function LoginGate({
     }
   };
 
-  // === Render logic ===
   if (!ready) return <div>Loading…</div>;
 
-  // Signed out → show your existing email form (preserves design)
   if (!signedIn) {
     return (
       <form onSubmit={sendMagicLink} className="p-4 border rounded bg-white">
@@ -122,7 +117,6 @@ export default function LoginGate({
     );
   }
 
-  // Signed in but admin required and caller is NOT admin
   if (requireAdmin && !isAdmin) {
     return fallback ?? (
       <div className="p-4 border rounded bg-white">
@@ -131,6 +125,5 @@ export default function LoginGate({
     );
   }
 
-  // Signed in (and admin if required) → render children normally
   return <>{children ?? fallback ?? null}</>;
 }
