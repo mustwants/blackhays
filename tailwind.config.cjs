@@ -1,6 +1,6 @@
-/** @type {import('tailwindcss').Config} */
+// tailwind.config.cjs
 module.exports = {
-  content: ["./index.html", "./src/**/*.{ts,tsx,js,jsx}"],
+  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: { extend: {} },
-  plugins: [],
-};
+  plugins: []
+}
