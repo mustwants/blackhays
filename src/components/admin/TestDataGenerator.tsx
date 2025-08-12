@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { RefreshCw, Database, AlertCircle, Check, Users, Calendar, Building, Rocket, Brain, Mail } from 'lucide-react';
-import { supabase } from '../../lib/supabaseClient';
+import { supabase } from '../../supabaseClient';
 
 interface TestDataGeneratorProps {
   onDataGenerated?: () => void;
