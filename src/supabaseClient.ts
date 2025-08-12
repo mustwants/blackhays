@@ -8,7 +8,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY');
 }
 
-// Canonical client. No probes, no console spam.
+// Canonical client
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: true,
@@ -17,3 +17,17 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   },
 });
 
+/**
+ * Legacy shims to satisfy older imports in the codebase.
+ * These keep the app compiling and running while we consolidate.
+ */
+export const supabaseAdmin = supabase;
+
+export async function isConnected(): Promise<boolean> {
+  try {
+    const { data } = await supabase.auth.getSession();
+    return !!data?.session;
+  } catch {
+    return false;
+  }
+}
