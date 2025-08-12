@@ -6,42 +6,44 @@ type Props = {
   children?: React.ReactNode;
   requireAdmin?: boolean;
   fallback?: React.ReactNode;
-  redirectTo?: string;
+  redirectTo?: string; // where the magic link should land
 };
 
 export default function LoginGate({
   children,
   requireAdmin = false,
   fallback,
-  redirectTo = '/submit',
+  redirectTo = '/admin',
 }: Props) {
   const [ready, setReady] = useState(false);
   const [signedIn, setSignedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
 
+  // Magic link form state
   const [email, setEmail] = useState('');
   const [sending, setSending] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
 
   const refresh = async () => {
+    setErr(null);
     const { data } = await supabase.auth.getSession();
     const session = data.session;
-    setSignedIn(!!session);
+    const loggedIn = !!session;
+    setSignedIn(loggedIn);
 
-    if (session && requireAdmin) {
-      const { data: adminVal } = await supabase.rpc('me_is_admin');
-      setIsAdmin(!!adminVal);
+    if (loggedIn && requireAdmin) {
+      const { data: isAdminVal } = await supabase.rpc('me_is_admin');
+      setIsAdmin(!!isAdminVal);
     } else {
       setIsAdmin(false);
     }
+
     setReady(true);
   };
 
   useEffect(() => {
-    const { data } = supabase.auth.onAuthStateChange(() => {
-      refresh();
-    });
+    const { data } = supabase.auth.onAuthStateChange(() => { refresh(); });
     const subscription = data.subscription;
     refresh();
     return () => subscription.unsubscribe();
@@ -51,6 +53,7 @@ export default function LoginGate({
     e.preventDefault();
     setErr(null);
     setMsg(null);
+
     if (!email.trim()) { setErr('Email is required.'); return; }
 
     setSending(true);
@@ -69,6 +72,7 @@ export default function LoginGate({
   };
 
   if (!ready) return <div>Loading…</div>;
+
   if (!signedIn) {
     return (
       <form onSubmit={sendMagicLink} className="p-4 border rounded bg-white">
@@ -102,4 +106,5 @@ export default function LoginGate({
 
   return <>{children ?? fallback ?? null}</>;
 }
+
 
