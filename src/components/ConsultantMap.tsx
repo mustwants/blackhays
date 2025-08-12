@@ -17,6 +17,7 @@ const ConsultantMap = () => {
   const [loading, setLoading] = useState(true);
   const [retryCount, setRetryCount] = useState(0);
   const maxRetries = 3;
+  const [mapLoaded, setMapLoaded] = useState(false);
   const mapRef = React.useRef(null);
 
   const fetchAdvisors = async () => {
@@ -107,6 +108,7 @@ const ConsultantMap = () => {
       <Map
         {...viewState}
         ref={mapRef}
+        onLoad={() => setMapLoaded(true)}
         onMove={evt => setViewState(evt.viewState)}
         mapStyle="mapbox://styles/mapbox/dark-v11"
         mapboxAccessToken={MAPBOX_TOKEN}
@@ -116,7 +118,7 @@ const ConsultantMap = () => {
       >
         <NavigationControl position="top-right" />
         
-        {advisors.map(advisor => (
+        {mapLoaded && advisors.map(advisor => (
           <Marker
             key={advisor.id}
             longitude={advisor.location[0]}

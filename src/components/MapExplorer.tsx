@@ -70,6 +70,7 @@ export default function MapExplorer() {
   const [showFilters, setShowFilters] = useState(false)
   const [controlsCollapsed, setControlsCollapsed] = useState(false)
   const [legendCollapsed, setLegendCollapsed] = useState(false)
+  const [mapLoaded, setMapLoaded] = useState(false)
 
   const mapRef = useRef<MapRef | null>(null)
   const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN as string | undefined
@@ -242,6 +243,7 @@ export default function MapExplorer() {
       <Map
         initialViewState={{ longitude: -95.7129, latitude: 37.0902, zoom: 3.5 }}
         ref={mapRef}
+        onLoad={() => setMapLoaded(true)}
         mapStyle="mapbox://styles/mapbox/dark-v11"
         mapboxAccessToken={MAPBOX_TOKEN!}
         style={{ width: '100%', height: '100%' }}
@@ -251,7 +253,7 @@ export default function MapExplorer() {
         <NavigationControl position="top-right" />
         <ScaleControl position="bottom-right" />
 
-        {filteredEntities.map((entity) => {
+        {mapLoaded && filteredEntities.map((entity) => {
           const Icon = typeIcons[entity.type]
           return (
             <Marker
