@@ -19,32 +19,19 @@ export default function LoginGate({
   const [signedIn, setSignedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
 
-  // Magic link form state (kept simple)
   const [email, setEmail] = useState('');
   const [sending, setSending] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
 
   const refresh = async () => {
-    setErr(null);
-    const { data, error } = await supabase.auth.getSession();
-    if (error) {
-      setSignedIn(false);
-      setIsAdmin(false);
-      setReady(true);
-      return;
-    }
+    const { data } = await supabase.auth.getSession();
     const session = data.session;
-    const isSignedIn = !!session;
-    setSignedIn(isSignedIn);
+    setSignedIn(!!session);
 
-    if (isSignedIn && requireAdmin) {
-      const { data: adminVal, error: adminErr } = await supabase.rpc('me_is_admin');
-      if (adminErr) {
-        setIsAdmin(false);
-      } else {
-        setIsAdmin(!!adminVal);
-      }
+    if (session && requireAdmin) {
+      const { data: adminVal } = await supabase.rpc('me_is_admin');
+      setIsAdmin(!!adminVal);
     } else {
       setIsAdmin(false);
     }
@@ -52,34 +39,25 @@ export default function LoginGate({
   };
 
   useEffect(() => {
-    let unsub: (() => void) | undefined;
-    (async () => {
-      await refresh();
-      const { data: listener } = supabase.auth.onAuthStateChange(() => {
-        refresh();
-      });
-      unsub = () => listener.subscription.unsubscribe();
-    })();
-    return () => { if (unsub) unsub(); };
+    const { data } = supabase.auth.onAuthStateChange(() => {
+      refresh();
+    });
+    const subscription = data.subscription;
+    refresh();
+    return () => subscription.unsubscribe();
   }, [requireAdmin]);
 
   const sendMagicLink = async (e: React.FormEvent) => {
     e.preventDefault();
     setErr(null);
     setMsg(null);
-
-    if (!email.trim()) {
-      setErr('Email is required.');
-      return;
-    }
+    if (!email.trim()) { setErr('Email is required.'); return; }
 
     setSending(true);
     try {
       const { error } = await supabase.auth.signInWithOtp({
         email: email.trim(),
-        options: {
-          emailRedirectTo: `${window.location.origin}${redirectTo}`,
-        },
+        options: { emailRedirectTo: `${window.location.origin}${redirectTo}` },
       });
       if (error) throw error;
       setMsg('Check your email for a magic link.');
@@ -91,7 +69,6 @@ export default function LoginGate({
   };
 
   if (!ready) return <div>Loading…</div>;
-
   if (!signedIn) {
     return (
       <form onSubmit={sendMagicLink} className="p-4 border rounded bg-white">
@@ -119,11 +96,10 @@ export default function LoginGate({
 
   if (requireAdmin && !isAdmin) {
     return fallback ?? (
-      <div className="p-4 border rounded bg-white">
-        Not authorized. Admin access required.
-      </div>
+      <div className="p-4 border rounded bg-white">Not authorized. Admin access required.</div>
     );
   }
 
   return <>{children ?? fallback ?? null}</>;
 }
+
