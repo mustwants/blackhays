@@ -1,58 +1,93 @@
-import React, { useEffect, useState } from 'react';
-+ import { supabase } from '../supabaseClient';
+// src/components/AdminPanel.tsx
+import React, { useEffect, useMemo, useState } from 'react';
+import { supabase } from '../supabaseClient';
+import {
+  CheckCircle2,
+  Shield,
+  RefreshCw,
+  UserPlus,
+  Loader2,
+  AlertTriangle,
+} from 'lucide-react';
 
+// Local types (kept minimal & resilient)
 type Profile = {
   id: string;
   email: string | null;
   is_admin: boolean;
-  status?: string | null; // may not exist in your schema; handled defensively
+  // status may or may not exist in your schema; we handle it defensively
+  status?: string | null;
 };
 
 export default function AdminPanel() {
-  const [isLoading, setIsLoading] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [me, setMe] = useState<Profile | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [pending, setPending] = useState<Profile[]>([]);
   const [newAdminEmail, setNewAdminEmail] = useState('');
   const [msg, setMsg] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
+  const [filter, setFilter] = useState<'all' | 'pendingOnly'>('pendingOnly');
 
+  // -------- helpers --------
+  function toastOK(text: string) {
+    setMsg(text);
+    setTimeout(() => setMsg(null), 3500);
+  }
+  function toastErr(text: string) {
+    setErr(text);
+    // keep error visible until next action
+  }
+
+  async function assertSession(): Promise<boolean> {
+    const { data, error } = await supabase.auth.getSession();
+    if (error) {
+      toastErr(`auth.getSession error: ${error.message}`);
+      return false;
+    }
+    if (!data.session) {
+      toastErr('Not signed in.');
+      return false;
+    }
+    return true;
+  }
+
+  // -------- data load --------
   async function refreshAll() {
+    setLoading(true);
     setErr(null);
     setMsg(null);
-    setIsLoading(true);
 
-    // 1) ensure we have a session
-    const { data: auth } = await supabase.auth.getSession();
-    if (!auth?.session) {
-      setErr('Not signed in.');
-      setIsLoading(false);
+    if (!(await assertSession())) {
+      setLoading(false);
       return;
     }
 
-    // 2) am I admin?
-    const { data: isAdminData, error: isAdminErr } = await supabase.rpc('me_is_admin');
-    if (isAdminErr) {
-      setErr(`me_is_admin error: ${isAdminErr.message}`);
-      setIsLoading(false);
+    // 1) am I admin?
+    const { data: adminVal, error: adminErr } = await supabase.rpc('me_is_admin');
+    if (adminErr) {
+      toastErr(`me_is_admin error: ${adminErr.message}`);
+      setLoading(false);
       return;
     }
-    setIsAdmin(!!isAdminData);
+    setIsAdmin(!!adminVal);
 
-    // 3) my profile (for display)
+    // 2) me profile (RLS-respecting)
     const { data: meProfile, error: meErr } = await supabase.rpc('me_profile');
     if (meErr) {
-      setErr(`me_profile error: ${meErr.message}`);
-      setIsLoading(false);
+      toastErr(`me_profile error: ${meErr.message}`);
+      setLoading(false);
       return;
     }
     setMe(meProfile ?? null);
 
-    // 4) pending list (admin-only RPC; will error if not admin)
-    if (isAdminData) {
+    // 3) pending list (admin only)
+    if (adminVal) {
       const { data: pend, error: pendErr } = await supabase.rpc('list_pending_profiles');
       if (pendErr) {
-        setErr(`list_pending_profiles error: ${pendErr.message}`);
+        // not fatal to admin view; just show warning
+        toastErr(`list_pending_profiles error: ${pendErr.message}`);
+        setPending([]);
       } else {
         setPending(Array.isArray(pend) ? pend : []);
       }
@@ -60,129 +95,208 @@ export default function AdminPanel() {
       setPending([]);
     }
 
-    setIsLoading(false);
+    setLoading(false);
   }
 
   useEffect(() => {
     refreshAll();
-    // also react to auth changes
     const { data: sub } = supabase.auth.onAuthStateChange((_e, _s) => {
+      // When auth changes (sign-in/out), re-load
       refreshAll();
     });
     return () => sub.subscription.unsubscribe();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // -------- actions --------
   async function handleAddAdmin() {
-    setErr(null); setMsg(null);
-    if (!newAdminEmail.trim()) {
-      setErr('Enter an email address.');
+    setErr(null);
+    setMsg(null);
+    const email = newAdminEmail.trim();
+    if (!email) {
+      toastErr('Enter an email address.');
       return;
     }
-    const { error } = await supabase.rpc('add_admin_by_email', { target_email: newAdminEmail.trim() });
+    const { error } = await supabase.rpc('add_admin_by_email', { target_email: email });
     if (error) {
-      setErr(`add_admin_by_email error: ${error.message}`);
+      toastErr(`add_admin_by_email error: ${error.message}`);
       return;
     }
-    setMsg(`Admin added/allowlisted: ${newAdminEmail.trim()}`);
+    toastOK(`Admin added/allowlisted: ${email}`);
     setNewAdminEmail('');
     await refreshAll();
   }
 
-  async function handleApprove(email: string) {
-    setErr(null); setMsg(null);
-    const { error } = await supabase.rpc('approve_user_by_email', { target_email: email });
-    if (error) {
-      setErr(`approve_user_by_email error: ${error.message}`);
+  async function handleApprove(email: string | null) {
+    setErr(null);
+    setMsg(null);
+    if (!email) {
+      toastErr('Missing email for approval.');
       return;
     }
-    setMsg(`Approved: ${email}`);
+    const { error } = await supabase.rpc('approve_user_by_email', { target_email: email });
+    if (error) {
+      toastErr(`approve_user_by_email error: ${error.message}`);
+      return;
+    }
+    toastOK(`Approved: ${email}`);
     await refreshAll();
   }
 
-  if (isLoading) return <div>Loading…</div>;
-  if (err) return (
-    <div style={{border:'1px solid #f00', padding:12, borderRadius:8}}>
-      <b>Error:</b> {err}
-    </div>
-  );
+  // -------- filtered view --------
+  const filteredPending = useMemo(() => {
+    if (filter === 'pendingOnly') {
+      return pending.filter((p) => (p as any).status === 'pending' || (p as any).status == null);
+    }
+    return pending;
+  }, [pending, filter]);
+
+  // -------- renders --------
+  if (loading) {
+    return (
+      <div className="p-6">
+        <div className="flex items-center gap-2 text-gray-700">
+          <Loader2 className="h-5 w-5 animate-spin" />
+          <span>Loading…</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    // Route should be gated by <LoginGate requireAdmin />, but keep a safe fallback.
+    return (
+      <div className="p-6">
+        <div className="border border-amber-300 bg-amber-50 text-amber-800 p-4 rounded-xl flex items-start gap-3">
+          <AlertTriangle className="h-5 w-5 mt-0.5" />
+          <div>
+            <div className="font-semibold">Not authorized.</div>
+            <div className="text-sm">Admin access required.</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div style={{display:'grid', gap:16, maxWidth:800}}>
-      <div style={{border:'1px solid #ddd', padding:12, borderRadius:8}}>
-        <h2>My Profile</h2>
-        {me ? (
-          <ul>
-            <li><b>Email:</b> {me.email ?? '—'}</li>
-            <li><b>is_admin:</b> {me.is_admin ? 'true' : 'false'}</li>
-            {'status' in me && <li><b>status:</b> {(me as any).status ?? '—'}</li>}
-          </ul>
-        ) : <div>Profile not found.</div>}
-      </div>
-
-      <div style={{border:'1px solid #ddd', padding:12, borderRadius:8}}>
-        <h2>Admin Status</h2>
-        <div>You are {isAdmin ? 'an ADMIN ✅' : 'NOT an admin ❌'}</div>
-      </div>
-
-      {isAdmin && (
-        <>
-          <div style={{border:'1px solid #ddd', padding:12, borderRadius:8}}>
-            <h2>Add Admin</h2>
-            <div style={{display:'flex', gap:8}}>
-              <input
-                type="email"
-                placeholder="email@domain.com"
-                value={newAdminEmail}
-                onChange={(e) => setNewAdminEmail(e.target.value)}
-                style={{flex:1, padding:8}}
-              />
-              <button onClick={handleAddAdmin}>Add</button>
-            </div>
-            <p style={{fontSize:12, color:'#666', marginTop:8}}>
-              Adds email to allowlist immediately; if the user already exists, flips their profile to admin now.
-            </p>
-          </div>
-
-          <div style={{border:'1px solid #ddd', padding:12, borderRadius:8}}>
-            <h2>Pending Users</h2>
-            {pending.length === 0 ? <div>No pending users.</div> : (
-              <table style={{width:'100%', borderCollapse:'collapse'}}>
-                <thead>
-                  <tr>
-                    <th style={{textAlign:'left', borderBottom:'1px solid #ccc', padding:6}}>Email</th>
-                    <th style={{textAlign:'left', borderBottom:'1px solid #ccc', padding:6}}>is_admin</th>
-                    <th style={{textAlign:'left', borderBottom:'1px solid #ccc', padding:6}}>status</th>
-                    <th style={{textAlign:'left', borderBottom:'1px solid #ccc', padding:6}}>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {pending.map((p) => (
-                    <tr key={p.id}>
-                      <td style={{padding:6}}>{p.email ?? '—'}</td>
-                      <td style={{padding:6}}>{p.is_admin ? 'true' : 'false'}</td>
-                      <td style={{padding:6}}>
-                        {'status' in p ? ((p as any).status ?? '—') : '—'}
-                      </td>
-                      <td style={{padding:6}}>
-                        <button onClick={() => handleApprove(p.email ?? '')} disabled={!p.email}>
-                          Approve
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
-        </>
-      )}
-
-      {msg && (
-        <div style={{border:'1px solid #0a0', padding:12, borderRadius:8, background:'#f6fff6'}}>
-          {msg}
+    <div className="grid gap-6 max-w-4xl mx-auto p-6">
+      {/* Alerts */}
+      {err && (
+        <div className="border border-red-300 bg-red-50 text-red-800 p-4 rounded-xl">
+          <div className="font-semibold mb-1">Error</div>
+          <div className="text-sm whitespace-pre-wrap">{err}</div>
         </div>
       )}
+      {msg && (
+        <div className="border border-emerald-300 bg-emerald-50 text-emerald-800 p-4 rounded-xl">
+          <div className="font-semibold mb-1">Success</div>
+          <div className="text-sm whitespace-pre-wrap">{msg}</div>
+        </div>
+      )}
+
+      {/* Me */}
+      <section className="card p-5">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-semibold">My Profile</h2>
+          <div className="inline-flex items-center gap-2 text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full">
+            <Shield className="h-4 w-4" />
+            <span className="text-sm">Admin</span>
+          </div>
+        </div>
+        <div className="mt-3 text-sm">
+          <div><span className="font-medium">Email:</span> {me?.email ?? '—'}</div>
+          <div><span className="font-medium">is_admin:</span> {me?.is_admin ? 'true' : 'false'}</div>
+          {'status' in (me || {}) && (
+            <div><span className="font-medium">status:</span> {(me as any)?.status ?? '—'}</div>
+          )}
+        </div>
+
+        <div className="mt-4">
+          <button
+            onClick={refreshAll}
+            className="inline-flex items-center gap-2 btn-ghost"
+            title="Refresh"
+          >
+            <RefreshCw className="h-4 w-4" />
+            Refresh
+          </button>
+        </div>
+      </section>
+
+      {/* Add Admin */}
+      <section className="card p-5">
+        <h2 className="text-xl font-semibold mb-3">Add Admin</h2>
+        <div className="flex gap-2">
+          <input
+            type="email"
+            placeholder="email@domain.com"
+            value={newAdminEmail}
+            onChange={(e) => setNewAdminEmail(e.target.value)}
+            className="form-input"
+          />
+          <button onClick={handleAddAdmin} className="btn-primary inline-flex gap-2">
+            <UserPlus className="h-4 w-4" />
+            Add
+          </button>
+        </div>
+        <p className="text-xs text-gray-600 mt-2">
+          Adds email to the allowlist immediately; if the user already exists, their profile becomes admin now.
+        </p>
+      </section>
+
+      {/* Pending Users */}
+      <section className="card p-5">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-xl font-semibold">Pending Users</h2>
+          <div className="flex items-center gap-2">
+            <select
+              className="form-select"
+              value={filter}
+              onChange={(e) => setFilter(e.target.value as any)}
+            >
+              <option value="pendingOnly">Pending only</option>
+              <option value="all">All</option>
+            </select>
+          </div>
+        </div>
+
+        {filteredPending.length === 0 ? (
+          <div className="text-sm text-gray-600">No users to show.</div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="text-left text-sm border-b">
+                  <th className="py-2 pr-3">Email</th>
+                  <th className="py-2 pr-3">is_admin</th>
+                  <th className="py-2 pr-3">status</th>
+                  <th className="py-2 pr-3">Action</th>
+                </tr>
+              </thead>
+              <tbody className="text-sm">
+                {filteredPending.map((p) => (
+                  <tr key={p.id} className="border-b last:border-0">
+                    <td className="py-2 pr-3">{p.email ?? '—'}</td>
+                    <td className="py-2 pr-3">{p.is_admin ? 'true' : 'false'}</td>
+                    <td className="py-2 pr-3">{(p as any).status ?? '—'}</td>
+                    <td className="py-2 pr-3">
+                      <button
+                        className="inline-flex items-center gap-2 btn-secondary"
+                        onClick={() => handleApprove(p.email ?? null)}
+                        disabled={!p.email}
+                        title="Approve user"
+                      >
+                        <CheckCircle2 className="h-4 w-4" />
+                        Approve
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
     </div>
   );
 }
-
