@@ -4,6 +4,8 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import App from './App';
 import './index.css';
 import ErrorBoundary from './components/ErrorBoundary';
+import LoginGate from './components/LoginGate';
+
 
 // Pages
 import HomePage from './pages/HomePage';
@@ -55,7 +57,7 @@ const router = createBrowserRouter([
       { path: 'add-consortium', element: <AddConsortiumPage /> },
       { path: 'add-innovation', element: <AddInnovationPage /> },
       { path: 'submit', element: <SubmitPage /> },
-      { path: 'admin-submissions', element: <SubmissionsAdmin /> },
+      + { path: 'admin-submissions', element: (<LoginGate requireAdmin redirectTo="/admin-submissions"> <SubmissionsAdmin />  </LoginGate> ) },
     ],
   },
 ]);
