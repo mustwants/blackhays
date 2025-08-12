@@ -216,7 +216,7 @@ const Footer: React.FC<FooterProps> = ({ onAdminClick }) => {
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="mb-4 md:mb-0">
               <img
-                src="https://zwjhmkfgtvmzkisqrfwm.supabase.co/storage/v1/object/public/images/BHfullwhite.png"
+                src="/BHfullwhite.png"
                 alt="BlackHays Group"
                 className="h-8 w-auto"
               />

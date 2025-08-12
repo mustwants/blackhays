@@ -131,7 +131,7 @@ const NavBar = () => {
           {/* Logo */}
           <div className="flex-shrink-0 cursor-pointer" onClick={() => navigate('/')}>
             <img 
-              src="https://zwjhmkfgtvmzkisqrfwm.supabase.co/storage/v1/object/public/images/BHfullwhite.png"
+              src="/BHfullwhite.png"
               alt="BlackHays Group"
               className="h-10 w-auto"
             />
