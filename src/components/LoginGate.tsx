@@ -16,7 +16,7 @@ type Props = {
 };
 
 export default function LoginGate({
-  headerHeightPx = 64,
+  headerHeightPx = 128,
   redirectPath = '/submit',
   companyDomainHint = 'you@blackhaysgroup.com',
   title = 'Sign in',
