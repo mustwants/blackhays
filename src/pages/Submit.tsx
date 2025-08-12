@@ -1,171 +1,111 @@
 // src/pages/Submit.tsx
-import React, { useEffect, useState } from 'react';
+import { useState, useMemo } from 'react';
 import { supabase } from '../supabaseClient';
-import LoginGate from '../components/LoginGate';
-
-type SubmissionRow = {
-  id: string;
-  created_at: string;
-  status: 'pending' | 'approved' | 'denied' | 'paused';
-  payload: { title?: string; description?: string | null };
-};
 
 export default function SubmitPage() {
-  const [sessionReady, setSessionReady] = useState(false);
-  const [loggedIn, setLoggedIn] = useState(false);
-  const [email, setEmail] = useState<string | null>(null);
+  const [email, setEmail] = useState('');
+  const [sending, setSending] = useState(false);
+  const [msg, setMsg] = useState<string | null>(null);
+  const [err, setErr] = useState<string | null>(null);
 
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [saving, setSaving] = useState(false);
-  const [rows, setRows] = useState<SubmissionRow[]>([]);
-  const [loadErr, setLoadErr] = useState<string | null>(null);
-  const [saveErr, setSaveErr] = useState<string | null>(null);
-
-  // Detect session
-  useEffect(() => {
-    (async () => {
-      const { data } = await supabase.auth.getSession();
-      const sess = data.session;
-      setLoggedIn(!!sess);
-      setEmail(sess?.user.email ?? null);
-      setSessionReady(true);
-    })();
-
-    const { data: sub } = supabase.auth.onAuthStateChange(async (_evt, sess) => {
-      setLoggedIn(!!sess);
-      setEmail(sess?.user.email ?? null);
-      if (sess) await loadMySubmissions();
-    });
-    return () => sub.subscription.unsubscribe();
+  const redirectTo = useMemo(() => {
+    // Send the user back to /submit after they click the email link
+    return `${window.location.origin}/submit`;
   }, []);
 
-  // Load my submissions (RLS filters by user_id)
-  const loadMySubmissions = async () => {
-    setLoadErr(null);
-    const { data, error } = await supabase
-      .from('submissions')
-      .select('id,created_at,status,payload')
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      setLoadErr(error.message);
-      setRows([]);
-      return;
-    }
-    setRows((data ?? []) as SubmissionRow[]);
-  };
-
-  useEffect(() => {
-    if (loggedIn) loadMySubmissions();
-  }, [loggedIn]);
-
-  // Create a submission
-  const handleCreate = async (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSaveErr(null);
+    setErr(null);
+    setMsg(null);
 
-    if (!title.trim()) {
-      setSaveErr('Title is required.');
+    const trimmed = email.trim();
+    if (!trimmed) {
+      setErr('Please enter your work email.');
       return;
     }
 
-    setSaving(true);
+    setSending(true);
     try {
-      const { error } = await supabase
-        .from('submissions')
-        .insert({
-          status: 'pending',
-          payload: {
-            title: title.trim(),
-            description: description.trim() || null,
-          },
-        })
-        .select()
-        .single();
+      const { error } = await supabase.auth.signInWithOtp({
+        email: trimmed,
+        options: { emailRedirectTo: redirectTo },
+      });
 
-      if (error) throw error;
+      if (error) {
+        // Typical causes:
+        // 422 => redirectTo not whitelisted in Supabase Auth "Additional Redirect URLs"
+        // 500 => Email provider disabled or misconfigured
+        if ((error as any)?.status === 422) {
+          setErr(
+            'Sign-in link blocked: this site URL is not allowed in Supabase Auth redirect URLs. Add your domain and Netlify preview hosts to “Additional Redirect URLs” in Supabase.'
+          );
+        } else {
+          setErr(error.message || 'Failed to send the magic link.');
+        }
+        return;
+      }
 
-      setTitle('');
-      setDescription('');
-      await loadMySubmissions();
-    } catch (err: any) {
-      setSaveErr(err?.message || 'Failed to create submission.');
+      setMsg('Check your inbox—your secure sign-in link is on the way.');
+    } catch (e: any) {
+      setErr(e?.message ?? 'Failed to send the magic link.');
     } finally {
-      setSaving(false);
+      setSending(false);
     }
   };
-
-  if (!sessionReady) return <div className="p-4">Checking session…</div>;
-
-  if (!loggedIn) {
-    return (
-      <div className="max-w-3xl mx-auto p-6 mt-16">
-        <LoginGate />
-      </div>
-    );
-  }
 
   return (
-    <div className="max-w-3xl mx-auto p-6 mt-16">
-      <h1 className="text-2xl font-bold mb-3">Submit</h1>
-      <p className="text-sm text-gray-600 mb-6">Signed in as: <b>{email}</b></p>
+    <div className="min-h-[calc(100vh-80px)] bg-white flex items-start md:items-center justify-center">
+      <div className="w-full max-w-md mx-4 my-10 md:my-0">
+        <div className="bg-white border border-gray-200 rounded-2xl shadow-lg p-6">
+          <h1 className="text-2xl font-bold mb-1">Sign in</h1>
+          <p className="text-gray-600 mb-6">
+            Use your work email and we’ll email you a secure sign-in link.
+          </p>
 
-      <form onSubmit={handleCreate} className="p-4 border rounded-lg bg-white mb-6">
-        <label className="block text-sm mb-1">Title</label>
-        <input
-          className="w-full border rounded px-3 py-2 mb-3"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Short, descriptive title"
-          required
-        />
+          <form onSubmit={onSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Work email
+              </label>
+              <input
+                type="email"
+                className="mt-1 block w-full rounded-md border border-gray-300 px-4 py-2 shadow-sm focus:border-bhred focus:ring-bhred"
+                placeholder="you@blackhaysgroup.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                autoComplete="email"
+                required
+              />
+            </div>
 
-        <label className="block text-sm mb-1">Description (optional)</label>
-        <textarea
-          className="w-full border rounded px-3 py-2 mb-3"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          placeholder="Add details"
-          rows={4}
-        />
+            {err && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded-md text-sm">
+                {err}
+              </div>
+            )}
+            {msg && (
+              <div className="bg-green-50 border border-green-200 text-green-700 px-3 py-2 rounded-md text-sm">
+                {msg}
+              </div>
+            )}
 
-        {saveErr && <p className="text-red-600 text-sm mb-2">{saveErr}</p>}
+            <button
+              type="submit"
+              disabled={sending}
+              className="w-full inline-flex items-center justify-center px-4 py-2 bg-bhred text-white font-semibold rounded-md hover:bg-red-700 disabled:opacity-60"
+            >
+              {sending ? 'Sending…' : 'Email me a magic link'}
+            </button>
+          </form>
 
-        <button
-          type="submit"
-          disabled={saving}
-          className="bg-bhred text-white px-4 py-2 rounded disabled:opacity-60"
-        >
-          {saving ? 'Saving…' : 'Create submission'}
-        </button>
-      </form>
+          <p className="mt-4 text-xs text-gray-500">
+            By continuing you agree to the Terms and acknowledge the Privacy Policy.
+          </p>
 
-      <div className="p-4 border rounded-lg bg-white">
-        <h2 className="text-lg font-semibold mb-3">My submissions</h2>
-        {loadErr && <p className="text-red-600 text-sm mb-3">{loadErr}</p>}
-        {rows.length === 0 ? (
-          <p className="text-sm text-gray-600">No submissions yet.</p>
-        ) : (
-          <ul className="space-y-3">
-            {rows.map((r) => (
-              <li key={r.id} className="p-3 border rounded">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="font-medium">{r.payload?.title || '(untitled)'}</div>
-                    {r.payload?.description && (
-                      <div className="text-sm text-gray-700">{r.payload.description}</div>
-                    )}
-                  </div>
-                  <span className="text-xs uppercase tracking-wide">{r.status}</span>
-                </div>
-                <div className="text-xs text-gray-500 mt-1">
-                  {new Date(r.created_at).toLocaleString()}
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
+          <div className="mt-4 text-[11px] text-gray-400">
+            Powered by Supabase · Problems signing in? contact support
+          </div>
+        </div>
       </div>
     </div>
   );
