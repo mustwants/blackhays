@@ -12,20 +12,3 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   },
 });
 
-+if (import.meta.env.DEV) {
-+  (async () => {
-+    try {
-+      // Only probe after we have a session; avoids RLS warnings pre-auth
-+      const { data } = await supabase.auth.getSession();
-+      if (!data.session) return;
-+      const { error } = await supabase.from('submissions').select('id').limit(1);
-+      if (error) {
-+        console.warn('Supabase select check:', error.message);
-+      } else {
-+        console.log('Supabase OK (public.submissions reachable).');
-+      }
-+    } catch (e: any) {
-+      console.error('Supabase connectivity error:', e?.message || e);
-+    }
-+  })();
-+}
