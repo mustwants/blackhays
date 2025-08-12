@@ -6,7 +6,7 @@ type Props = {
   children?: React.ReactNode;
   requireAdmin?: boolean;
   fallback?: React.ReactNode;
-  redirectTo?: string; // where the magic link should land
+  redirectTo?: string; // where the magic link lands after login
 };
 
 export default function LoginGate({
@@ -19,7 +19,6 @@ export default function LoginGate({
   const [signedIn, setSignedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
 
-  // Magic link form state
   const [email, setEmail] = useState('');
   const [sending, setSending] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
@@ -38,7 +37,6 @@ export default function LoginGate({
     } else {
       setIsAdmin(false);
     }
-
     setReady(true);
   };
 
@@ -53,7 +51,6 @@ export default function LoginGate({
     e.preventDefault();
     setErr(null);
     setMsg(null);
-
     if (!email.trim()) { setErr('Email is required.'); return; }
 
     setSending(true);
