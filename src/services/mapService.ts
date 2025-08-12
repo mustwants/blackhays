@@ -1,4 +1,4 @@
-import { supabase } from '../lib/supabaseClient';
+import { supabase } from '../supabaseClient';
 import { LocationService } from '../lib/locationService';
 import { errorUtils } from '../utils/errorUtils';
 import { cacheUtils } from '../utils/cacheUtils';
