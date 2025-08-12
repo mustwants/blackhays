@@ -132,7 +132,6 @@ export default function AdminPanel() {
       return;
     }
 
-    // Admins can see all; RLS policies created earlier allow this.
     const { data, error } = await supabase
       .from('submissions')
       .select('*')
@@ -153,18 +152,15 @@ export default function AdminPanel() {
     action: 'approve' | 'deny' | 'pause' | 'resume' | 'delete' | 'edit',
     details: any
   ) {
-    // Prefer actor_user_id per your existing types; if your table uses a different field,
-    // let me know and I’ll swap it (we added admin override RLS so admins can insert).
     const { error } = await supabase.from('submission_actions').insert([
       {
         submission_id: submission.id,
-        actor_user_id: uid,
+        actor_user_id: uid,   // if your column name differs, tell me and I’ll swap it
         action,
         details,
       } as any,
     ]);
     if (error) {
-      // Not fatal to the UI, but we should surface it
       toastErr(`submission_actions insert error: ${error.message}`);
     }
   }
@@ -205,7 +201,7 @@ export default function AdminPanel() {
       }
 
       await logAction(uid, submission, action, { from: submission.status, to: newStatus });
-      setSubs((prev) => prev.map((s) => (s.id === data.id ? (data as Submission) : s)));
+      setSubs((prev) => prev.map((s) => (s.id === (data as Submission).id ? (data as Submission) : s)));
       toastOK(`Status set to ${newStatus}.`);
     }
   }
