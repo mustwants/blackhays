@@ -1,64 +1,38 @@
-import { Handler } from '@netlify/functions';
-import { z } from 'zod';
-import { json, options } from './lib/response';
-import { supabaseAdmin } from './lib/supabase';
-import { requireUser } from './lib/auth';
-
-const CreateSchema = z.object({
-  title: z.string().min(3).max(140),
-  description: z.string().max(4000).optional().default(''),
-  category: z.string().max(80).optional().default(''),
-  latitude: z.number().min(-90).max(90),
-  longitude: z.number().min(-180).max(180),
-  address: z.string().max(240).optional().default(''),
-  website: z.string().url().max(240).optional().or(z.literal('')).default(''),
-  contact_email: z.string().email().max(240).optional().or(z.literal('')).default(''),
-  contact_phone: z.string().max(40).optional().or(z.literal('')).default(''),
-  tags: z.array(z.string().max(40)).max(20).optional().default([]),
-  images: z.array(z.string().url().max(512)).max(12).optional().default([]),
-});
+// netlify/functions/submissions-create.ts
+import type { Handler } from '@netlify/functions'
+import { getServiceClient, getUserFromBearer, json } from './_supabase'
 
 export const handler: Handler = async (event) => {
-  if (event.httpMethod === 'OPTIONS') return options();
-  if (event.httpMethod !== 'POST') return json(405, { error: 'Method not allowed' });
+  if (event.httpMethod === 'OPTIONS') return json(200, {})
+  if (event.httpMethod !== 'POST') return json(405, { error: 'Method not allowed' })
 
-  try {
-    const me = await requireUser(event);
+  const user = await getUserFromBearer(event)
+  if (!user) return json(401, { error: 'Authentication required' })
 
-    const parsed = CreateSchema.safeParse(JSON.parse(event.body || '{}'));
-    if (!parsed.success) {
-      return json(400, { error: 'Validation failed', details: parsed.error.issues });
-    }
+  let payload: any
+  try { payload = JSON.parse(event.body || '{}') } catch { return json(400, { error: 'Invalid JSON' }) }
 
-    const payload = parsed.data;
+  const { title, description, attachment_url } = payload
+  if (!title || !description) return json(400, { error: 'title and description are required' })
 
-    const insertRow = {
-      title: payload.title,
-      description: payload.description,
-      category: payload.category,
-      latitude: payload.latitude,
-      longitude: payload.longitude,
-      address: payload.address,
-      website: payload.website,
-      contact_email: payload.contact_email,
-      contact_phone: payload.contact_phone,
-      tags: payload.tags,
-      images: payload.images,
-      submitted_by: me.id,
+  const supabase = getServiceClient()
+  const { data, error } = await supabase
+    .from('submissions')
+    .insert([{
+      title,
+      description,
+      attachment_url: attachment_url ?? null,
       status: 'pending',
-    };
+      // keep the DB schema flexible: if your table has a user_id column this will populate it,
+      // if not, Postgrest will ignore the extra field.
+      user_id: user.id,
+    }])
+    .select('*')
+    .single()
 
-    const { data, error } = await supabaseAdmin
-      .from('submissions')
-      .insert(insertRow)
-      .select('id, status, created_at')
-      .single();
+  if (error) return json(500, { error: error.message })
 
-    if (error) return json(400, { error: error.message });
+  return json(201, { data })
+}
 
-    return json(201, { id: data.id, status: data.status, created_at: data.created_at });
-  } catch (e: any) {
-    return json(401, { error: e.message || 'Unauthorized' });
-  }
-};
 
