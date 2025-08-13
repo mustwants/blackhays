@@ -1,90 +1,65 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { User } from '@supabase/supabase-js';
-import { supabase } from '../supabaseClient';
-import { authService } from '../services/auth';
+// src/contexts/AuthContext.tsx
+import React, { createContext, useContext, useEffect, useState } from 'react'
+import type { User, Session } from '@supabase/supabase-js'
+import { supabase } from '../supabaseClient'
 
-interface AuthContextType {
-  user: User | null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  logout: () => Promise<void>;
-  signup: (email: string, password: string) => Promise<void>;
+type Ctx = {
+  user: User | null
+  session: Session | null
+  isLoading: boolean
+  sendMagicLink: (email: string, redirectPath?: string) => Promise<{ error?: string }>
+  signOut: () => Promise<void>
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<Ctx | undefined>(undefined)
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
-
-interface AuthProviderProps {
-  children: ReactNode;
-}
-
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+export const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
+  const [user, setUser] = useState<User | null>(null)
+  const [session, setSession] = useState<Session | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    // Get initial session
-    const getInitialSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setUser(session?.user ?? null);
-      setIsLoading(false);
-    };
+    supabase.auth.getSession().then(({ data }) => {
+      setSession(data.session ?? null)
+      setUser(data.session?.user ?? null)
+      setIsLoading(false)
+    })
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, ses) => {
+      setSession(ses)
+      setUser(ses?.user ?? null)
+      setIsLoading(false)
+    })
+    return () => sub.subscription.unsubscribe()
+  }, [])
 
-    getInitialSession();
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        setUser(session?.user ?? null);
-        setIsLoading(false);
-      }
-    );
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  const login = async (email: string, password: string) => {
-    const { data, error } = await authService.login(email, password);
-    if (error) throw new Error(error);
-    if (data?.user) {
-      setUser(data.user);
+  const sendMagicLink: Ctx['sendMagicLink'] = async (email, redirectPath = '/submit') => {
+    try {
+      const { error } = await supabase.auth.signInWithOtp({
+        email: email.trim(),
+        options: { emailRedirectTo: `${window.location.origin}${redirectPath}` },
+      })
+      return error ? { error: error.message } : {}
+    } catch (e: any) {
+      return { error: e?.message ?? 'Failed to send magic link' }
     }
-  };
+  }
 
-  const logout = async () => {
-    const { error } = await authService.logout();
-    if (error) throw new Error(error);
-    setUser(null);
-  };
-
-  const signup = async (email: string, password: string) => {
-    const { data, error } = await authService.signup(email, password);
-    if (error) throw new Error(error);
-    if (data?.user) {
-      setUser(data.user);
-    }
-  };
-
-  const value: AuthContextType = {
-    user,
-    isAuthenticated: !!user,
-    isLoading,
-    login,
-    logout,
-    signup,
-  };
+  const signOut = async () => {
+    await supabase.auth.signOut()
+    setSession(null)
+    setUser(null)
+  }
 
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider value={{ user, session, isLoading, sendMagicLink, signOut }}>
       {children}
     </AuthContext.Provider>
-  );
-};
+  )
+}
+
+export const useAuth = () => {
+  const ctx = useContext(AuthContext)
+  if (!ctx) throw new Error('useAuth must be used within AuthProvider')
+  return ctx
+}
+
