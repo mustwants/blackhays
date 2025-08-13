@@ -1,4 +1,3 @@
-// src/pages/Submit.tsx
 import { useState, useMemo } from 'react';
 import { supabase } from '../supabaseClient';
 
@@ -9,7 +8,6 @@ export default function SubmitPage() {
   const [err, setErr] = useState<string | null>(null);
 
   const redirectTo = useMemo(() => {
-    // Send the user back to /submit after they click the email link
     return `${window.location.origin}/submit`;
   }, []);
 
@@ -32,12 +30,9 @@ export default function SubmitPage() {
       });
 
       if (error) {
-        // Typical causes:
-        // 422 => redirectTo not whitelisted in Supabase Auth "Additional Redirect URLs"
-        // 500 => Email provider disabled or misconfigured
         if ((error as any)?.status === 422) {
           setErr(
-            'Sign-in link blocked: this site URL is not allowed in Supabase Auth redirect URLs. Add your domain and Netlify preview hosts to “Additional Redirect URLs” in Supabase.'
+            'Sign-in link blocked: this site URL is not allowed in Supabase Auth redirect URLs. Add your domain and Netlify preview hosts under “Additional Redirect URLs”.'
           );
         } else {
           setErr(error.message || 'Failed to send the magic link.');
@@ -110,3 +105,4 @@ export default function SubmitPage() {
     </div>
   );
 }
+
