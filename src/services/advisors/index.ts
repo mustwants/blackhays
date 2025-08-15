@@ -1,5 +1,5 @@
 import { apiService, ApiResponse } from '../api';
-import { supabase } from '../../supabaseClient';
+import { supabase } from '../../lib/supabaseClient';
 import { db } from '../../lib/database';
 
 export interface Advisor {

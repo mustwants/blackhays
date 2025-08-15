@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { supabase, supabaseAdmin } from '../../supabaseClient';
+import { supabase, supabaseAdmin } from '../../lib/supabaseClient';
 import { Search, Filter, Edit2, Trash2, Check, X, Pause, Eye, ExternalLink } from 'lucide-react';
 
 interface CompanySubmission {

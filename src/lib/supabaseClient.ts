@@ -1,29 +1,22 @@
 // src/lib/supabaseClient.ts
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js'
 
-// Browser client (for user-facing code)
-export const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL as string,
-  import.meta.env.VITE_SUPABASE_ANON_KEY as string
-);
+// ---- Browser client (safe in React) ----
+const PUBLIC_URL  = import.meta.env.VITE_SUPABASE_URL as string
+const PUBLIC_ANON = import.meta.env.VITE_SUPABASE_ANON_KEY as string
 
-// Admin client (serverless functions or secure code only)
-// Will fallback to anon key if service key is not present (browser-safe)
-export const supabaseAdmin = createClient(
-  import.meta.env.VITE_SUPABASE_URL as string,
-  import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY || import.meta.env.VITE_SUPABASE_ANON_KEY as string,
-  {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false
-    }
-  }
-);
+export const supabase = createClient(PUBLIC_URL, PUBLIC_ANON)
 
-// Quick connection check
-export const isConnected = () => {
-  return Boolean(
-    (import.meta.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL) &&
-    (import.meta.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY)
-  );
-};
+// ---- Server/admin client (never runs in the browser) ----
+// Only create this when a Node env exists (e.g., Netlify/Vercel function).
+let _admin: ReturnType<typeof createClient> | null = null
+// @ts-ignore - process is only defined in server environments
+if (typeof process !== 'undefined' && process?.env?.SUPABASE_SERVICE_ROLE_KEY && process?.env?.SUPABASE_URL) {
+  // @ts-ignore - process is only defined in server environments
+  _admin = createClient(process.env.SUPABASE_URL as string, process.env.SUPABASE_SERVICE_ROLE_KEY as string, {
+    auth: { autoRefreshToken: false, persistSession: false }
+  })
+}
+export const supabaseAdmin = _admin
+
+export const isConnected = Boolean(PUBLIC_URL && PUBLIC_ANON)

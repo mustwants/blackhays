@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { supabase, supabaseAdmin } from '../../supabaseClient';
+import { supabase, supabaseAdmin } from '../../lib/supabaseClient';
 import { Users, Calendar, Building, Rocket, Brain, Mail } from 'lucide-react';
 
 interface CategoryStats {
@@ -43,7 +43,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCategoryClick }) => {
     try {
       setLoading(true);
       setError(null);
-      console.log('🔄 Starting dashboard stats fetch...');
+      console.log('ðŸ”„ Starting dashboard stats fetch...');
 
       // Set up admin session for authenticated access when not using service key
       if (!supabaseAdmin) {
@@ -56,7 +56,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCategoryClick }) => {
                 access_token: sessionData.session.access_token,
                 refresh_token: sessionData.session.refresh_token || sessionData.session.access_token
               });
-              console.log('✅ Admin session set from localStorage');
+              console.log('âœ… Admin session set from localStorage');
             }
           } catch (e) {
             console.warn('Failed to parse auth session:', e);
@@ -82,7 +82,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCategoryClick }) => {
         fetchNewsletterStats(client)
       ]);
 
-      console.log('📊 All stats fetched:', {
+      console.log('ðŸ“Š All stats fetched:', {
         advisors: advisorStats,
         events: eventStats,
         companies: companyStats,
@@ -100,7 +100,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCategoryClick }) => {
         newsletterCount: newsletterStats
       });
     } catch (err) {
-      console.error('❌ Error fetching dashboard stats:', err);
+      console.error('âŒ Error fetching dashboard stats:', err);
       setError('Failed to load dashboard statistics');
     } finally {
       setLoading(false);
@@ -109,7 +109,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCategoryClick }) => {
 
   const fetchCategoryStats = async (client: typeof supabase, table: string): Promise<CategoryStats> => {
     try {
-      console.log(`📋 Fetching stats for ${table}...`);
+      console.log(`ðŸ“‹ Fetching stats for ${table}...`);
       
       const { data, error } = await client
         .from(table)
@@ -117,14 +117,14 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCategoryClick }) => {
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error(`❌ Error fetching ${table} stats:`, error);
+        console.error(`âŒ Error fetching ${table} stats:`, error);
         return { total: 0, approved: 0, pending: 0, paused: 0, rejected: 0 };
       }
       
-      console.log(`✅ ${table} - found ${data?.length || 0} records`);
+      console.log(`âœ… ${table} - found ${data?.length || 0} records`);
       
       if (!data || data.length === 0) {
-        console.log(`⚠️ No data found for ${table}`);
+        console.log(`âš ï¸ No data found for ${table}`);
         return { total: 0, approved: 0, pending: 0, paused: 0, rejected: 0 };
       }
 
@@ -136,17 +136,17 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCategoryClick }) => {
         rejected: data.filter(item => item.status === 'rejected').length
       };
 
-      console.log(`📈 ${table} breakdown:`, stats);
+      console.log(`ðŸ“ˆ ${table} breakdown:`, stats);
       return stats;
     } catch (err) {
-      console.error(`❌ Exception fetching ${table} stats:`, err);
+      console.error(`âŒ Exception fetching ${table} stats:`, err);
       return { total: 0, approved: 0, pending: 0, paused: 0, rejected: 0 };
     }
   };
 
   const fetchNewsletterStats = async (client: typeof supabase): Promise<number> => {
     try {
-      console.log('📧 Fetching newsletter stats...');
+      console.log('ðŸ“§ Fetching newsletter stats...');
       
       const { data, error } = await client
         .from('newsletter_subscribers')
@@ -154,14 +154,14 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onCategoryClick }) => {
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('❌ Error fetching newsletter stats:', error);
+        console.error('âŒ Error fetching newsletter stats:', error);
         return 0;
       }
       
-      console.log(`✅ Newsletter - found ${data?.length || 0} subscribers`);
+      console.log(`âœ… Newsletter - found ${data?.length || 0} subscribers`);
       return data ? data.length : 0;
     } catch (err) {
-      console.error('❌ Exception fetching newsletter stats:', err);
+      console.error('âŒ Exception fetching newsletter stats:', err);
       return 0;
     }
   };

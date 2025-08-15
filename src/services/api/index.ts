@@ -1,4 +1,4 @@
-import { supabase } from '../../supabaseClient';
+import { supabase } from '../../lib/supabaseClient';
 
 export interface ApiResponse<T> {
   data: T | null;

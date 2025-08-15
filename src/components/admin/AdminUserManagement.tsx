@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../../supabaseClient';
+import { supabase } from '../../lib/supabaseClient';
 import { RefreshCw, Trash2, UserPlus, Lock, AlertTriangle, Edit2, Check, X, Mail, Eye, EyeOff } from 'lucide-react';
 
 const AdminUserManagement = () => {
@@ -280,9 +280,9 @@ const AdminUserManagement = () => {
             <p className="text-sm text-amber-700 mt-1">
               For this application, the following admin accounts are available:
               <br />
-              • <strong>admin@example.com</strong> with password <strong>Admin1967</strong>
+              â€¢ <strong>admin@example.com</strong> with password <strong>Admin1967</strong>
               <br />
-              • <strong>scott@blackhaysgroup.com</strong> with password <strong>Admin1967!</strong>
+              â€¢ <strong>scott@blackhaysgroup.com</strong> with password <strong>Admin1967!</strong>
             </p>
           </div>
         </div>

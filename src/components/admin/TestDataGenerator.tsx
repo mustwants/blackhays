@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { RefreshCw, Database, AlertCircle, Check, Users, Calendar, Building, Rocket, Brain, Mail } from 'lucide-react';
-import { supabase } from '../../supabaseClient';
+import { supabase } from '../../lib/supabaseClient';
 
 interface TestDataGeneratorProps {
   onDataGenerated?: () => void;
@@ -22,33 +22,33 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
       
       console.log('Generating advisors...');
       await generateTestAdvisors();
-      console.log('✅ Completed advisors');
+      console.log('âœ… Completed advisors');
       
       console.log('Generating events...');
       await generateTestEvents();
-      console.log('✅ Completed events');
+      console.log('âœ… Completed events');
       
       console.log('Generating companies...');
       await generateTestCompanies();
-      console.log('✅ Completed companies');
+      console.log('âœ… Completed companies');
       
       console.log('Generating consortiums...');
       await generateTestConsortiums();
-      console.log('✅ Completed consortiums');
+      console.log('âœ… Completed consortiums');
       
       console.log('Generating innovations...');
       await generateTestInnovations();
-      console.log('✅ Completed innovations');
+      console.log('âœ… Completed innovations');
       
       console.log('Generating newsletter subscribers...');
       await generateTestNewsletterSubscribers();
-      console.log('✅ Completed newsletter subscribers');
+      console.log('âœ… Completed newsletter subscribers');
 
       setSuccess('Successfully generated 30 test items total (5 for each category)!');
       
       // Notify parent component to refresh data
       if (onDataGenerated) {
-        console.log('🔄 Triggering component refresh...');
+        console.log('ðŸ”„ Triggering component refresh...');
         onDataGenerated();
       }
       
@@ -857,11 +857,11 @@ const TestDataGenerator: React.FC<TestDataGeneratorProps> = ({ onDataGenerated }
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
           <h4 className="font-medium text-yellow-800 mb-2">Test Data Features:</h4>
           <ul className="text-sm text-yellow-700 space-y-1">
-            <li>• Realistic company names, contact info, and descriptions</li>
-            <li>• Test images for logos, product photos, and headshots</li>
-            <li>• Complete address information for mapping testing</li>
-            <li>• Variety of industries, focus areas, and organization types</li>
-            <li>• All submissions start as "pending" for approval testing</li>
+            <li>â€¢ Realistic company names, contact info, and descriptions</li>
+            <li>â€¢ Test images for logos, product photos, and headshots</li>
+            <li>â€¢ Complete address information for mapping testing</li>
+            <li>â€¢ Variety of industries, focus areas, and organization types</li>
+            <li>â€¢ All submissions start as "pending" for approval testing</li>
           </ul>
         </div>
       </div>

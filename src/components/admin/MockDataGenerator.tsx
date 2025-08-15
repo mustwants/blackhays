@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { RefreshCw, Database, AlertCircle, Check,
   Briefcase, Users, Calendar, Rocket, Brain, Mail } from 'lucide-react';
-import { supabase } from '../../supabaseClient';
+import { supabase } from '../../lib/supabaseClient';
 
 type SubmissionType = 'event' | 'advisor' | 'newsletter' | 'company' | 'consortium' | 'innovation';
 

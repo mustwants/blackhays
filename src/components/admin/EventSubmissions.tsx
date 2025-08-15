@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { supabase, supabaseAdmin } from '../../supabaseClient';
+import { supabase, supabaseAdmin } from '../../lib/supabaseClient';
 import { RefreshCw, Trash2, Edit2, Check, X, PauseCircle, Search } from 'lucide-react';
 
 interface EventSubmissionsProps {
