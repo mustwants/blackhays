@@ -1,33 +1,49 @@
-// Cache utilities
+// Simple in-memory cache with expiration
+export type CacheRecord<T> = {
+  data: T;
+  timestamp: number;
+};
 export const cacheUtils = {
-  cache: new Map<string, { data: any; timestamp: number }>(),
-  
-  // Get cached data
-  get<T>(key: string, maxAge: number = 300000): T | null {
-    const record = this.cache.get(key);
+  cache: new Map<string, CacheRecord<unknown>>(),
+
+  // Retrieve a value if it has not expired
+  get<T>(key: string, maxAge = 300_000): T | null {
+    const record = this.cache.get(key) as CacheRecord<T> | undefined;
     if (!record) return null;
     
     if (Date.now() - record.timestamp > maxAge) {
       this.cache.delete(key);
       return null;
     }
-    
-    return record.data as T;
+     
+    return record.data;
   },
   
-  // Set cached data
-  set(key: string, data: any): void {
+
+  // Store a value
+  set<T>(key: string, data: T): void {
     this.cache.set(key, {
       data,
       timestamp: Date.now()
     });
   },
   
-  // Clear expired cache entries
-  cleanup(): void {
+
+  // Remove a specific entry
+  delete(key: string): void {
+    this.cache.delete(key);
+  },
+
+  // Clear all entries
+  clear(): void {
+    this.cache.clear();
+  },
+
+  // Remove stale entries
+  cleanup(maxAge = 3_600_000): void {
     const now = Date.now();
     for (const [key, record] of this.cache.entries()) {
-      if (now - record.timestamp > 3600000) { // 1 hour
+      if (now - record.timestamp > maxAge) {
         this.cache.delete(key);
       }
     }
@@ -35,4 +51,4 @@ export const cacheUtils = {
 };
 
 // Run cache cleanup every 5 minutes
-setInterval(() => cacheUtils.cleanup(), 300000);
+setInterval(() => cacheUtils.cleanup(), 300_000);

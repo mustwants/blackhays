@@ -1,150 +1,131 @@
-import { apiService, ApiResponse } from '../api';
-import { supabase } from '../../lib/supabaseClient';
-import { db } from '../../lib/database';
+// src/services/advisors/index.ts
+import { supabase, isConnected } from '../../lib/supabaseClient'
+
+export type AdvisorStatus = 'pending' | 'approved' | 'rejected' | 'paused'
 
 export interface Advisor {
-  id: string;
-  name: string;
-  email: string;
-  state: string;
-  zip_code: string;
-  phone?: string;
-  address?: string;
-  city?: string;
-  webpage?: string;
-  facebook?: string;
-  x?: string;
-  linkedin?: string;
-  bluesky?: string;
-  instagram?: string;
-  professional_title?: string;
-  military_branch?: string;
-  other_branch?: string;
-  years_of_service?: string;
-  service_status?: string[];
-  other_status?: string;
-  about?: string;
-  resume_url?: string;
-  headshot_url?: string;
-  business_logo_url?: string;
-  status: 'pending' | 'approved' | 'rejected' | 'paused';
-  location?: any; // Can be point, string, or array
+  id: string
+  name: string
+  email: string
+  state: string
+  zip_code: string
+  phone?: string
+  address?: string
+  city?: string
+  webpage?: string
+  facebook?: string
+  x?: string
+  linkedin?: string
+  bluesky?: string
+  instagram?: string
+  professional_title?: string
+  military_branch?: string
+  other_branch?: string
+  years_of_service?: string
+  service_status?: string[]
+  other_status?: string
+  about?: string
+  resume_url?: string
+  headshot_url?: string
+  business_logo_url?: string
+  status: AdvisorStatus
+  // coordinates can be stored in multiple ways:
+  lat?: number | null
+  lng?: number | null
+  location?: unknown
+  // optional legacy fields we’ll map from if present:
+  full_name?: string
+  first_name?: string
+  last_name?: string
 }
 
-class AdvisorService {
-  private readonly endpoint = 'advisor_applications';
-
-  async getAdvisors(): Promise<ApiResponse<Advisor[]>> {
-    try {
-      // Check if database is connected
-      const isConnected = db.isConnected();
-      
-      if (!isConnected) {
-        console.warn("Database not connected, returning mock advisors");
-        return { 
-          data: this.generateMockAdvisors(), 
-          error: null 
-        };
-      }
-      
-      // Use the database helper for better reliability
-      return await db.fetchSubmissions<Advisor>(this.endpoint);
-    } catch (error) {
-      console.error("Error in getAdvisors:", error);
-      // Fall back to mock data
-      return { 
-        data: this.generateMockAdvisors(), 
-        error: error as Error 
-      };
-    }
-  }
-
-  async submitApplication(application: Omit<Advisor, 'id' | 'status'>): Promise<ApiResponse<Advisor>> {
-    try {
-      // Use the database helper for better reliability
-      return await db.createSubmission<Advisor>(this.endpoint, {
-        ...application,
-        status: 'pending'
-      });
-    } catch (error) {
-      console.error("Error in submitApplication:", error);
-      return { data: null, error: error as Error };
-    }
-  }
-
-  async approveApplication(id: string): Promise<ApiResponse<Advisor>> {
-    try {
-      // Use the database helper for better reliability
-      return await db.updateSubmissionStatus(this.endpoint, id, 'approved');
-    } catch (error) {
-      console.error("Error in approveApplication:", error);
-      return { data: null, error: error as Error };
-    }
-  }
-
-  async rejectApplication(id: string): Promise<ApiResponse<Advisor>> {
-    try {
-      // Use the database helper for better reliability
-      return await db.updateSubmissionStatus(this.endpoint, id, 'rejected');
-    } catch (error) {
-      console.error("Error in rejectApplication:", error);
-      return { data: null, error: error as Error };
-    }
-  }
-
-  async deleteApplication(id: string): Promise<ApiResponse<void>> {
-    try {
-      // Use the database helper for better reliability
-      return await db.deleteSubmission(this.endpoint, id);
-    } catch (error) {
-      console.error("Error in deleteApplication:", error);
-      return { data: null, error: error as Error };
-    }
-  }
-
-  // Generate some mock advisors for development or fallback when database is unavailable
-  private generateMockAdvisors(): Advisor[] {
-    return [
-      {
-        id: 'mock-advisor-1',
-        name: 'John Smith',
-        email: 'john.smith@example.com',
-        phone: '555-123-4567',
-        professional_title: 'Defense Consultant',
-        military_branch: 'Army',
-        years_of_service: '25',
-        service_status: ['Veteran'],
-        other_branch: '',
-        other_status: '',
-        about: 'Former Special Operations Command with 25 years of experience in defense acquisition.',
-        status: 'approved',
-        address: '123 Defense St',
-        city: 'Arlington',
-        state: 'VA',
-        zip_code: '22201',
-        location: [-77.0864, 38.8904]
-      },
-      {
-        id: 'mock-advisor-2',
-        name: 'Jane Adams',
-        email: 'jane.adams@example.com',
-        phone: '555-987-6543',
-        professional_title: 'Intelligence Specialist',
-        military_branch: 'Air Force',
-        years_of_service: '18',
-        service_status: ['Retired'],
-        other_branch: '',
-        other_status: '',
-        about: 'Intelligence specialist with expertise in cybersecurity and emerging technologies.',
-        status: 'approved',
-        street_address: '456 Innovation Ave',
-        city: 'San Francisco',
-        state: 'CA',
-        zip_code: '94107',
-        location: [-122.4194, 37.7749]
-      }
-    ];
-  }
+export interface MapAdvisor {
+  id: string
+  name: string
+  professional_title?: string
+  military_branch?: string
+  about?: string
+  // [lng, lat]
+  location: [number, number]
 }
 
-export const advisorService = new AdvisorService();
+function pickName(r: Partial<Advisor>): string {
+  const parts = [
+    r.name,
+    r.full_name,
+    [r.first_name, r.last_name].filter(Boolean).join(' ').trim(),
+    r.email
+  ].filter(v => typeof v === 'string' && v.trim().length > 0) as string[]
+  return parts[0] ?? 'Unnamed'
+}
+
+/** Accepts various shapes of "location" and returns [lng, lat] or null */
+function toLngLat(r: Partial<Advisor>): [number, number] | null {
+  // 1) explicit numeric columns
+  if (typeof r.lng === 'number' && typeof r.lat === 'number') {
+    return [r.lng, r.lat]
+  }
+  // 2) GeoJSON: { type: 'Point', coordinates: [lng,lat] }
+  const loc: any = r.location
+  if (loc && typeof loc === 'object') {
+    if (loc.type === 'Point' && Array.isArray(loc.coordinates) && loc.coordinates.length >= 2) {
+      const [lng, lat] = loc.coordinates
+      if (Number.isFinite(lng) && Number.isFinite(lat)) return [lng, lat]
+    }
+    // 3) array [lng,lat]
+    if (Array.isArray(loc) && loc.length >= 2) {
+      const [lng, lat] = loc
+      if (Number.isFinite(lng) && Number.isFinite(lat)) return [lng as number, lat as number]
+    }
+    // 4) object with {lng,lat}
+    if (typeof loc.lng === 'number' && typeof loc.lat === 'number') {
+      return [loc.lng, loc.lat]
+    }
+  }
+  return null
+}
+
+async function fetchRows(): Promise<Advisor[]> {
+  if (!isConnected()) throw new Error('Supabase is not configured')
+
+  // Select a superset of columns we know how to map from.
+  const { data, error } = await supabase
+    .from('advisor_applications')
+    .select(`
+      id,
+      name, full_name, first_name, last_name,
+      email, phone,
+      address, city, state, zip_code,
+      webpage, facebook, x, linkedin, bluesky, instagram,
+      professional_title, military_branch, other_branch,
+      years_of_service, service_status, other_status,
+      about, resume_url, headshot_url, business_logo_url,
+      status, lat, lng, location
+    `)
+    .eq('status', 'approved')
+
+  if (error) throw error
+  return (data ?? []) as Advisor[]
+}
+
+export async function getApprovedAdvisors(): Promise<MapAdvisor[]> {
+  const rows = await fetchRows()
+  const mapped: MapAdvisor[] = []
+  for (const r of rows) {
+    const point = toLngLat(r)
+    if (!point) continue // cannot plot without coords
+    mapped.push({
+      id: r.id,
+      name: pickName(r),
+      professional_title: r.professional_title ?? undefined,
+      military_branch: r.military_branch ?? undefined,
+      about: r.about ?? undefined,
+      location: point
+    })
+  }
+  return mapped
+}
+
+export const advisorMapService = {
+  getApprovedAdvisors
+}
