@@ -57,7 +57,12 @@ const router = createBrowserRouter([
       { path: 'add-consortium', element: <AddConsortiumPage /> },
       { path: 'add-innovation', element: <AddInnovationPage /> },
       { path: 'submit', element: <SubmitPage /> },
-      + { path: 'admin-submissions', element: (<LoginGate requireAdmin redirectTo="/admin-submissions"> <SubmissionsAdmin />  </LoginGate> ) },
+      { path: 'admin-submissions', element: (
+      <LoginGate requireAdmin redirectTo="/admin-submissions"> 
+      <SubmissionsAdmin />  
+      </LoginGate> 
+      ) 
+    },
     ],
   },
 ]);
@@ -67,7 +72,10 @@ if (root) {
   createRoot(root).render(
     <React.StrictMode>
       <ErrorBoundary>
-      <RouterProvider router={router} future={{ v7_startTransition: true }} />
+<RouterProvider
+  router={router}
+  future={{ v7_startTransition: true }}
+/>
       </ErrorBoundary>
     </React.StrictMode>
   );

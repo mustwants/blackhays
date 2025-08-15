@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { authService } from '../services/auth';
+import { supabase } from '../lib/supabaseClient';
+
 
 export function useAuth() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);

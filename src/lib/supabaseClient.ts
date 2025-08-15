@@ -1,30 +1,27 @@
 // src/lib/supabaseClient.ts
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
-// Read-only public browser client
-const url  = import.meta.env.VITE_SUPABASE_URL as string | undefined;
-const anon = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
+const url = import.meta.env.VITE_SUPABASE_URL;
+const anon = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-// Create the client once per browser tab (prevents duplicate GoTrue warnings)
-const getClient = (): SupabaseClient | null => {
-  if (!url || !anon) return null;
+export const supabase = createClient(url!, anon!, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true,
+  },
+});
 
-  // cache on globalThis to avoid re-creating
-  const g = globalThis as any;
-  if (!g.__SUPABASE__) {
-    g.__SUPABASE__ = createClient(url, anon, {
-      auth: {
-        autoRefreshToken: true,
-        persistSession: true,
-      },
-    });
-  }
-  return g.__SUPABASE__ as SupabaseClient;
-};
+// Simple health check the app can call before querying
+export const isConnected = () => Boolean(url && anon);
 
-export const supabase = getClient();
-
-/** Small helper the app can call before making requests */
-export function isConnected(): boolean {
-  return !!supabase;
-}
+/**
+ * DO NOT use service-role in the browser.
+ * This stub exists ONLY so legacy imports don't break bundling.
+ * Any call on it will throw at runtime.
+ */
+export const supabaseAdmin: SupabaseClient = new Proxy({} as SupabaseClient, {
+  get() {
+    throw new Error('supabaseAdmin is server-only. Call a Netlify Function instead.');
+  },
+}) as unknown as SupabaseClient;

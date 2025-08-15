@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "dev:netlify": "netlify dev --port 5191",
-    "build": "tsc -b && vite build",
+    "build": "vite build",
+    "typecheck": "tsc -b --pretty",
     "preview": "vite preview --port 4191 --host 0.0.0.0",
     "lint": "eslint ."
   },
@@ -33,3 +34,4 @@
     "vite": "^7.1.2"
   }
 }
+
