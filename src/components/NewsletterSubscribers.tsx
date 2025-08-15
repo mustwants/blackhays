@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { supabase, supabaseAdmin } from '../supabaseClient';
+import { supabase } from '../supabaseClient';
+import { supabaseAdmin } from '../../netlify/functions/_supabaseAdmin';
 import { RefreshCw, Download, Trash2, Upload, Edit2, Check, PauseCircle, X } from 'lucide-react';
 
 interface Subscriber {

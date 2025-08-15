@@ -26,7 +26,7 @@ const Hero = () => {
             </h1>
             
             <p className="mt-6 text-lg sm:text-xl text-white/90 leading-relaxed max-w-xl">
-              Established to provide affordable subscription-based knowledge about engaging US Defense, Intelligence Community, and other US Agencies. The experience and expertise to engage the US Government at the RIGHT time and in the RIGHT way.
+              Established to provide affordable fractional or subscription-based knowledge about engaging US Defense, Intelligence Community, and other US Agencies. The experience and expertise to engage the US Government at the RIGHT time and in the RIGHT way.
             </p>
             
             <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-4">
