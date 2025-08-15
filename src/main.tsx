@@ -67,7 +67,7 @@ if (root) {
   createRoot(root).render(
     <React.StrictMode>
       <ErrorBoundary>
-        <RouterProvider router={router} />
+      <RouterProvider router={router} future={{ v7_startTransition: true }} />
       </ErrorBoundary>
     </React.StrictMode>
   );
