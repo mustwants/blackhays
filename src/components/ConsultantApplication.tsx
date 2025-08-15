@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAdvisors } from '../hooks/useAdvisors';
 import { FileText, Upload, Check, Beaker } from 'lucide-react';
-import { supabase } from '../supabaseClient';
+import { supabase } from '../lib/supabaseClient';
 
 interface AdvisorApplicationForm {
   name: string;

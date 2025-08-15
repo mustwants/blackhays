@@ -3,7 +3,7 @@ import { Calendar, MapPin, Globe, Plus, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Footer from '../components/Footer';
 import AdminPanel from '../components/AdminPanel';
-import { supabase } from '../supabaseClient';
+import { supabase } from '../lib/supabaseClient';
 import EventMap from '../components/EventMap';
 import EventCalendar from '../components/EventCalendar';
 import EventDetailModal, { EventInfo } from '../components/EventDetailModal';

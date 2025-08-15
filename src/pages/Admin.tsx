@@ -1,6 +1,6 @@
 import LoginGate from '../components/LoginGate'
 import { useEffect, useMemo, useState } from 'react'
-import { supabase } from '../supabaseClient'
+import { supabase } from '../lib/supabaseClient'
 import type { Submission, SubmissionStatus } from '../types'
 
 export default function AdminPage() { return <LoginGate requireAdmin><AdminInner/></LoginGate> }

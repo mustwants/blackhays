@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Mail, Check, X, Beaker } from 'lucide-react';
-import { supabase } from '../supabaseClient';
+import { supabase } from '../lib/supabaseClient';
 
 interface NewsletterSignupProps {
   onClose?: () => void;

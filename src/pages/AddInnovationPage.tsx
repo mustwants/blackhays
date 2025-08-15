@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Brain, MapPin, Link2, Mail, Phone, Check, Briefcase, Clock, Beaker, Lightbulb, Upload } from 'lucide-react';
 import Footer from '../components/Footer';
 import AdminPanel from '../components/AdminPanel';
-import { supabase } from '../supabaseClient';
+import { supabase } from '../lib/supabaseClient';
 
 const AddInnovationPage = () => {
   const [showAdminPanel, setShowAdminPanel] = useState(false);

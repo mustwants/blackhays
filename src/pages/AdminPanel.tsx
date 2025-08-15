@@ -1,6 +1,6 @@
 // src/components/AdminPanel.tsx
 import React, { useEffect, useMemo, useState } from 'react';
-import { supabase } from '../supabaseClient';
+import { supabase } from '../lib/supabaseClient';
 import {
   CheckCircle2, Shield, RefreshCw, UserPlus, Loader2, AlertTriangle,
   XCircle, PauseCircle, PlayCircle, Pencil, Trash2, Search,

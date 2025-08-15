@@ -1,4 +1,4 @@
-import { supabase, isConnected } from '../supabaseClient';
+import { supabase, isConnected } from '../lib/supabaseClient';
 
 export interface MapAdvisor {
   id: string;
