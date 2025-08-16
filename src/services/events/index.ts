@@ -1,96 +1,133 @@
 // src/services/events/index.ts
-import { supabase, isConnected } from '../../lib/supabaseClient'
+import { supabase } from '../../lib/supabaseClient';
 
-export type EventStatus = 'pending' | 'approved' | 'paused' | 'rejected'
+export type EventStatus = 'pending' | 'approved' | 'rejected' | 'paused';
 
-export interface EventRecord {
-  id: string
-  name?: string // "events" table
-  title?: string // fallback
-  start_date?: string | null
-  end_date?: string | null
-  location?: string | null
-  website?: string | null
-  about?: string | null
-  status?: EventStatus | null
+export interface EventItem {
+  id: string;
+  name: string;
+  start_date: string; // ISO
+  end_date: string;   // ISO
+  location?: string | null;
+  website?: string | null;
+  about?: string | null;
+  source: 'events' | 'event_submissions';
+  status?: EventStatus; // submissions only
 }
 
-export interface CalendarEvent {
-  id: string
-  name: string
-  start_date: string
-  end_date: string
-  location?: string
-  website?: string
-  about?: string
-  status: EventStatus
-  source: 'events' | 'event_submissions'
-}
-
-function toName(r: EventRecord): string {
-  return (r.name ?? r.title ?? 'Untitled').trim()
-}
-
-function normalize(r: EventRecord, source: CalendarEvent['source']): CalendarEvent | null {
-  const start = r.start_date ? new Date(r.start_date) : null
-  const end = r.end_date ? new Date(r.end_date) : null
-  if (!start || !end || isNaN(start.getTime()) || isNaN(end.getTime())) return null
-
+function mapEventRow(row: any): EventItem {
   return {
-    id: r.id,
-    name: toName(r),
-    start_date: start.toISOString(),
-    end_date: end.toISOString(),
-    location: r.location ?? undefined,
-    website: r.website ?? undefined,
-    about: r.about ?? undefined,
-    status: (r.status ?? 'pending') as EventStatus,
-    source
-  }
+    id: row.id,
+    name: row.name ?? '',
+    start_date: row.start_date,
+    end_date: row.end_date,
+    location: row.location ?? null,
+    website: row.website ?? null,
+    about: row.about ?? row.description ?? null,
+    source: 'events'
+  };
 }
 
-export async function getUpcomingEvents(): Promise<CalendarEvent[]> {
-  if (!isConnected()) throw new Error('Supabase is not configured')
-
-  const nowIso = new Date().toISOString()
-
-  const [eventsRes, subsRes] = await Promise.all([
-    supabase.from('events')
-      .select('*')
-      .gte('end_date', nowIso),
-    supabase.from('event_submissions')
-      .select('*')
-      .in('status', ['approved', 'pending'])
-      .gte('end_date', nowIso)
-  ])
-
-  if (eventsRes.error) throw eventsRes.error
-  if (subsRes.error) throw subsRes.error
-
-  const normalized = [
-    ...(eventsRes.data ?? []).map(r => normalize(r as EventRecord, 'events')),
-    ...(subsRes.data ?? []).map(r => normalize(r as EventRecord, 'event_submissions'))
-  ].filter(Boolean) as CalendarEvent[]
-
-  // De-dup by (website || name+start_date)
-  const seen = new Set<string>()
-  const unique: CalendarEvent[] = []
-  for (const e of normalized) {
-    const key = e.website || `${e.name}|${e.start_date}`
-    if (!seen.has(key)) {
-      seen.add(key)
-      unique.push(e)
-    }
-  }
-
-  unique.sort((a, b) =>
-    new Date(a.start_date).getTime() - new Date(b.start_date).getTime()
-  )
-
-  return unique
+function mapSubmissionRow(row: any): EventItem {
+  return {
+    id: row.id,
+    name: row.name ?? '',
+    start_date: row.start_date,
+    end_date: row.end_date,
+    location: row.location ?? null,
+    website: row.website ?? null,
+    about: row.about ?? row.description ?? null,
+    source: 'event_submissions',
+    status: row.status as EventStatus
+  };
 }
 
 export const eventsService = {
-  getEvents: getUpcomingEvents,
-  getUpcomingEvents
-}
+  /** Public feed: upcoming approved submissions + curated events, deduped & sorted. */
+  async getUpcoming(): Promise<EventItem[]> {
+    const nowIso = new Date().toISOString();
+
+    const [eventsRes, subsRes] = await Promise.all([
+      supabase.from('events').select('*').gte('end_date', nowIso),
+      supabase
+        .from('event_submissions')
+        .select('*')
+        .in('status', ['approved', 'pending']) // pending can be shown in admin; hide from public in your UI if needed
+        .gte('end_date', nowIso)
+    ]);
+
+    if (eventsRes.error) throw new Error(eventsRes.error.message || 'Failed to fetch events');
+    if (subsRes.error) throw new Error(subsRes.error.message || 'Failed to fetch submissions');
+
+    const events = (eventsRes.data ?? []).map(mapEventRow);
+    const subs = (subsRes.data ?? []).map(mapSubmissionRow);
+
+    // Dedupe by (name + start_date)
+    const seen = new Set<string>();
+    const combined: EventItem[] = [];
+    [...events, ...subs].forEach((e) => {
+      const key = `${(e.name || '').toLowerCase()}|${e.start_date}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        combined.push(e);
+      }
+    });
+
+    combined.sort(
+      (a, b) =>
+        new Date(a.start_date).getTime() - new Date(b.start_date).getTime()
+    );
+
+    return combined;
+  },
+
+  /** Admin: update submission status (approve/pause/reject). */
+  async updateSubmissionStatus(id: string, status: EventStatus): Promise<void> {
+    const { error } = await supabase
+      .from('event_submissions')
+      .update({ status })
+      .eq('id', id);
+
+    if (error) throw new Error(error.message || 'Failed to update status');
+  },
+
+  /** Admin: delete a submission. */
+  async deleteSubmission(id: string): Promise<void> {
+    const { error } = await supabase
+      .from('event_submissions')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw new Error(error.message || 'Failed to delete submission');
+  },
+
+  /** Public submit: create a new event submission (defaults to pending). */
+  async createSubmission(payload: Partial<EventItem>): Promise<EventItem> {
+    const insert = {
+      ...payload,
+      status: (payload.status ?? 'pending') as EventStatus
+    };
+    const { data, error } = await supabase
+      .from('event_submissions')
+      .insert(insert)
+      .select()
+      .single();
+
+    if (error) throw new Error(error.message || 'Failed to create submission');
+    return mapSubmissionRow(data);
+  },
+
+  /** Admin curated: insert directly into events table. */
+  async createEvent(payload: Partial<EventItem>): Promise<EventItem> {
+    const { data, error } = await supabase
+      .from('events')
+      .insert(payload)
+      .select()
+      .single();
+
+    if (error) throw new Error(error.message || 'Failed to create event');
+    return mapEventRow(data);
+  }
+};
+
+export default eventsService;

@@ -8,7 +8,7 @@ import EventMap from '../components/EventMap';
 import EventCalendar from '../components/EventCalendar';
 import EventDetailModal, { EventInfo } from '../components/EventDetailModal';
 
-const EventsPage = () => {
+const EventsPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showAdminPanel, setShowAdminPanel] = useState(false);
   const [events, setEvents] = useState<EventInfo[]>([]);
@@ -20,94 +20,87 @@ const EventsPage = () => {
 
   useEffect(() => {
     fetchEvents();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchEvents = async () => {
     setLoading(true);
     try {
-      // Get approved events from both tables
+      // Pull from both sources; show approved submissions + curated events
       const [approvedSubmissionsResult, eventsResult] = await Promise.all([
         supabase
           .from('event_submissions')
           .select('*')
           .eq('status', 'approved')
           .order('start_date', { ascending: true }),
-        
         supabase
           .from('events')
           .select('*')
           .order('start_date', { ascending: true })
       ]);
-      
-      // Handle errors in both requests
+
       if (approvedSubmissionsResult.error) {
-        console.error("Error fetching approved submissions:", approvedSubmissionsResult.error);
+        console.error('Error fetching approved submissions:', approvedSubmissionsResult.error);
       }
-      
       if (eventsResult.error) {
-        console.error("Error fetching events:", eventsResult.error);
+        console.error('Error fetching events:', eventsResult.error);
       }
-      
+
       let allEvents: EventInfo[] = [];
-      
-      // Add approved submissions
       if (approvedSubmissionsResult.data) {
-        allEvents = [...allEvents, ...(approvedSubmissionsResult.data as EventInfo[])];
+        allEvents = allEvents.concat(approvedSubmissionsResult.data as EventInfo[]);
       }
-      
-      // Add events
       if (eventsResult.data) {
-        allEvents = [...allEvents, ...(eventsResult.data as EventInfo[])];
+        allEvents = allEvents.concat(eventsResult.data as EventInfo[]);
       }
-      
-      // Remove duplicates
-      const uniqueMap = new Map();
-      allEvents.forEach(event => {
-        const key = `${event.name}|${event.start_date}|${event.location}`;
-        uniqueMap.set(key, event);
-      });
-      
+
+      // De-dupe by name + start_date + location
+      const uniqueMap = new Map<string, EventInfo>();
+      for (const ev of allEvents) {
+        const key = `${(ev.name ?? '').trim()}|${ev.start_date ?? ''}|${(ev.location ?? '').trim()}`;
+        if (!uniqueMap.has(key)) uniqueMap.set(key, ev);
+      }
       const uniqueEvents = Array.from(uniqueMap.values());
-      
-      // Sort by start date
-      uniqueEvents.sort((a, b) => new Date(a.start_date) - new Date(b.start_date));
-      
-      // Filter out past events
-      const now = new Date();
-      const futureEvents = uniqueEvents.filter(event => new Date(event.start_date) >= now);
-      
+
+      // Sort ascending by start date
+      uniqueEvents.sort(
+        (a, b) =>
+          new Date(a.start_date ?? '').getTime() - new Date(b.start_date ?? '').getTime()
+      );
+
+      // Only show upcoming
+      const now = Date.now();
+      const futureEvents = uniqueEvents.filter(
+        (ev) => new Date(ev.start_date ?? '').getTime() >= now
+      );
+
       setEvents(futureEvents);
-      
-      if (futureEvents.length === 0) {
-        setError("No upcoming events found.");
-      }
-    } catch (err) {
-      console.error("Error fetching events:", err);
-      setError("Failed to load events. Please try again later.");
+      setError(futureEvents.length === 0 ? 'No upcoming events found.' : null);
+    } catch (e) {
+      console.error('Error fetching events:', e);
+      setError('Failed to load events. Please try again later.');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleAdminClick = () => {
-    setShowAdminPanel(true);
-  };
-
+  const handleAdminClick = () => setShowAdminPanel(true);
   const handleCloseAdminPanel = () => {
     setShowAdminPanel(false);
-    // Refresh events after closing admin panel
     fetchEvents();
   };
 
-  // Filter events based on search term
-  const filteredEvents = events.filter(event => 
-    event.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    event.location?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredEvents = events.filter((ev) => {
+    const q = searchTerm.toLowerCase();
+    return (
+      (ev.name ?? '').toLowerCase().includes(q) ||
+      (ev.location ?? '').toLowerCase().includes(q)
+    );
+  });
 
   return (
     <div className="pt-20 min-h-screen bg-white">
-      {/* Hero Section */}
+      {/* Hero */}
       <div className="bg-black text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-4xl font-bold mb-4">Defense & Intelligence Events</h1>
@@ -117,12 +110,12 @@ const EventsPage = () => {
         </div>
       </div>
 
-      {/* Search and Filter Bar */}
+      {/* Search & Actions */}
       <div className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0 md:space-x-4">
             <div className="relative flex-1 max-w-lg">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
                 type="text"
                 placeholder="Search events by name or location..."
@@ -139,7 +132,8 @@ const EventsPage = () => {
               Submit Event
             </button>
           </div>
-                    <div className="flex justify-center mt-4 space-x-2">
+
+          <div className="flex justify-center mt-4 space-x-2">
             <button
               onClick={() => setViewMode('list')}
               className={`px-4 py-2 rounded-lg border ${
@@ -174,21 +168,21 @@ const EventsPage = () => {
         </div>
       </div>
 
-      {/* Events Content */}
+      {/* Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {error && (
           <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded mb-6">
             <p>{error}</p>
           </div>
         )}
-        
+
         {loading ? (
           <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-bhred mx-auto"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-bhred mx-auto" />
             <p className="mt-4 text-gray-600">Loading events...</p>
           </div>
         ) : filteredEvents.length > 0 ? (
-            viewMode === 'list' ? (
+          viewMode === 'list' ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {filteredEvents.map((event, index) => (
                 <div
@@ -210,34 +204,32 @@ const EventsPage = () => {
                     <div className="space-y-2 mb-4">
                       <div className="flex items-center text-bhgray-600">
                         <Calendar className="w-5 h-5 mr-2" />
-                        {new Date(event.start_date).toLocaleDateString()} -
+                        {new Date(event.start_date).toLocaleDateString()} –{' '}
                         {new Date(event.end_date).toLocaleDateString()}
                       </div>
                       <div className="flex items-center text-bhgray-600">
                         <MapPin className="w-5 h-5 mr-2" />
                         {event.location}
                       </div>
-                    {event.about && (
-                      <p className="text-bhgray-600 mb-6">
-                        {event.about}
-                      </p>
-                    )}
-                    {event.website && (
-                      <a
-                        href={event.website}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center text-bhred hover:text-red-700"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <Globe className="w-4 h-4 mr-1" />
-                        Visit Website
-                      </a>
-                    )}
+                      {event.about && (
+                        <p className="text-bhgray-600 mb-6">{event.about}</p>
+                      )}
+                      {event.website && (
+                        <a
+                          href={event.website}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center text-bhred hover:text-red-700"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <Globe className="w-4 h-4 mr-1" />
+                          Visit Website
+                        </a>
+                      )}
+                    </div>
                   </div>
-                  </div>
-                  </div>
-                            ))}
+                </div>
+              ))}
             </div>
           ) : viewMode === 'map' ? (
             <EventMap events={filteredEvents} onSelectEvent={setSelectedEvent} />
@@ -247,14 +239,24 @@ const EventsPage = () => {
         ) : (
           <div className="text-center py-12">
             <p className="text-gray-600">
-              {searchTerm ? 'No events found matching your search.' : 'No upcoming events found.'}
+              {searchTerm
+                ? 'No events found matching your search.'
+                : 'No upcoming events found.'}
             </p>
           </div>
         )}
       </div>
 
       <Footer onAdminClick={handleAdminClick} />
+
       {showAdminPanel && <AdminPanel onClose={handleCloseAdminPanel} />}
+
+      {selectedEvent && (
+        <EventDetailModal
+          event={selectedEvent}
+          onClose={() => setSelectedEvent(null)}
+        />
+      )}
     </div>
   );
 };

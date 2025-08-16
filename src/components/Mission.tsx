@@ -15,7 +15,7 @@ const Mission = () => {
         'Align with federal budget cycles',
         'Optimize proposal submissions',
         'Maximize funding opportunities',
-        'Reduce time-to-market by 6-8 months'
+        'Reduction in Advisor/BD Costs'
       ],
       stat: { value: '40-60%', label: 'Cost Reduction' },
       gradient: 'from-blue-600 to-blue-700'
@@ -32,7 +32,7 @@ const Mission = () => {
         'Stakeholder communication',
         'Impact demonstration'
       ],
-      stat: { value: '85%', label: 'Success Rate' },
+      stat: { value: '$250M+', label: 'in Awards' },
       gradient: 'from-purple-600 to-purple-700'
     },
     {
@@ -47,7 +47,7 @@ const Mission = () => {
         'Contract vehicle selection',
         'Technology transition planning'
       ],
-      stat: { value: '500+', label: 'Partner Network' },
+      stat: { value: '200+', label: 'Partner Network' },
       gradient: 'from-green-600 to-green-700'
     }
   ];
@@ -125,7 +125,7 @@ const Mission = () => {
 
                 {/* CTA */}
                 <a
-                  href="https://calendly.com/blackhaysgroup"
+                  href="https://tidycal.com/blackhays"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="group inline-flex items-center w-full justify-center px-6 py-3 bg-gray-900 text-white rounded-xl hover:bg-bhred transition-all duration-300 font-semibold"
@@ -150,7 +150,7 @@ const Mission = () => {
               </p>
             </div>
             <a
-              href="https://calendly.com/blackhaysgroup"
+              href="https://tidycal.com/blackhays"
               target="_blank"
               rel="noopener noreferrer"
               className="flex-shrink-0 inline-flex items-center px-8 py-4 bg-bhred text-white rounded-xl hover:bg-red-700 transition-colors font-semibold whitespace-nowrap"
