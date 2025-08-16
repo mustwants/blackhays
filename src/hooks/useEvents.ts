@@ -1,69 +1,41 @@
-import { useState, useEffect } from 'react';
-import { eventService, Event, EventSubmission } from '../services/events';
+// src/hooks/useEvents.ts
+import { useEffect, useState, useCallback } from 'react';
+import { eventsService } from '../services/events'; // NOTE: plural export
+
+export type { Event, EventSubmission } from '../services/events';
+
+type State<T> = {
+  data: T;
+  loading: boolean;
+  error: string | null;
+};
 
 export function useEvents() {
-  const [events, setEvents] = useState<Event[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+  const [state, setState] = useState<State<Awaited<ReturnType<typeof eventsService.getEvents>>>>({
+    data: [],
+    loading: true,
+    error: null,
+  });
 
-  useEffect(() => {
-    fetchEvents();
+  const load = useCallback(async () => {
+    setState(s => ({ ...s, loading: true, error: null }));
+    try {
+      const data = await eventsService.getEvents();
+      setState({ data, loading: false, error: null });
+    } catch (err: unknown) {
+      const msg = (err as { message?: string })?.message ?? 'Failed to load events';
+      setState({ data: [], loading: false, error: msg });
+    }
   }, []);
 
-  const fetchEvents = async () => {
-    setIsLoading(true);
-    try {
-      const { data, error } = await eventService.getEvents();
-      if (error) throw error;
-      setEvents(data || []);
-    } catch (err) {
-      console.error('Error fetching events:', err);
-      setError(err as Error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const submitEvent = async (submission: Omit<EventSubmission, 'status'>): Promise<{ data: EventSubmission | null; error: Error | null }> => {
-    try {
-      const { data, error } = await eventService.submitEvent(submission);
-      if (error) throw error;
-      await fetchEvents(); // Refresh events list
-      return { data, error: null };
-    } catch (err) {
-      return { data: null, error: err as Error };
-    }
-  };
-
-  const deleteEvent = async (id: string): Promise<{ error: Error | null }> => {
-    try {
-      const { error } = await eventService.deleteEvent(id);
-      if (error) throw error;
-      await fetchEvents(); // Refresh events list
-      return { error: null };
-    } catch (err) {
-      return { error: err as Error };
-    }
-  };
-
-  const updateEventStatus = async (id: string, status: 'approved' | 'rejected' | 'paused'): Promise<{ error: Error | null }> => {
-    try {
-      const { error } = await eventService.updateEventStatus(id, status);
-      if (error) throw error;
-      await fetchEvents(); // Refresh events list
-      return { error: null };
-    } catch (err) {
-      return { error: err as Error };
-    }
-  };
+  useEffect(() => {
+    void load();
+  }, [load]);
 
   return {
-    events,
-    isLoading,
-    error,
-    submitEvent,
-    deleteEvent,
-    updateEventStatus,
-    refreshEvents: fetchEvents
+    events: state.data,
+    loading: state.loading,
+    error: state.error,
+    refresh: load,
   };
 }
